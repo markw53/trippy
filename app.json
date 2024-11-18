@@ -1,0 +1,16 @@
+{
+    "expo": {
+      "name": "Trippy",
+      "slug": "Trippy",
+      "ios": {
+        "bundleIdentifier": "com.southcoders.trippy"
+      },
+      "android": {
+        "package": "com.yourname.holidayplanner"
+      },
+      "web": {
+        "favicon": "./assets/favicon.png"
+      }
+    }
+  }
+  
