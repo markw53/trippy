@@ -1,25 +1,11 @@
-import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import React from "react";
+import { AuthProvider } from "./AuthContext";
+import MainApp from "./MainApp";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Hello, World!</Text>
-    </View>
+    <AuthProvider>
+      <MainApp />
+    </AuthProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white', 
-  },
-  text: {
-    color: 'black', 
-    fontSize: 20,
-  },
-});
-
-

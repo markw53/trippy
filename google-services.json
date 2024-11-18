@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "405488491571",
+    "project_id": "trippy-holiday-app",
+    "storage_bucket": "trippy-holiday-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:405488491571:android:8ed59f55b373d6128b5746",
+        "android_client_info": {
+          "package_name": "com.southcoders.trippy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "405488491571-ndrjlmif4tjevj8d4c2bslhfuivck8cr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLQrWw1gclPU4qdgvef4FAGC2WkTlU0iw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "405488491571-ndrjlmif4tjevj8d4c2bslhfuivck8cr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "405488491571-e26mbjr6r1ggltqh35tu37ebiflpke76.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.southcoders.trippy"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
