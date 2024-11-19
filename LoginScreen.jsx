@@ -17,9 +17,16 @@ export default function LoginScreen() {
       .catch((err) => setError(err.message));
   };
 
+  const handleSignUp = () => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(() => console.log("Account created successfully"))
+      .catch((err) => setError(err.message));
+  };
+
   const handleGuestLogin = () => {
     const guestEmail = "guest@example.com";
     const guestPassword = "trippy";
+
     signInWithEmailAndPassword(auth, guestEmail, guestPassword)
       .then(() => console.log("Guest logged in successfully"))
       .catch((err) => setError(err.message));
@@ -54,6 +61,13 @@ export default function LoginScreen() {
           title="Log In"
           onPress={handleLogin}
           style={styles.loginButton}
+          textStyle={styles.buttonText}
+        />
+
+        <RoundedButton
+          title="Sign Up"
+          onPress={handleSignUp}
+          style={styles.signupButton}
           textStyle={styles.buttonText}
         />
 
@@ -94,7 +108,13 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: "#24565C",
     borderRadius: 10,
-    marginVertical: 20,
+    marginVertical: 10,
+    paddingVertical: 10,
+  },
+  signupButton: {
+    backgroundColor: "#4A90E2", // Different color for distinction
+    borderRadius: 10,
+    marginVertical: 10,
     paddingVertical: 10,
   },
   buttonText: {
