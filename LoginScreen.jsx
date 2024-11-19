@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import RoundedButton from "./src/components/Button";
 import Header from "./src/components/Header";
 import Footer from "./src/components/Footer";
@@ -34,10 +41,8 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <Header title="Trippy" />
 
-      {/* Main Content */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.inputContainer}>
           <TextInput
@@ -56,7 +61,6 @@ export default function LoginScreen() {
           {error ? <Text style={styles.error}>{error}</Text> : null}
         </View>
 
-        {/* Buttons */}
         <RoundedButton
           title="Log In"
           onPress={handleLogin}
@@ -71,14 +75,12 @@ export default function LoginScreen() {
           textStyle={styles.buttonText}
         />
 
-        {/* Guest Login */}
         <TouchableOpacity onPress={handleGuestLogin} style={styles.guestLink}>
           <Text style={styles.guestText}>Sign in as Guest</Text>
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Footer */}
-      <Footer text="© 2024 Trippy Holiday Planner" style={styles.footer} />
+      <Footer text="© 2024 Trippy Holiday Planner" />
     </View>
   );
 }
@@ -112,7 +114,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   signupButton: {
-    backgroundColor: "#4A90E2", // Different color for distinction
+    backgroundColor: "#4A90E2",
     borderRadius: 10,
     marginVertical: 10,
     paddingVertical: 10,
@@ -136,9 +138,5 @@ const styles = StyleSheet.create({
     color: "red",
     marginBottom: 10,
     textAlign: "center",
-  },
-  footer: {
-    marginTop: 20,
-    alignSelf: "stretch", // Ensures the footer spans the full width
   },
 });
