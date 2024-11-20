@@ -1,10 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const Card = ({ title, content, style }) => {
+const Card = ({ title, content, style, time }) => {
   return (
     <View style={[styles.card, style]}>
       {title && <Text style={styles.title}>{title}</Text>}
+      {time && <Text style={styles.time}> {time}</Text>}
       {content && <Text style={styles.content}>{content}</Text>}
     </View>
   );
@@ -29,6 +30,11 @@ const styles = StyleSheet.create({
   },
   content: {
     fontSize: 14
+  },
+  time: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: "right",
   }
 });
 
