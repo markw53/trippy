@@ -3,10 +3,10 @@
       "name": "Trippy",
       "slug": "Trippy",
       "ios": {
-        "bundleIdentifier": "com.southcoders.trippy"
+        "bundleIdentifier": "com.southcoders.trippy-app"
       },
       "android": {
-        "package": "com.yourname.holidayplanner"
+        "package": "com.southcoders.trippy.app"
       },
       "web": {
         "favicon": "./assets/favicon.png"

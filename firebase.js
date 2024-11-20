@@ -8,13 +8,12 @@ import { getAuth } from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyC_RmP8KhvEy38FhWVNod42r2uE8Smow24",
-  authDomain: "trippy-holiday-app.firebaseapp.com",
-  projectId: "trippy-holiday-app",
-  storageBucket: "trippy-holiday-app.firebasestorage.app",
-  messagingSenderId: "405488491571",
-  appId: "1:405488491571:web:5ab8c92445794fcf8b5746",
-  measurementId: "G-RC2K2G5XV8"
+  apiKey: "AIzaSyDiZ_iCqgBO3YgmLBwDwjCNITNI6W9uduk",
+  authDomain: "trippy-holiday-planner.firebaseapp.com",
+  projectId: "trippy-holiday-planner",
+  storageBucket: "trippy-holiday-planner.firebasestorage.app",
+  messagingSenderId: "798714188657",
+  appId: "1:798714188657:web:92a2419f27bcfc17b7dcd0"
 };
 
 // Initialize Firebase

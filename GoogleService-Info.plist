@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>405488491571-e26mbjr6r1ggltqh35tu37ebiflpke76.apps.googleusercontent.com</string>
+	<string>798714188657-rd2894ucj6o27f2s47v1019i3o5silc4.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.405488491571-e26mbjr6r1ggltqh35tu37ebiflpke76</string>
+	<string>com.googleusercontent.apps.798714188657-rd2894ucj6o27f2s47v1019i3o5silc4</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDb-jfKFZHri2c1ocjT8ajGU7f35r5CF2o</string>
+	<string>AIzaSyAga29SlvpteJaHpJQH72sE9JQ68v7Fn1c</string>
 	<key>GCM_SENDER_ID</key>
-	<string>405488491571</string>
+	<string>798714188657</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.southcoders.trippy</string>
+	<string>com.southcoders.trippy-app</string>
 	<key>PROJECT_ID</key>
-	<string>trippy-holiday-app</string>
+	<string>trippy-holiday-planner</string>
 	<key>STORAGE_BUCKET</key>
-	<string>trippy-holiday-app.firebasestorage.app</string>
+	<string>trippy-holiday-planner.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:405488491571:ios:e1bc02bf1441728f8b5746</string>
+	<string>1:798714188657:ios:0713422a0ab57b90b7dcd0</string>
 </dict>
 </plist>
