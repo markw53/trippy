@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
 
 export default function HomeScreen() {
   return (
@@ -10,7 +9,6 @@ export default function HomeScreen() {
       <View style={styles.content}>
         <Text style={styles.text}>Welcome to the Home Screen!</Text>
       </View>
-      <Footer text="© 2024 Trippy Holiday Planner" />
     </View>
   );
 }
