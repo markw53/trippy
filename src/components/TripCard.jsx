@@ -1,7 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const TripCard = ({ tripName, tripImage, onPress }) => {
+  const navigation = useNavigation();
+
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
       <Image
