@@ -31,6 +31,11 @@ const Header = ({ title, style, textStyle }) => {
     navigation.navigate("Chat");
   };
 
+  const handleNavigateToItinerary = () => {
+    toggleMenu();
+    navigation.navigate("Itinerary"); 
+  };
+
   return (
     <View style={[styles.header, style]}>
       <Text style={[styles.title, textStyle]}>{title}</Text>
@@ -46,7 +51,7 @@ const Header = ({ title, style, textStyle }) => {
        >
         <View style={styles.modalOverlay}>
           <View style={styles.menu}>
-            <Button title="Itinerary" onPress={() => alert("Itinerary pressed")} />
+            <Button title="Itinerary" onPress={handleNavigateToItinerary} />
             <Button title="Chat" onPress={handleNavigateToChat} />
             <Button title="Logout" onPress={handleLogout} />
             <Button title="Close" onPress={toggleMenu} />

@@ -11,15 +11,15 @@ import HomeScreen from "./src/screens/HomeScreen";
 import WeatherScreen from "./src/screens/WeatherScreen";
 import UserScreen from "./src/screens/UserScreen";
 import ChatScreen from "./src/screens/ChatScreen";
+import ItineraryScreen from "./src/screens/ItineraryScreen";
 import Header from "./src/components/Header";
 
 export default function MainApp() {
-  const { user } = useAuth(); // Get the authenticated user from AuthContext
+  const { user } = useAuth(); 
   const Tab = createBottomTabNavigator();
   const Stack = createStackNavigator();
 
   if (!user) {
-    // If the user is not logged in, show the LoginScreen
     return (
       <NavigationContainer>
         <LoginScreen />
@@ -27,12 +27,11 @@ export default function MainApp() {
     );
   }
 
-  // If the user is logged in, show the bottom tab navigator
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Tabs">
-          {() =>
+          {() => (
             <Tab.Navigator
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
@@ -53,12 +52,12 @@ export default function MainApp() {
                 tabBarStyle: {
                   backgroundColor: "#CCD6D5",
                   borderTopWidth: 0,
-                  height: 70
+                  height: 70,
                 },
                 tabBarLabelStyle: {
                   fontSize: 12,
                   fontWeight: "bold",
-                  color: "#24565C"
+                  color: "#24565C",
                 },
                 headerShown: false,
               })}
@@ -66,8 +65,12 @@ export default function MainApp() {
               <Tab.Screen name="Home" component={HomeScreen} />
               <Tab.Screen name="Weather" component={WeatherScreen} />
               <Tab.Screen name="User" component={UserScreen} />
-            </Tab.Navigator>}
+            </Tab.Navigator>
+          )}
         </Stack.Screen>
+
+        <Stack.Screen name="Itinerary" component={ItineraryScreen} />
+        
         <Stack.Screen name="Chat" component={ChatScreen} />
       </Stack.Navigator>
     </NavigationContainer>
