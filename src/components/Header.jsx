@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Button } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { auth } from "../../firebase"; // Adjust path as needed
+import { auth } from "../../firebase"; 
 import { signOut } from "firebase/auth";
-import { useAuth } from "../../AuthContext"; // Ensure you're using your AuthContext here
+import { useAuth } from "../../AuthContext"; 
+import { useNavigation } from "@react-navigation/native";
 
 const Header = ({ title, style, textStyle }) => {
   const [menuVisible, setMenuVisible] = useState(false);
-  const { setUser } = useAuth(); // Add this to update the auth context on logout
+  const { setUser } = useAuth(); 
+  const navigation = useNavigation();
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -16,12 +18,17 @@ const Header = ({ title, style, textStyle }) => {
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
-        setUser(null); // Reset the user in the AuthContext
+        setUser(null); 
         console.log("User logged out");
       })
       .catch((error) => {
         console.error("Error logging out:", error);
       });
+  };
+
+  const handleNavigateToChat = () => {
+    toggleMenu();
+    navigation.navigate("Chat");
   };
 
   return (
@@ -31,11 +38,16 @@ const Header = ({ title, style, textStyle }) => {
         <Ionicons name="menu" size={30} color="#fff" />
       </TouchableOpacity>
 
-      <Modal visible={menuVisible} transparent={true} animationType="fade" onRequestClose={toggleMenu}>
+      <Modal
+       visible={menuVisible} 
+       transparent={true} 
+       animationType="fade" 
+       onRequestClose={toggleMenu}
+       >
         <View style={styles.modalOverlay}>
           <View style={styles.menu}>
             <Button title="Itinerary" onPress={() => alert("Itinerary pressed")} />
-            <Button title="Chat" onPress={() => alert("Chat pressed")} />
+            <Button title="Chat" onPress={handleNavigateToChat} />
             <Button title="Logout" onPress={handleLogout} />
             <Button title="Close" onPress={toggleMenu} />
           </View>
@@ -49,7 +61,7 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
     marginTop: 0,
-    paddingTop: 55,
+    paddingTop: 40,
     paddingBottom: 20,
     paddingHorizontal: 20,
     backgroundColor: "#24565C",
