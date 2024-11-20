@@ -43,9 +43,14 @@ export default function MainApp() {
           tabBarActiveTintColor: "#24565C",
           tabBarInactiveTintColor: "gray",
           tabBarStyle: {
-            backgroundColor: "#F7F7F7",
-            borderTopWidth: 1,
-            borderColor: "#ccc",
+            backgroundColor: "#CCD6D5",
+            borderTopWidth: 0,
+            height: 70,
+          },
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight:"bold",
+            color: "#24565C",
           },
         })}
       >
