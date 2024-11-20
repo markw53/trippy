@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@expo/metro-runtime": "~4.0.0",
+    "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/bottom-tabs": "^7.0.6",
     "@react-navigation/native": "^7.0.3",
     "@react-navigation/stack": "^7.0.5",
@@ -18,7 +19,6 @@
     "react-native-screens": "~4.1.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
-    "undefined": "expo-auth-session/providers/google",
-    "@react-native-async-storage/async-storage": "1.23.1"
+    "undefined": "expo-auth-session/providers/google"
   }
 }
