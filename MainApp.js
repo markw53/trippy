@@ -3,11 +3,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useAuth } from "./AuthContext";
+import { SafeAreaView } from "react-native";
 
 import LoginScreen from "./LoginScreen";
 import HomeScreen from "./src/screens/HomeScreen";
 import WeatherScreen from "./src/screens/WeatherScreen";
 import UserScreen from "./src/screens/UserScreen";
+import Header from "./src/components/Header";
 
 export default function MainApp() {
   const { user } = useAuth(); // Get the authenticated user from AuthContext
@@ -52,6 +54,7 @@ export default function MainApp() {
             fontWeight:"bold",
             color: "#24565C",
           },
+          headerShown: false,
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />

@@ -5,7 +5,7 @@ import Header from "../components/Header";
 export default function WeatherScreen() {
   return (
     <View style={styles.container}>
-      <Header title="Trippy - Weather" />
+      <Header title="Trippy" />
       <View style={styles.content}>
         <Text style={styles.text}>Weather Forecast Coming Soon!</Text>
       </View>
