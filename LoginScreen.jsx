@@ -41,8 +41,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="Trippy" />
-
+      
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.inputContainer}>
           <TextInput
