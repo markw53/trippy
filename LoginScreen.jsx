@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import RoundedButton from "./src/components/Button";
-import Header from "./src/components/Header";
 import Footer from "./src/components/Footer";
 import { auth } from "./firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
@@ -41,9 +40,10 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="Trippy" />
-
+      
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.appName}>Trippy</Text>
+        <Text style={styles.tagline}>Addicted to Travelling</Text>
         <View style={styles.inputContainer}>
           <TextInput
             placeholder="Email"
@@ -94,6 +94,21 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: 20,
+  },
+  appName: {
+    fontSize: 50,
+    fontFamily: "Gabriola", 
+    fontWeight: "bold",
+    color: "#24565C", 
+    textAlign: "center",
+    marginVertical: 20,
+  },
+  tagline: {
+    fontSize: 16,
+    fontFamily: "Gabriola", 
+    color: "#24565C", 
+    textAlign: "center",
+    marginBottom: 30,
   },
   inputContainer: {
     marginVertical: 30,

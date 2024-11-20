@@ -1,63 +1,109 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useAuth } from "./AuthContext";
+import { SafeAreaView } from "react-native";
 
 import LoginScreen from "./LoginScreen";
 import HomeScreen from "./src/screens/HomeScreen";
 import WeatherScreen from "./src/screens/WeatherScreen";
 import UserScreen from "./src/screens/UserScreen";
+import ChatScreen from "./src/screens/ChatScreen";
+import ItineraryScreen from "./src/screens/ItineraryScreen";
+import Header from "./src/components/Header";
 
 export default function MainApp() {
-  const { user } = useAuth(); // Get the authenticated user from AuthContext
+  const { user } = useAuth();
   const Tab = createBottomTabNavigator();
+  const Stack = createStackNavigator();
 
   if (!user) {
-    // If the user is not logged in, show the LoginScreen
     return (
       <NavigationContainer>
-        <LoginScreen />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={LoginScreen} />
+        </Stack.Navigator>
       </NavigationContainer>
     );
   }
 
-  // If the user is logged in, show the bottom tab navigator
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Tabs">
+          {() =>
+            <Tab.Navigator
+              screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused, color, size }) => {
+                  let iconName;
 
-            if (route.name === "Home") {
-              iconName = focused ? "home" : "home-outline";
-            } else if (route.name === "Weather") {
-              iconName = focused ? "cloud" : "cloud-outline";
-            } else if (route.name === "User") {
-              iconName = focused ? "person" : "person-outline";
-            }
+                  if (route.name === "Home") {
+                    iconName = focused ? "home" : "home-outline";
+                  } else if (route.name === "Weather") {
+                    iconName = focused ? "cloud" : "cloud-outline";
+                  } else if (route.name === "User") {
+                    iconName = focused ? "person" : "person-outline";
+                  }
 
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: "#24565C",
-          tabBarInactiveTintColor: "gray",
-          tabBarStyle: {
-            backgroundColor: "#CCD6D5",
-            borderTopWidth: 0,
-            height: 70,
-          },
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight:"bold",
-            color: "#24565C",
-          },
-        })}
-      >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Weather" component={WeatherScreen} />
-        <Tab.Screen name="User" component={UserScreen} />
-      </Tab.Navigator>
+                  return <Ionicons name={iconName} size={size} color={color} />;
+                },
+                tabBarActiveTintColor: "#24565C",
+                tabBarInactiveTintColor: "gray",
+                tabBarStyle: {
+                  backgroundColor: "#CCD6D5",
+                  borderTopWidth: 0,
+                  height: 70
+                },
+                tabBarLabelStyle: {
+                  fontSize: 12,
+                  fontWeight: "bold",
+                  color: "#24565C"
+                },
+                headerShown: false
+              })}
+            >
+              <Tab.Screen
+                name="Home"
+                component={HomeScreen}
+                options={{
+                  header: () => <Header title="Home" />
+                }}
+              />
+              <Tab.Screen
+                name="Weather"
+                component={WeatherScreen}
+                options={{
+                  header: () => <Header title="Weather" />
+                }}
+              />
+              <Tab.Screen
+                name="User"
+                component={UserScreen}
+                options={{
+                  header: () => <Header title="User" />
+                }}
+              />
+            </Tab.Navigator>}
+        </Stack.Screen>
+
+        <Stack.Screen
+          name="Itinerary"
+          component={ItineraryScreen}
+          options={{
+            header: () => <Header title="Itinerary" />
+          }}
+        />
+
+        <Stack.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{
+            header: () => <Header title="Chat" />
+          }}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
