@@ -15,14 +15,16 @@ import ItineraryScreen from "./src/screens/ItineraryScreen";
 import Header from "./src/components/Header";
 
 export default function MainApp() {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
   const Tab = createBottomTabNavigator();
   const Stack = createStackNavigator();
 
   if (!user) {
     return (
       <NavigationContainer>
-        <LoginScreen />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={LoginScreen} />
+        </Stack.Navigator>
       </NavigationContainer>
     );
   }
@@ -31,7 +33,7 @@ export default function MainApp() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Tabs">
-          {() => (
+          {() =>
             <Tab.Navigator
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
@@ -52,26 +54,55 @@ export default function MainApp() {
                 tabBarStyle: {
                   backgroundColor: "#CCD6D5",
                   borderTopWidth: 0,
-                  height: 70,
+                  height: 70
                 },
                 tabBarLabelStyle: {
                   fontSize: 12,
                   fontWeight: "bold",
-                  color: "#24565C",
+                  color: "#24565C"
                 },
-                headerShown: false,
+                headerShown: false
               })}
             >
-              <Tab.Screen name="Home" component={HomeScreen} />
-              <Tab.Screen name="Weather" component={WeatherScreen} />
-              <Tab.Screen name="User" component={UserScreen} />
-            </Tab.Navigator>
-          )}
+              <Tab.Screen
+                name="Home"
+                component={HomeScreen}
+                options={{
+                  header: () => <Header title="Home" />
+                }}
+              />
+              <Tab.Screen
+                name="Weather"
+                component={WeatherScreen}
+                options={{
+                  header: () => <Header title="Weather" />
+                }}
+              />
+              <Tab.Screen
+                name="User"
+                component={UserScreen}
+                options={{
+                  header: () => <Header title="User" />
+                }}
+              />
+            </Tab.Navigator>}
         </Stack.Screen>
 
-        <Stack.Screen name="Itinerary" component={ItineraryScreen} />
-        
-        <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen
+          name="Itinerary"
+          component={ItineraryScreen}
+          options={{
+            header: () => <Header title="Itinerary" />
+          }}
+        />
+
+        <Stack.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{
+            header: () => <Header title="Chat" />
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
