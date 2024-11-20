@@ -16,17 +16,17 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F7F7",
+    backgroundColor: "#F7F7F7"
   },
   content: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 20
   },
   text: {
     fontSize: 24,
     color: "#24565C",
-    fontWeight: "bold",
-  },
+    fontWeight: "bold"
+  }
 });

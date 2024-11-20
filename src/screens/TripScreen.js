@@ -23,10 +23,11 @@ const TripScreen = () => {
           <Text>17C</Text>
           <Image
             source={{
-              uri: "https://i.pinimg.com/736x/f1/83/cc/f183ccd0f8be3477c28d4104dc836a97.jpg",
+              uri:
+                "https://i.pinimg.com/736x/f1/83/cc/f183ccd0f8be3477c28d4104dc836a97.jpg",
               width: 50,
               height: 50,
-              alignItems: "right",
+              alignItems: "right"
             }}
           />
         </View>
@@ -58,42 +59,42 @@ const TripScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F7F7",
+    backgroundColor: "#F7F7F7"
   },
   scrollContainer: {
     padding: 0,
-    flexGrow: 1,
+    flexGrow: 1
   },
   section: {
     marginTop: 40,
-    marginBottom: 24,
+    marginBottom: 24
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 8
   },
   button: {
     paddingHorizontal: 40,
-    marginHorizontal: "auto",
+    marginHorizontal: "auto"
   },
   date: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 8,
-    textAlign: "center",
+    textAlign: "center"
   },
   image: {
     alignSelf: "flex-end",
-    marginRight: 20,
+    marginRight: 20
   },
   tabs: {
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   footer: {
-    margin: 0,
-  },
+    margin: 0
+  }
 });
 
 export default TripScreen;
