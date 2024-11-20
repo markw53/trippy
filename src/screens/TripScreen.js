@@ -1,6 +1,6 @@
 import React from "react";
-import Button from "../components/Button";
 import { View, ScrollView, Text, Image, StyleSheet } from "react-native";
+import Button from "../components/Button";
 import Header from "../components/Header";
 import Card from "../components/Card";
 
@@ -12,7 +12,8 @@ const handlePossibility = () => {
   console.log("pressed possibility");
 };
 
-const TripScreen = () => {
+const TripScreen = ({ route }) => {
+  const { tripId, tripName } = route.params
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
