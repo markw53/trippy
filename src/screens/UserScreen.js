@@ -5,7 +5,7 @@ import Header from "../components/Header";
 export default function UserScreen() {
   return (
     <View style={styles.container}>
-      <Header title="Trippy - Profile" />
+      <Header title="Trippy" />
       <View style={styles.content}>
         <Text style={styles.text}>Welcome to your Profile!</Text>
       </View>

@@ -5,7 +5,7 @@ import Header from "../components/Header";
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Header title="Trippy - Home" />
+      <Header title="Trippy" />
       <View style={styles.content}>
         <Text style={styles.text}>Welcome to the Home Screen!</Text>
       </View>
