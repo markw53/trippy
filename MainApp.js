@@ -12,6 +12,7 @@ import WeatherScreen from "./src/screens/WeatherScreen";
 import UserScreen from "./src/screens/UserScreen";
 import ChatScreen from "./src/screens/ChatScreen";
 import ItineraryScreen from "./src/screens/ItineraryScreen";
+import SignUpScreen from "./src/screens/SignUpScreen";
 import Header from "./src/components/Header";
 
 export default function MainApp() {
@@ -24,6 +25,7 @@ export default function MainApp() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     );

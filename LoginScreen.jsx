@@ -6,13 +6,17 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert
 } from "react-native";
 import RoundedButton from "./src/components/Button";
 import Footer from "./src/components/Footer";
+import {
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail
+} from "firebase/auth";
 import { auth } from "./firebase";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,12 +24,6 @@ export default function LoginScreen() {
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then(() => console.log("Logged in successfully"))
-      .catch((err) => setError(err.message));
-  };
-
-  const handleSignUp = () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => console.log("Account created successfully"))
       .catch((err) => setError(err.message));
   };
 
@@ -38,18 +36,39 @@ export default function LoginScreen() {
       .catch((err) => setError(err.message));
   };
 
+  const handleForgetPassword = () => {
+    if (!email) {
+      Alert.alert(
+        "Forgot Password",
+        "Please enter your email address to reset your password."
+      );
+      return;
+    }
+
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        Alert.alert(
+          "Password Reset",
+          "A password reset email has been sent to your email address."
+        );
+      })
+      .catch((err) => {
+        Alert.alert("Error", err.message);
+      });
+  };
+
   return (
     <View style={styles.container}>
-      
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.appName}>Trippy</Text>
         <Text style={styles.tagline}>Addicted to Travelling</Text>
         <View style={styles.inputContainer}>
           <TextInput
-            placeholder="Email"
+            placeholder="Username"
             value={email}
             onChangeText={setEmail}
             style={styles.input}
+            placeholderTextColor="#888"
           />
           <TextInput
             placeholder="Password"
@@ -57,8 +76,12 @@ export default function LoginScreen() {
             onChangeText={setPassword}
             secureTextEntry
             style={styles.input}
+            placeholderTextColor="#888"
           />
           {error ? <Text style={styles.error}>{error}</Text> : null}
+          <TouchableOpacity onPress={handleForgetPassword}>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
         </View>
 
         <RoundedButton
@@ -68,16 +91,17 @@ export default function LoginScreen() {
           textStyle={styles.buttonText}
         />
 
-        <RoundedButton
-          title="Sign Up"
-          onPress={handleSignUp}
-          style={styles.signupButton}
-          textStyle={styles.buttonText}
-        />
-
-        <TouchableOpacity onPress={handleGuestLogin} style={styles.guestLink}>
-          <Text style={styles.guestText}>Sign in as Guest</Text>
-        </TouchableOpacity>
+        <View style={styles.linkRowContainer}>
+          <TouchableOpacity onPress={handleGuestLogin} style={styles.guestLink}>
+            <Text style={styles.guestText}>Sign in as Guest</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("SignUp")}
+            style={styles.signupLink}
+          >
+            <Text style={styles.signupText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
       <Footer text="© 2024 Trippy Holiday Planner" />
@@ -88,30 +112,37 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F7F7",
+    backgroundColor: "#F7F7F7"
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 20
+  },
+  forgotPasswordText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: "#4A90E2",
+    textDecorationLine: "underline",
+    textAlign: "right"
   },
   appName: {
     fontSize: 50,
-    fontFamily: "Gabriola", 
+    fontFamily: "Gabriola",
     fontWeight: "bold",
-    color: "#24565C", 
+    color: "#24565C",
     textAlign: "center",
-    marginVertical: 20,
+    marginVertical: 20
   },
   tagline: {
     fontSize: 16,
-    fontFamily: "Gabriola", 
-    color: "#24565C", 
+    fontFamily: "Gabriola",
+    color: "#24565C",
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: 30
   },
   inputContainer: {
-    marginVertical: 30,
+    marginVertical: 30
   },
   input: {
     backgroundColor: "#fff",
@@ -120,38 +151,57 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     padding: 12,
-    fontSize: 16,
+    fontSize: 16
   },
   loginButton: {
     backgroundColor: "#24565C",
     borderRadius: 10,
     marginVertical: 10,
-    paddingVertical: 10,
+    paddingVertical: 10
   },
   signupButton: {
     backgroundColor: "#4A90E2",
     borderRadius: 10,
     marginVertical: 10,
-    paddingVertical: 10,
+    paddingVertical: 10
   },
   buttonText: {
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#FFF",
+    color: "#FFF"
+  },
+  linkContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 20,
+    paddingHorizontal: 10
+  },
+  linkRowContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    marginTop: 10
   },
   guestLink: {
-    marginTop: 10,
-    alignSelf: "flex-end",
+    marginRight: 20
+  },
+  signupLink: {
+    alignItems: "flex-end"
   },
   guestText: {
     color: "#24565C",
     fontSize: 14,
-    textDecorationLine: "underline",
+    textDecorationLine: "underline"
+  },
+  signupText: {
+    color: "#4A90E2",
+    fontSize: 14,
+    textDecorationLine: "underline"
   },
   error: {
     color: "red",
     marginBottom: 10,
-    textAlign: "center",
-  },
+    textAlign: "center"
+  }
 });
