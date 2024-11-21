@@ -1,16 +1,19 @@
 {
-    "expo": {
-      "name": "Trippy",
-      "slug": "Trippy",
-      "ios": {
-        "bundleIdentifier": "com.southcoders.trippy-app"
-      },
-      "android": {
-        "package": "com.southcoders.trippy.app"
-      },
-      "web": {
-        "favicon": "./assets/favicon.png"
+  "expo": {
+    "name": "Trippy",
+    "slug": "Trippy",
+    "ios": {
+      "bundleIdentifier": "com.southcoders.trippy-app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need your location to provide weather information for your area."
       }
+    },
+    "android": {
+      "package": "com.southcoders.trippy.app",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     }
   }
-  
+}

@@ -1,33 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, FlatList } from "react-native";
+import * as Location from "expo-location";
 import axios from "axios";
 import Header from "../components/Header";
 
 export default function WeatherScreen() {
-  const [forecast, setForecast] = useState([]);
+  const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const API_KEY = "9bbf52bb91991e0f174188157333b47c"; // Replace with your OpenWeather API key
-  const CITY = "London"; // Change to your desired city
-  const UNITS = "metric"; // Use 'imperial' for Fahrenheit
-
-  const fetchWeather = async () => {
-    try {
-      const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${CITY}&units=${UNITS}&appid=${API_KEY}`
-      );
-      const data = response.data.list.filter((item, index) => index % 8 === 0); // Filter for daily forecasts
-      setForecast(data);
-      setLoading(false);
-    } catch (err) {
-      setError("Unable to fetch weather data.");
-      setLoading(false);
-    }
-  };
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchWeather();
+    const fetchLocationAndWeather = async () => {
+      try {
+        // Request location permissions
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          throw new Error("Permission to access location was denied");
+        }
+
+        // Get current location
+        const location = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = location.coords;
+
+        // Fetch weather data
+        const API_KEY = "9bbf52bb91991e0f174188157333b47c"; // Replace with your OpenWeather API key
+        const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
+        const response = await axios.get(url);
+
+        // Filter for daily forecasts
+        const filteredData = response.data.list.filter((item, index) => index % 8 === 0);
+        setWeatherData({
+          city: response.data.city,
+          forecast: filteredData,
+        });
+        setLoading(false);
+      } catch (err) {
+        console.error("Error:", err.message);
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchLocationAndWeather();
   }, []);
 
   if (loading) {
@@ -41,7 +55,7 @@ export default function WeatherScreen() {
   if (error) {
     return (
       <View style={styles.container}>
-        <Text style={styles.error}>{error}</Text>
+        <Text style={styles.error}>Error: {error}</Text>
       </View>
     );
   }
@@ -49,8 +63,11 @@ export default function WeatherScreen() {
   return (
     <View style={styles.container}>
       <Header title="Weather Forecast" />
+      <Text style={styles.city}>
+        {weatherData.city.name}, {weatherData.city.country}
+      </Text>
       <FlatList
-        data={forecast}
+        data={weatherData.forecast}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.forecastItem}>
@@ -73,10 +90,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F7F7F7",
   },
+  city: {
+    fontSize: 18,
+    textAlign: "center",
+    marginVertical: 10,
+    color: "#24565C",
+    fontWeight: "bold",
+  },
   error: {
     color: "red",
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 16,
     marginTop: 20,
   },
   list: {
