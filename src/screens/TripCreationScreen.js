@@ -6,6 +6,7 @@ import Button from "../components/Button";
 import Card from "../components/Card";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { createTrip } from "../api";
 
 export default function TripCreationScreen() {
   const [destination, setDestination] = useState("");
@@ -28,7 +29,26 @@ const handleSubmit = () => {
       alert("End Date cannot be before Start Date!");
       return;
     }
-    console.log("Trip Submitted:", { destination, description, startDate, endDate });
+
+    const tripData = {
+      trip_name: "destination",
+      location: "destination",
+      description: "description",
+      start_date: startDate,
+      end_date: endDate,
+    
+    }
+
+
+    createTrip(tripData)
+    .then((response)=>{
+      alert(`Trip Created Successfully`)
+      console.log("Created Trip:", response.data)
+    })
+    .catch((err)=>{
+      alert("Failed to reate trip. Please try again");
+      console.error(err)
+  }) 
 };
 //-------------------------------------------------------------------------
 
