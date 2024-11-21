@@ -9,11 +9,13 @@ import {
 import * as Location from "expo-location";
 import axios from "axios";
 import Header from "../components/Header";
+import MapView, { Marker } from "react-native-maps"; 
 
 export default function WeatherScreen() {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [location, setLocation] = useState(null); 
 
   useEffect(() => {
     const fetchLocationAndWeather = async () => {
@@ -25,6 +27,7 @@ export default function WeatherScreen() {
 
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
+        setLocation({ latitude, longitude }); 
 
         const API_KEY = "9bbf52bb91991e0f174188157333b47c";
         const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
@@ -68,14 +71,37 @@ export default function WeatherScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="Weather Forecast" />
+      <Header title="Trippy" />
       <Text style={styles.city}>
         {weatherData.city.name}, {weatherData.city.country}
       </Text>
+      
+      {/* MapView */}
+      {location && (
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: location.latitude,
+            longitude: location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        >
+          <Marker
+            coordinate={{
+              latitude: location.latitude,
+              longitude: location.longitude,
+            }}
+            title="Your Location"
+            description="Current location"
+          />
+        </MapView>
+      )}
+
       <FlatList
         data={weatherData.forecast}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) =>
+        renderItem={({ item }) => (
           <View style={styles.forecastItem}>
             <Text style={styles.date}>
               {new Date(item.dt * 1000).toDateString()}
@@ -87,7 +113,8 @@ export default function WeatherScreen() {
               {item.weather[0].description.charAt(0).toUpperCase() +
                 item.weather[0].description.slice(1)}
             </Text>
-          </View>}
+          </View>
+        )}
         contentContainerStyle={styles.list}
       />
     </View>
@@ -136,5 +163,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#24565C",
     marginTop: 5
+  },
+  map: {
+    width: "100%",
+    height: 250, 
+    marginBottom: 20
   }
 });
