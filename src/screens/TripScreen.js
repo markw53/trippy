@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   ScrollView,
@@ -6,19 +6,35 @@ import {
   Image,
   StyleSheet,
   TextInput,
+  FlatList,
 } from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Card from "../components/Card";
+import { fetchItinerary, fetchPossibility } from "../api";
 
 const TripScreen = ({ route }) => {
-  const { tripId, tripName, tripStart, tripEnd } = route.params;
+  const { tripId, tripName } = route.params;
+  const [itinerary, setItinerary] = useState([]);
+  const [possibility, setPossibility] = useState([]);
   const [isItinerary, setIsItinerary] = useState(true);
   const [isPossibility, setIsPossibility] = useState(false);
   const [isEvent, setIsEvent] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [time, setTime] = useState("");
+  const id = 2;
+
+  useEffect(() => {
+    fetchItinerary(id).then((response) => {
+      const itineraryList = response.data.activities;
+      setItinerary(itineraryList);
+    });
+    fetchPossibility(id).then((response) => {
+      const possibilityList = response.data.activities;
+      setPossibility(possibilityList);
+    });
+  }, []);
 
   const handleItinerary = () => {
     setIsPossibility(false);
@@ -51,14 +67,21 @@ const TripScreen = ({ route }) => {
     setIsEvent(false);
   };
 
+  const renderActivity = (activity) => {
+    return (
+      <Card
+        title={activity.item.activity_name}
+        time={activity.item.time}
+        content={activity.item.description}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
       <View style={styles.section}>
         <Text style={styles.title}>{tripName}</Text>
-        <Text>
-          {tripStart} --- {tripEnd}
-        </Text>
         <View style={styles.image}>
           <Text>17C</Text>
           <Image
@@ -83,35 +106,12 @@ const TripScreen = ({ route }) => {
           style={styles.button}
         />
       </View>
-      <ScrollView
-        automaticallyAdjustKeyboardInsets={true}
-        contentContainerStyle={styles.scrollContainer}
-      >
-        <View style={styles.section}>
-          {isItinerary && !isEvent && (
-            <Text style={styles.date}>{tripStart}</Text>
-          )}
-          {isItinerary && !isEvent && (
-            <Card
-              title="Landing"
-              time="15:00"
-              style={{ marginHorizontal: 30 }}
-            />
-          )}
-          {isPossibility && !isEvent && (
-            <Text style={styles.date}>{tripStart}</Text>
-          )}
-          {isPossibility && !isEvent && (
-            <Card
-              title="Nightclub"
-              time="19:30"
-              content="Going to party!"
-              style={{ marginHorizontal: 30 }}
-            />
-          )}
-        </View>
-        <View>
-          {isEvent && (
+      {isEvent && (
+        <ScrollView
+          automaticallyAdjustKeyboardInsets={true}
+          contentContainerStyle={styles.scrollContainer}
+        >
+          <View style={styles.section}>
             <TextInput
               placeholder="Title"
               value={title}
@@ -119,8 +119,6 @@ const TripScreen = ({ route }) => {
               style={styles.input}
               placeholderTextColor="#888"
             />
-          )}
-          {isEvent && (
             <TextInput
               placeholder="Time"
               value={time}
@@ -128,8 +126,6 @@ const TripScreen = ({ route }) => {
               style={styles.input}
               placeholderTextColor="#888"
             />
-          )}
-          {isEvent && isPossibility && (
             <TextInput
               multiline={true}
               numberOfLines={4}
@@ -139,9 +135,29 @@ const TripScreen = ({ route }) => {
               style={styles.input}
               placeholderTextColor="#888"
             />
-          )}
-        </View>
-      </ScrollView>
+          </View>
+        </ScrollView>
+      )}
+      <View style={styles.section}>
+        {isItinerary && !isEvent && (
+          <FlatList
+            data={itinerary}
+            renderItem={renderActivity}
+            keyExtractor={(activity) => activity.activity_id.toString()}
+            numColumns={1}
+            scrollEnabled={true}
+          />
+        )}
+        {isPossibility && !isEvent && (
+          <FlatList
+            data={possibility}
+            renderItem={renderActivity}
+            keyExtractor={(activity) => activity.activity_id.toString()}
+            numColumns={1}
+            scrollEnabled={true}
+          />
+        )}
+      </View>
       <View style={styles.section}>
         {!isEvent && (
           <Button
