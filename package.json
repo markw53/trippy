@@ -20,7 +20,10 @@
     "react-native-screens": "~4.1.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "undefined": "expo-auth-session/providers/google",
-    "expo-location": "~18.0.2"
+    "expo-location": "~18.0.2",
+    "react-native-maps": "1.18.0"
   }
 }
