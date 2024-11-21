@@ -94,20 +94,20 @@ const handleSubmit = () => {
   };
 
 
-  const members = [
-    { id: "1", name: "Abdiaziz" },
-    { id: "2", name: "Callum" },
-    { id: "3", name: "Mark" },
-    { id: "4", name: "Serkan" },
-    { id: "5", name: "Stefano" },
-  ];
+  // const members = [
+  //   { id: "1", name: "Abdiaziz" },
+  //   { id: "2", name: "Callum" },
+  //   { id: "3", name: "Mark" },
+  //   { id: "4", name: "Serkan" },
+  //   { id: "5", name: "Stefano" },
+  // ];
 
-  const renderMembers = ({ item }) => (
-    <Card
-      title={item.name}
-      onPress={() => console.log(`MemberCard Pressed: ${item.name}`)}
-    />
-  );
+  // const renderMembers = ({ item }) => (
+  //   <Card
+  //     title={item.name}
+  //     onPress={() => console.log(`MemberCard Pressed: ${item.name}`)}
+  //   />
+  // );
 
   return (
     <View style={styles.container}>
@@ -227,28 +227,27 @@ const handleSubmit = () => {
           multiline
         />
         <Text style={styles.subText}>Add Friends</Text>
-        <FlatList
+        {/* <FlatList
           data={members}
           renderItem={renderMembers}
           keyExtractor={(item) => item.name.toString()}
           contentContainerStyle={styles.cardsContainer}
-        //   scrollEnabled={false}
-
-        />
+          scrollEnabled={false}
+         /> */}
       </ScrollView>
          <View style={styles.buttonContainer}>
-            <Button
+            {/* <Button
             title="Add Member"
             onPress={() => console.log("Button Add Member")}
             style={{ alignSelf: "center", paddingHorizontal: 40 }}
-            />
+            /> */}
+        </View>
             <Button
             title="Done"
             onPress={handleSubmit}
             // onPress={() => console.log("Button Done")}
             style={{ alignSelf: "center", paddingHorizontal: 40 }}
             />
-        </View>
       <Footer text="Icons display here" style={styles.footer} />
     </View>
   );
