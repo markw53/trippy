@@ -36,8 +36,15 @@ const TripScreen = ({ route }) => {
     setIsEvent(true);
   };
 
-  const handlePostEvent = () => {
-    console.log("Event Posted!");
+  const handlePostItinerary = () => {
+    console.log("Itinerary Item Posted!");
+    setTitle("");
+    setTime("");
+    setIsEvent(false);
+  };
+
+  const handlePostPossibility = () => {
+    console.log("Possibility Item Posted!");
     setTitle("");
     setDescription("");
     setTime("");
@@ -133,13 +140,6 @@ const TripScreen = ({ route }) => {
               placeholderTextColor="#888"
             />
           )}
-          {isEvent && (
-            <Button
-              title="Post"
-              onPress={handlePostEvent}
-              style={styles.button}
-            />
-          )}
         </View>
       </ScrollView>
       <View style={styles.section}>
@@ -147,6 +147,20 @@ const TripScreen = ({ route }) => {
           <Button
             title={"Add Event"}
             onPress={handleEvent}
+            style={styles.button}
+          />
+        )}
+        {isEvent && isItinerary && (
+          <Button
+            title="Post"
+            onPress={handlePostItinerary}
+            style={styles.button}
+          />
+        )}
+        {isEvent && isPossibility && (
+          <Button
+            title="Post"
+            onPress={handlePostPossibility}
             style={styles.button}
           />
         )}
