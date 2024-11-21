@@ -9,24 +9,32 @@ export default function HomeScreen({ navigation }) {
     {
       id: "1",
       name: "Paris",
+      start: "2024-12-6",
+      end: "2024-12-28",
       imgUrl:
         "https://media.disneylandparis.com/d4th/en-usd/images/VDP10_2025apr03_world_paris-vedettes-de-paris-Couloir3-VDP10_16-9_tcm1861-251625.jpg",
     },
     {
       id: "2",
       name: "Hungary",
+      start: "2024-06-04",
+      end: "2024-06-18",
       imgUrl:
         "https://malaysianharmony.com.my/wp-content/uploads/2022/02/Hungary.jpg",
     },
     {
       id: "3",
       name: "Barcelona",
+      start: "2023-01-26",
+      end: "2023-02-09",
       imgUrl:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYkIEdnS0Ouk8ajir-ZQk3NrTHhpa_X9StZw&s",
     },
     {
       id: "4",
       name: "Greece",
+      start: "2023-08-12",
+      end: "2023-08-25",
       imgUrl:
         "https://static.independent.co.uk/s3fs-public/thumbnails/image/2021/06/02/20/istock-833264986.jpg",
     },
@@ -36,9 +44,16 @@ export default function HomeScreen({ navigation }) {
     <TripCard
       tripId={item.id}
       tripName={item.name}
+      tripStart={item.start}
+      tripEnd={item.end}
       tripImage={item.imgUrl}
       onPress={() =>
-        navigation.navigate("Trip", { tripId: item.id, tripName: item.name })
+        navigation.navigate("Trip", {
+          tripId: item.id,
+          tripName: item.name,
+          tripStart: item.start,
+          tripEnd: item.end,
+        })
       }
     />
   );
