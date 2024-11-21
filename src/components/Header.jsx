@@ -9,7 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 const Header = ({ title, style, textStyle }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const { setUser } = useAuth(); 
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);

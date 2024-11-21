@@ -1,12 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
-const Card = ({ title, content, style }) => {
+const Card = ({ title, content, style, onPress }) => {
   return (
-    <View style={[styles.card, style]}>
+    <TouchableOpacity onPress={onPress} style={[styles.card, style]}>
       {title && <Text style={styles.title}>{title}</Text>}
       {content && <Text style={styles.content}>{content}</Text>}
-    </View>
+    </TouchableOpacity>
   );
 };
 
