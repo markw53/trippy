@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList } from "react-native";
 import io from "socket.io-client";
 import Header from "../components/Header";
+import axios from "axios";
 
 
-const socket = io("http://localhost:3000"); 
+const socket = io("https://backend-for-trippy.onrender.com");
 
 export default function ChatScreen() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-
+  const userId = 1;
+  const user_id = 2;
   useEffect(() => {
-    socket.on("receive_message", (data) => {
+    socket.on("message", (data) => {
       setMessages((prevMessages) => [...prevMessages, data]);
     });
 
@@ -24,7 +26,7 @@ export default function ChatScreen() {
   const sendMessage = () => {
     if (message.trim()) {
       const chatMessage = { text: message, timestamp: new Date().toISOString() };
-      socket.emit("send_message", chatMessage); 
+      socket.emit("message", chatMessage); 
       setMessages((prevMessages) => [...prevMessages, chatMessage]); 
       setMessage(""); 
     }
@@ -35,12 +37,15 @@ export default function ChatScreen() {
       <Header title="Chat" />
       <FlatList
         data={messages}
-        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.message}>
-            <Text style={styles.messageText}>{item.text}</Text>
-            <Text style={styles.timestamp}>{new Date(item.timestamp).toLocaleTimeString()}</Text>
+          <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
+          <View>
+            <Text style={styles.userName}>{item.user_name}</Text>
+            <Text style={styles.messageText}>{item.content}</Text>
           </View>
+          <Text style={styles.timestamp}>{new Date(item.timestamp).toLocaleTimeString()}</Text>
+        </View>
         )}
         contentContainerStyle={styles.messagesContainer}
       />
