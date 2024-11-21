@@ -68,7 +68,7 @@ export default function WeatherScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="Weather Forecast" />
+      <Header title="Trippy" />
       <Text style={styles.city}>
         {weatherData.city.name}, {weatherData.city.country}
       </Text>
