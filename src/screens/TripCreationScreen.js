@@ -38,7 +38,7 @@ const handleSubmit = () => {
 
   const onStartChange = ({type}, selectedDate) => {
     if (type == "set") {
-        const currentDate = selectedDate || date; // added ||date
+        const currentDate = formatDate(selectedDate || date); // added ||date
 
       setDate(selectedDate);
       setStartDate(currentDate);
@@ -74,7 +74,7 @@ const handleSubmit = () => {
 
   const onEndchange = ({type}, selectedDate) => {
     if (type == "set") {
-        const currentDate = selectedDate || date; // added ||date
+        const currentDate = formatDate(selectedDate || date); // added ||date
 
       setDate(selectedDate);
       setEndDate(currentDate);
@@ -131,7 +131,7 @@ const handleSubmit = () => {
                 value={date}
                 onChange={onStartChange}
                 style={styles.datePicker}
-                minimumDate={new Date()}
+                minimumDate={startDate ? new Date(startDate) : new Date()}
                 />
             )}
 
@@ -179,6 +179,8 @@ const handleSubmit = () => {
                     value={date}
                     onChange={onEndchange}
                     style={styles.datePicker}
+                    minimumDate={endDate ? new Date(endDate) : new Date()}
+
                 />
             )};
 
