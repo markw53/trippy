@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, FlatList, Platform, TouchableOpacity, Pressable, ScrollView } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -29,14 +30,15 @@ const handleSubmit = () => {
       alert("End Date cannot be before Start Date!");
       return;
     }
+  const userId = 1;
 
     const tripData = {
-      trip_name: "destination",
-      location: "destination",
-      description: "description",
+      trip_name: destination,
+      location: destination,
+      description: description,
       start_date: startDate,
       end_date: endDate,
-    
+      created_by: userId,
     }
 
 
@@ -46,7 +48,7 @@ const handleSubmit = () => {
       console.log("Created Trip:", response.data)
     })
     .catch((err)=>{
-      alert("Failed to reate trip. Please try again");
+      alert("Failed to create trip. Please try again");
       console.error(err)
   }) 
 };
