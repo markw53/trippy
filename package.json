@@ -5,6 +5,7 @@
     "@react-navigation/bottom-tabs": "^7.0.6",
     "@react-navigation/native": "^7.0.3",
     "@react-navigation/stack": "^7.0.5",
+    "axios": "^1.7.7",
     "expo": "^52.0.7",
     "expo-auth-session": "~6.0.0",
     "firebase": "^11.0.2",
@@ -19,6 +20,7 @@
     "react-native-screens": "~4.1.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
-    "undefined": "expo-auth-session/providers/google"
+    "undefined": "expo-auth-session/providers/google",
+    "expo-location": "~18.0.2"
   }
 }
