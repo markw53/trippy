@@ -8,30 +8,91 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 export default function TripCreationScreen() {
-  const [destination, setDestination] = useState();
-  const [description, setTripDescription] = useState();
+  const [destination, setDestination] = useState("");
+  const [description, setTripDescription] = useState("");
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
+  
   const [startDate, setStartDate] = useState("");
+
+  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [endDate, setEndDate] = useState("");
+  //Added
+ //-------------------------------------------------------------------------
+const handleSubmit = () => {
+  if (!destination || !description || !startDate || !endDate) {
+    alert("All fields are required!");
+    return;
+  }
+  if (new Date(endDate) < new Date(startDate)) {
+      alert("End Date cannot be before Start Date!");
+      return;
+    }
+    console.log("Trip Submitted:", { destination, description, startDate, endDate });
+};
+//-------------------------------------------------------------------------
 
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
   };
 
-  const onChange = (event, selectedDate) => {
-    if (selectedDate) {
+  const onStartChange = ({type}, selectedDate) => {
+    if (type == "set") {
+        const currentDate = selectedDate || date; // added ||date
+
       setDate(selectedDate);
-      setStartDate(selectedDate.toDateString());
-      if (Platform.OS === "android") toggleDatePicker();
+      setStartDate(currentDate);
+
+      if (Platform.OS === "android") {
+        toggleDatePicker();
+        // setStartDate(formatDate(currentDate));
+      }
     } else {
       toggleDatePicker();
     }
   };
 
   const confirmIOSDate = () => {
-    setStartDate(date.toDateString());
+    setStartDate(formatDate(date));
     toggleDatePicker();
   };
+
+  const formatDate = (rawDate)=>{
+    let date = new Date(rawDate);
+
+    let year = date.getFullYear();
+    let month = date.getMonth() +1;
+    let day = date.getDate();
+
+    month = month < 10 ? `0${month}` : month;
+    day = day < 10 ? `0${day}` : day;
+
+    return `${day}-${month}-${year}`;
+  }
+
+  const toggleEndDatePicker = ()=> setShowEndPicker(!showEndPicker)
+
+  const onEndchange = ({type}, selectedDate) => {
+    if (type == "set") {
+        const currentDate = selectedDate || date; // added ||date
+
+      setDate(selectedDate);
+      setEndDate(currentDate);
+
+      if (Platform.OS === "android") {
+        toggleEndDatePicker();
+        // setStartDate(formatDate(currentDate));
+      }
+    } else {
+      toggleEndDatePicker();
+    }
+  };
+
+  const confirmIOSEndDate = () => {
+    setEndDate(formatDate(date));
+    toggleEndDatePicker();
+  };
+
 
   const members = [
     { id: "1", name: "Abdiaziz" },
@@ -59,34 +120,36 @@ export default function TripCreationScreen() {
           placeholder="Enter Destination"
           value={destination}
         />
-        <TouchableOpacity onPress={toggleDatePicker}>
-          <Text style={styles.label}>Start Date</Text>
+          {destination === "" && <Text style={styles.errorText}>Destination is required.</Text>}
+        <View onPress={toggleDatePicker}>
+            <Text style={styles.label}>Start Date</Text>
 
-          {showPicker && (
-            <DateTimePicker
-              mode="date"
-              display="spinner"
-              value={date}
-              onChange={onChange}
-              style={styles.datePicker}
-            />
-          )}
+            {showPicker && (
+                <DateTimePicker
+                mode="date"
+                display="spinner"
+                value={date}
+                onChange={onStartChange}
+                style={styles.datePicker}
+                minimumDate={new Date()}
+                />
+            )}
 
-          {showPicker && Platform.OS === "ios" && (
-            <View style={styles.iosButtons}>
-              <TouchableOpacity
-                style={[styles.button, styles.pickerButton, styles.cancelButton]}
-                onPress={toggleDatePicker}
-              >
-                <Text style={styles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
+            {showPicker && Platform.OS === "ios" && (
+                <View style={styles.iosButtons}>
+                <TouchableOpacity
+                    style={[styles.button, styles.pickerButton, styles.cancelButton]}
+                    onPress={toggleDatePicker}
+                >
+                    <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.button, styles.pickerButton]}
-                onPress={confirmIOSDate}
-              >
-                <Text style={styles.buttonText}>Confirm</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.button, styles.pickerButton]}
+                    onPress={confirmIOSDate}
+                >
+                    <Text style={styles.buttonText}>Confirm</Text>
+                </TouchableOpacity>
             </View>
           )}
 
@@ -94,14 +157,65 @@ export default function TripCreationScreen() {
             <Pressable onPress={toggleDatePicker}>
               <TextInput
                 style={styles.input}
-                placeholder="Select a Date"
+                placeholder="Start Date"
                 value={startDate}
+                onChangeText={setStartDate}
+                placeholderTextColor="#11182744"
                 editable={false}
-                placeholderTextColor={"#11182744"}
+                onPressIn={toggleDatePicker}
               />
             </Pressable>
           )}
-        </TouchableOpacity>
+        {!startDate && <Text style={styles.errorText}>Start Date is required.</Text>}
+        </View>
+
+        <View onPress={toggleDatePicker}>
+            <Text style={styles.label}>End Date</Text>
+            
+            {showEndPicker && (
+                <DateTimePicker
+                    mode="date"
+                    display="spinner"
+                    value={date}
+                    onChange={onEndchange}
+                    style={styles.datePicker}
+                />
+            )};
+
+            {showEndPicker && Platform.OS === "ios" && (
+                <View style={styles.iosButtons}>
+                    <TouchableOpacity
+                    style={[styles.button, styles.pickerButton, styles.cancelButton]}
+                    onPress={toggleEndDatePicker}
+                >
+                    <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.button, styles.pickerButton]}
+                    onPress={confirmIOSEndDate}
+                >
+                    <Text style={styles.buttonText}>Confirm</Text>
+                </TouchableOpacity>
+                </View>
+            
+            )};
+            {!showEndPicker && (
+            <Pressable onPress={toggleEndDatePicker}>
+              <TextInput
+                style={styles.input}
+                placeholder="End Date"
+                value={endDate}
+                onChangeText={setEndDate}
+                placeholderTextColor="#11182744"
+                editable={false}
+                onPressIn={toggleEndDatePicker}
+              />
+            </Pressable>
+          )}
+        {!endDate && <Text style={styles.errorText}>End Date is required.</Text>}
+
+        </View>
 
         <TextInput
           style={[styles.input, styles.multiLineText]}
@@ -128,7 +242,8 @@ export default function TripCreationScreen() {
             />
             <Button
             title="Done"
-            onPress={() => console.log("Button Done")}
+            onPress={handleSubmit}
+            // onPress={() => console.log("Button Done")}
             style={{ alignSelf: "center", paddingHorizontal: 40 }}
             />
         </View>
@@ -197,6 +312,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#e5e7eb",
   },
   buttonText: {
+    fontSize: 14,
+    fontWeight: "500",
     color: "#fff",
     textAlign: "center",
   },
