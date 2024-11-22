@@ -26,21 +26,24 @@ const handleSubmit = () => {
     alert("All fields are required!");
     return;
   }
-  if (new Date(endDate) < new Date(startDate)) {
+  if (new Date(endDate).toISOString() < new Date(startDate).toISOString()) {
       alert("End Date cannot be before Start Date!");
       return;
     }
-  const userId = 1;
+   
+    
+    const userId = 1;
 
     const tripData = {
       trip_name: destination,
       location: destination,
-     description: description,
-      start_date: new Date(startDate).toISOString(),
+      description: description,
+      start_date: new Date(startDate).toISOString() ,
       end_date: new Date(endDate).toISOString(),
       created_by: userId,
     }
 
+    console.log("Trip Data:", tripData)
 
     createTrip(tripData)
     .then((response)=>{
@@ -79,6 +82,8 @@ const handleSubmit = () => {
   };
 
   const formatDate = (rawDate)=>{
+    // const date = new Date(rawDate)
+    // return date.toISOString()
     let date = new Date(rawDate);
 
     let year = date.getFullYear();

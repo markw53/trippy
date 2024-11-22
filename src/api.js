@@ -15,5 +15,5 @@ export const fetchTripById = (tripId) => {
 }
 
 export const createTrip = (tripData) => {
-  return axios.post(`${apiBase}/trips`)
+  return axios.post(`${apiBase}/trips`,tripData)
 }
