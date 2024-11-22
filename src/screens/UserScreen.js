@@ -1,127 +1,156 @@
-import React, { useState } from "react";
-
-import { View, Text, StyleSheet,TextInput, Image, ScrollView, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TextInput, Image, ScrollView } from "react-native";
 import Header from "../components/Header";
 import Button from "../components/Button";
-
+import { fetchUserDetails } from "../api";
 
 export default function UserScreen() {
-  const [name, setName] = useState("");
+  const [userName, setUserName] = useState("");
   const [profilePic, setProfilePic] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  
+
+  useEffect(() => {
+    fetchUserDetails(6)
+      .then((response) => {
+        console.log("API Response:", response.data);
+
+        const data = response.data.user;
+
+        setUserName(data.name || "");
+        setProfilePic(data.avatar_url || "");
+        setEmail(data.email || "");
+
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching user details:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Loading user details...</Text>
+      </View>
+    );
+  }
+
+  const handleSubmit = () => { }
 
   return (
     <View style={styles.container}>
-    <Header title="Trippy" />
-    <View style={styles.content}>
-    <ScrollView>
-        <Text style={styles.text}>Welcome to your Profile!</Text>
-        <View style={styles.imageContainer}>
-        <Image
-        style={styles.image}
-        source={{
-          uri: 'https://reactnative.dev/img/tiny_logo.png',
-        }}
-      />
-        <Text style={styles.userNameheading}>The Goat Coder</Text>
-        </View>
-        <View> 
-          <View>
-              <Text style={styles.label}>Name:</Text>
-                <TextInput
-                  style={styles.input}
-                  onChangeText={setName}
-                  placeholder={"Enter Name"}
-                  value={name}
-                />
+      <Header title="Trippy" />
+      <View style={styles.content}>
+        <ScrollView>
+          <Text style={styles.text}>Welcome to your Profile!</Text>
+          <View style={styles.imageContainer}>
+            <Image
+              style={styles.image}
+              source={{
+                uri: profilePic || "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={styles.userNameheading}>{userName || "The Goat Coder"}</Text>
           </View>
-        <View>
+          <View>
+            <Text style={styles.label}>Name:</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={setUserName}
+              value={userName}
+            />
+          </View>
+          <View>
             <Text style={styles.label}>Profile Picture:</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={setProfilePic}
-                placeholder={"Enter Picture URl"}
-                value={profilePic}
-              />
-        </View>
+            <TextInput
+              style={styles.input}
+              onChangeText={setProfilePic}
+              value={profilePic}
+              numberOfLines={1}
+              multiline={false}
+              textAlignVertical="center"
+              autoCapitalize="none"
+
+            />
+          </View>
           <View>
             <Text style={styles.label}>Email:</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={setProfilePic}
-                placeholder={"TheGoatCoder@gmail.com"}
-                
-              />
+            <TextInput
+              style={[styles.input, styles.disabledInput]}
+              value={email}
+              editable={false}
+            />
           </View>
-               <View style={styles.saveChangesbtn}>
-                <Button
-                  title={"Save Changes"}
-                  style={{ alignSelf: "center", paddingHorizontal: 30 }}
-                />
-              </View>
-            <View style={styles.cancelbtn}>
-                <Button
-                  title={"Cancel"}
-                  style={{ alignSelf: "center", paddingHorizontal: 40 }}
-                />
+          <View style={styles.saveChangesbtn}>
+            <Button title="Save Changes" />
           </View>
+          <View style={styles.cancelbtn}>
+            <Button title="Cancel" />
+          </View>
+        </ScrollView>
       </View>
-      </ScrollView>
     </View>
-  </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F7F7",
+    backgroundColor: "#F7F7F7"
   },
   content: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
-    marginTop: 40,
+    padding: 20
   },
   text: {
     fontSize: 24,
     color: "#24565C",
-    fontWeight: "bold",
+    fontWeight: "bold"
   },
   label: {
     fontSize: 16,
     marginVertical: 10,
-    color: "#333",
+    color: "#333"
   },
   input: {
     backgroundColor: "#fff",
     borderRadius: 10,
     borderColor: "#ccc",
     borderWidth: 1,
-    marginBottom: 10,
     padding: 12,
     fontSize: 16
   },
-  imageContainer:{
-    flex:1,
-    alignItems: "center",
+  imageContainer: {
+    alignItems: "center"
   },
   image: {
-    marginTop: 20,
     width: 100,
     height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
+    borderRadius: 50
   },
-  userNameheading:{
-
+  userNameheading: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 10
   },
-  saveChangesbtn:{
+  saveChangesbtn: {
     padding: 10
   },
-  cancelbtn:{
+  cancelbtn: {
     padding: 10
+  },
+  loadingText: {
+    fontSize: 18,
+    color: "#999",
+    marginTop: 20
+  },
+  disabledInput: {
+    backgroundColor: "#f5f5f5",
+    color: "#fffff",
   },
 });
