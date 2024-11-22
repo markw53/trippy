@@ -6,13 +6,12 @@ import {
   Image,
   StyleSheet,
   TextInput,
-  FlatList,
-  Alert,
 } from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Card from "../components/Card";
 import { fetchItinerary, fetchPossibility, postPossibility } from "../api";
+import { FlatList } from "react-native-gesture-handler";
 
 const TripScreen = ({ route }) => {
   const { tripId, tripName } = route.params;
@@ -33,7 +32,7 @@ const TripScreen = ({ route }) => {
           setItinerary(itineraryList);
         })
         .catch((err) => console.error("Error fetching itinerary:", err));
-  
+
       fetchPossibility(tripId)
         .then((response) => {
           const possibilityList = response.data.activities;
@@ -168,14 +167,13 @@ const TripScreen = ({ route }) => {
           </View>
         </ScrollView>
       )}
-      <View style={styles.section}>
+      <View style={styles.cards}>
         {isItinerary && (
           <FlatList
             data={itinerary}
             renderItem={renderActivity}
             keyExtractor={(activity) => activity.activity_id.toString()}
             numColumns={1}
-            scrollEnabled={true}
           />
         )}
         {isPossibility && (
@@ -184,7 +182,6 @@ const TripScreen = ({ route }) => {
             renderItem={renderActivity}
             keyExtractor={(activity) => activity.activity_id.toString()}
             numColumns={1}
-            scrollEnabled={true}
           />
         )}
       </View>
@@ -255,6 +252,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 12,
     fontSize: 16,
+  },
+  cards: {
+    flex: 1,
+    marginTop: 40,
+    marginBottom: 24,
+    marginLeft: 10,
   },
   footer: {
     margin: 0,
