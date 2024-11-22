@@ -45,6 +45,10 @@ export default function HomeScreen({ navigation }) {
     }
   }, [user]);
 
+  const handleCreateTrip = () => {
+    navigation.navigate("TripCreationScreen")
+  }
+
   const renderTrip = ({ item }) => (
     <TripCard
       tripId={item.trip_id}
@@ -88,7 +92,7 @@ export default function HomeScreen({ navigation }) {
         scrollEnabled={false}
       />
       <View>
-        <Button title="Add trip" style={styles.button} />
+        <Button title="Add trip" style={styles.button} onPress={handleCreateTrip} />
       </View>
     </View>
   );

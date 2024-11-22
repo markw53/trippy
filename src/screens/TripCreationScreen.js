@@ -247,7 +247,6 @@ const handleSubmit = () => {
             />
         </View>
       </ScrollView>
-      <Footer text="Icons display here" style={styles.footer} />
     </View>
   );
 }
@@ -290,11 +289,6 @@ const styles = StyleSheet.create({
   },
   cardsContainer: {
     paddingVertical: 0
-  },
-  footer: {
-    borderTopWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
   },
   datePicker: {
     height: 120,
