@@ -10,19 +10,20 @@ import Footer from "../components/Footer";
 import { createTrip } from "../api";
 
 export default function TripCreationScreen() {
+  const [tripName, setTripName] = useState("");
   const [destination, setDestination] = useState("");
   const [description, setTripDescription] = useState("");
+
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  
   const [startDate, setStartDate] = useState("");
-
+  
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [endDate, setEndDate] = useState("");
   //Added
  //-------------------------------------------------------------------------
 const handleSubmit = () => {
-  if (!destination || !description || !startDate || !endDate) {
+  if (!destination || !tripName || !startDate || !endDate) {
     alert("All fields are required!");
     return;
   }
@@ -35,15 +36,13 @@ const handleSubmit = () => {
     const userId = 1;
 
     const tripData = {
-      trip_name: destination,
+      trip_name: tripName,
       location: destination,
       description: description,
       start_date: new Date(startDate).toISOString() ,
       end_date: new Date(endDate).toISOString(),
       created_by: userId,
     }
-
-    console.log("Trip Data:", tripData)
 
     createTrip(tripData)
     .then((response)=>{
@@ -62,11 +61,10 @@ const handleSubmit = () => {
   };
 
   const onStartChange = ({type}, selectedDate) => {
-    console.log("Line 65: OnstartChangeDate-Selected Date:", selectedDate)
+    
     if (type == "set") {
         const currentDate = selectedDate || date; // added ||date
-    console.log("Line 68 :OnstartChangeDateSelectedDate:", selectedDate)
-    console.log("Line 69 :OnstartChangeDateCurrentDate:", currentDate)
+
       setDate(selectedDate);
       setStartDate(currentDate.toDateString());
       
@@ -79,44 +77,20 @@ const handleSubmit = () => {
   };
 
   const confirmIOSDate = () => {
-    console.log("Line 82 :ConfirmIOSDate:", date)
+ 
     setStartDate(date.toDateString());
     toggleDatePicker();
   };
 
-//   const formatDate = (rawDate)=>{
-//         console.log("Line 88 :RawDate:", rawDate)
-
-//     // const date = new Date(rawDate)
-//     // return date.toISOString()
-//     let date = new Date(rawDate);
-//         console.log("Line 93 :Date:", rawDate)
-
-//     let year = date.getFullYear();
-//     let month = date.getMonth() +1;
-//     let day = date.getDate();
-
-//     month = month < 10 ? `0${month}` : month;
-//     day = day < 10 ? `0${day}` : day;
-// console.log("Year:",year)
-// console.log("Month:",month)
-// console.log("Day:",day)
-//     return `${day}-${month}-${year}`;
-//   }
-
   const toggleEndDatePicker = ()=> setShowEndPicker(!showEndPicker)
 
   const onEndchange = ({type}, selectedDate) => {
-        console.log("Line 110 :OnEndChangeDate:", selectedDate)
+        
         if (type == "set") {
-          const currentDate = selectedDate || date; // added ||date
-          console.log("Line 113 :SelectedDate:", selectedDate)
-            console.log("Line 114 :CurrentDate:", currentDate)
-
+      const currentDate = selectedDate || date; // added ||date
       setDate(selectedDate);
       setEndDate(currentDate.toDateString());
-      console.log("Line 118 :SelectedDate:", selectedDate)
-      console.log("Line 119 :CurrentDate:", currentDate)
+
 
       if (Platform.OS === "android") {
         toggleEndDatePicker();
@@ -127,9 +101,9 @@ const handleSubmit = () => {
   };
 
   const confirmIOSEndDate = () => {
-    console.log("Line 130 :ConfirmIOSDate-Date:", date)
+   
     setEndDate(date.toDateString());
-    console.log("Line 132 :ConfirmIOSDate-SetEndDate:", date)
+    
     toggleEndDatePicker();
   };
 
@@ -138,13 +112,26 @@ const handleSubmit = () => {
       <Header title="Trippy" />
       <ScrollView style={styles.content}>
         <Text style={styles.text}>Create Trip</Text>
+        <View>
+        <Text>Trip Name</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={setTripName}
+          placeholder="Enter Trip Name"
+          value={tripName}
+        />
+        {/* {tripName === "" && <Text style={styles.errorText}>Trip Name is required.</Text>} */}
+        </View>
+        <View>
+        <Text>Destination</Text>
         <TextInput
           style={styles.input}
           onChangeText={setDestination}
           placeholder="Enter Destination"
           value={destination}
         />
-          {destination === "" && <Text style={styles.errorText}>Destination is required.</Text>}
+        </View>
+          {/* {destination === "" && <Text style={styles.errorText}>Destination is required.</Text>} */}
         <View onPress={toggleDatePicker}>
             <Text style={styles.label}>Start Date</Text>
 
@@ -160,7 +147,7 @@ const handleSubmit = () => {
             )}
 
             {showPicker && Platform.OS === "ios" && (
-                <View style={styles.iosButtons}>
+              <View style={styles.iosButtons}>
                 <TouchableOpacity
                     style={[styles.button, styles.pickerButton, styles.cancelButton]}
                     onPress={toggleDatePicker}
@@ -190,7 +177,7 @@ const handleSubmit = () => {
               />
             </Pressable>
           )}
-        {!startDate && <Text style={styles.errorText}>Start Date is required.</Text>}
+        {/* {!startDate && <Text style={styles.errorText}>Start Date is required.</Text>} */}
         </View>
 
         <View onPress={toggleDatePicker}>
@@ -239,10 +226,11 @@ const handleSubmit = () => {
               />
             </Pressable>
           )}
-        {!endDate && <Text style={styles.errorText}>End Date is required.</Text>}
+        {/* {!endDate && <Text style={styles.errorText}>End Date is required.</Text>} */}
 
         </View>
-
+        <View>
+        <Text>Trip Description</Text>
         <TextInput
           style={[styles.input, styles.multiLineText]}
           onChangeText={setTripDescription}
@@ -250,17 +238,15 @@ const handleSubmit = () => {
           value={description}
           multiline
         />
-        <Text style={styles.subText}>Add Friends</Text>
-        
+        </View>
       </ScrollView>
          <View style={styles.buttonContainer}>
-        </View>
             <Button
             title="Done"
             onPress={handleSubmit}
-            // onPress={() => console.log("Button Done")}
             style={{ alignSelf: "center", paddingHorizontal: 40 }}
             />
+        </View>
       <Footer text="Icons display here" style={styles.footer} />
     </View>
   );
@@ -340,5 +326,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     marginTop: 10,
     marginBottom: 10,
+  },
+  errorText:{
+    color: "red"
   }
 });
