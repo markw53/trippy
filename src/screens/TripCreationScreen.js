@@ -1,10 +1,10 @@
 
+
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, FlatList, Platform, TouchableOpacity, Pressable, ScrollView } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import Button from "../components/Button";
-import Card from "../components/Card";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { createTrip } from "../api";
@@ -35,9 +35,9 @@ const handleSubmit = () => {
     const tripData = {
       trip_name: destination,
       location: destination,
-      description: description,
-      start_date: startDate,
-      end_date: endDate,
+     description: description,
+      start_date: new Date(startDate).toISOString(),
+      end_date: new Date(endDate).toISOString(),
       created_by: userId,
     }
 
@@ -67,7 +67,6 @@ const handleSubmit = () => {
 
       if (Platform.OS === "android") {
         toggleDatePicker();
-        // setStartDate(formatDate(currentDate));
       }
     } else {
       toggleDatePicker();
@@ -103,7 +102,6 @@ const handleSubmit = () => {
 
       if (Platform.OS === "android") {
         toggleEndDatePicker();
-        // setStartDate(formatDate(currentDate));
       }
     } else {
       toggleEndDatePicker();
@@ -114,22 +112,6 @@ const handleSubmit = () => {
     setEndDate(formatDate(date));
     toggleEndDatePicker();
   };
-
-
-  // const members = [
-  //   { id: "1", name: "Abdiaziz" },
-  //   { id: "2", name: "Callum" },
-  //   { id: "3", name: "Mark" },
-  //   { id: "4", name: "Serkan" },
-  //   { id: "5", name: "Stefano" },
-  // ];
-
-  // const renderMembers = ({ item }) => (
-  //   <Card
-  //     title={item.name}
-  //     onPress={() => console.log(`MemberCard Pressed: ${item.name}`)}
-  //   />
-  // );
 
   return (
     <View style={styles.container}>
@@ -249,20 +231,9 @@ const handleSubmit = () => {
           multiline
         />
         <Text style={styles.subText}>Add Friends</Text>
-        {/* <FlatList
-          data={members}
-          renderItem={renderMembers}
-          keyExtractor={(item) => item.name.toString()}
-          contentContainerStyle={styles.cardsContainer}
-          scrollEnabled={false}
-         /> */}
+        
       </ScrollView>
          <View style={styles.buttonContainer}>
-            {/* <Button
-            title="Add Member"
-            onPress={() => console.log("Button Add Member")}
-            style={{ alignSelf: "center", paddingHorizontal: 40 }}
-            /> */}
         </View>
             <Button
             title="Done"
