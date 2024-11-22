@@ -1,12 +1,18 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 
-const Card = ({ title, content, style, onPress, time }) => {
-
+const Card = ({ title, content, style, onPress, time, image }) => {
   return (
     <TouchableOpacity onPress={onPress} style={[styles.card, style]}>
+      {image && (
+        <Image
+          source={{ uri: image }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      )}
       {title && <Text style={styles.title}>{title}</Text>}
-      {time && <Text style={styles.time}> {time}</Text>}
+      {time && <Text style={styles.time}>{time}</Text>}
       {content && <Text style={styles.content}>{content}</Text>}
     </TouchableOpacity>
   );
@@ -23,6 +29,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     marginVertical: 8,
+  },
+  image: {
+    width: "100%", 
+    height: 150,   
+    borderRadius: 10,
+    marginBottom: 8,
   },
   title: {
     fontSize: 18,
