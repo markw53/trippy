@@ -21,3 +21,7 @@ export const fetchItinerary = (tripId) => {
 export const fetchPossibility = (tripId) => {
   return axios.get(`${apiBase}/trips/${tripId}/activities/possibility`);
 };
+
+export const postPossibility = (trip_id, possibility) => {
+  return axios.post(`${apiBase}/trips/${trip_id}/activities`, possibility);
+};
