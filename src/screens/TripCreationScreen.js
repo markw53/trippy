@@ -62,12 +62,14 @@ const handleSubmit = () => {
   };
 
   const onStartChange = ({type}, selectedDate) => {
+    console.log("Line 65: OnstartChangeDate-Selected Date:", selectedDate)
     if (type == "set") {
-        const currentDate = formatDate(selectedDate || date); // added ||date
-
+        const currentDate = selectedDate || date; // added ||date
+    console.log("Line 68 :OnstartChangeDateSelectedDate:", selectedDate)
+    console.log("Line 69 :OnstartChangeDateCurrentDate:", currentDate)
       setDate(selectedDate);
-      setStartDate(currentDate);
-
+      setStartDate(currentDate.toDateString());
+      
       if (Platform.OS === "android") {
         toggleDatePicker();
       }
@@ -77,33 +79,44 @@ const handleSubmit = () => {
   };
 
   const confirmIOSDate = () => {
-    setStartDate(formatDate(date));
+    console.log("Line 82 :ConfirmIOSDate:", date)
+    setStartDate(date.toDateString());
     toggleDatePicker();
   };
 
-  const formatDate = (rawDate)=>{
-    // const date = new Date(rawDate)
-    // return date.toISOString()
-    let date = new Date(rawDate);
+//   const formatDate = (rawDate)=>{
+//         console.log("Line 88 :RawDate:", rawDate)
 
-    let year = date.getFullYear();
-    let month = date.getMonth() +1;
-    let day = date.getDate();
+//     // const date = new Date(rawDate)
+//     // return date.toISOString()
+//     let date = new Date(rawDate);
+//         console.log("Line 93 :Date:", rawDate)
 
-    month = month < 10 ? `0${month}` : month;
-    day = day < 10 ? `0${day}` : day;
+//     let year = date.getFullYear();
+//     let month = date.getMonth() +1;
+//     let day = date.getDate();
 
-    return `${day}-${month}-${year}`;
-  }
+//     month = month < 10 ? `0${month}` : month;
+//     day = day < 10 ? `0${day}` : day;
+// console.log("Year:",year)
+// console.log("Month:",month)
+// console.log("Day:",day)
+//     return `${day}-${month}-${year}`;
+//   }
 
   const toggleEndDatePicker = ()=> setShowEndPicker(!showEndPicker)
 
   const onEndchange = ({type}, selectedDate) => {
-    if (type == "set") {
-        const currentDate = formatDate(selectedDate || date); // added ||date
+        console.log("Line 110 :OnEndChangeDate:", selectedDate)
+        if (type == "set") {
+          const currentDate = selectedDate || date; // added ||date
+          console.log("Line 113 :SelectedDate:", selectedDate)
+            console.log("Line 114 :CurrentDate:", currentDate)
 
       setDate(selectedDate);
-      setEndDate(currentDate);
+      setEndDate(currentDate.toDateString());
+      console.log("Line 118 :SelectedDate:", selectedDate)
+      console.log("Line 119 :CurrentDate:", currentDate)
 
       if (Platform.OS === "android") {
         toggleEndDatePicker();
@@ -114,7 +127,9 @@ const handleSubmit = () => {
   };
 
   const confirmIOSEndDate = () => {
-    setEndDate(formatDate(date));
+    console.log("Line 130 :ConfirmIOSDate-Date:", date)
+    setEndDate(date.toDateString());
+    console.log("Line 132 :ConfirmIOSDate-SetEndDate:", date)
     toggleEndDatePicker();
   };
 
