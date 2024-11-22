@@ -7,11 +7,12 @@ import {
   StyleSheet,
   TextInput,
   FlatList,
+  Alert,
 } from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Card from "../components/Card";
-import { fetchItinerary, fetchPossibility } from "../api";
+import { fetchItinerary, fetchPossibility, postPossibility } from "../api";
 
 const TripScreen = ({ route }) => {
   const { tripId, tripName } = route.params;
@@ -23,14 +24,13 @@ const TripScreen = ({ route }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [time, setTime] = useState("");
-  const id = 2;
 
   useEffect(() => {
-    fetchItinerary(id).then((response) => {
+    fetchItinerary(tripId).then((response) => {
       const itineraryList = response.data.activities;
       setItinerary(itineraryList);
     });
-    fetchPossibility(id).then((response) => {
+    fetchPossibility(tripId).then((response) => {
       const possibilityList = response.data.activities;
       setPossibility(possibilityList);
     });
@@ -49,22 +49,46 @@ const TripScreen = ({ route }) => {
   };
 
   const handleEvent = () => {
+    setIsItinerary(false);
+    setIsPossibility(false);
     setIsEvent(true);
   };
 
-  const handlePostItinerary = () => {
-    console.log("Itinerary Item Posted!");
-    setTitle("");
-    setTime("");
-    setIsEvent(false);
+  const handleTitleChange = (e) => {
+    setTitle(e.nativeEvent.text);
   };
 
-  const handlePostPossibility = () => {
-    console.log("Possibility Item Posted!");
+  const handleTimeChange = (e) => {
+    setTime(e.nativeEvent.text);
+  };
+
+  const handleDescriptionChange = (e) => {
+    setDescription(e.nativeEvent.text);
+  };
+
+  const handlePostEvent = () => {
+    const newEvent = {
+      activity_name: title,
+      description: description,
+      date: "2024-11-20T12:00:00.000Z",
+      time: time,
+    };
+
+    console.log("Event being posted: ", newEvent);
+
+    postPossibility(id, newEvent)
+      .then((response) => {
+        alert("Event Created");
+        console.log(response.data);
+      })
+      .catch((err) => {
+        console.log("err >>", err);
+      });
     setTitle("");
-    setDescription("");
     setTime("");
+    setDescription("");
     setIsEvent(false);
+    setIsItinerary(true);
   };
 
   const renderActivity = (activity) => {
@@ -115,14 +139,14 @@ const TripScreen = ({ route }) => {
             <TextInput
               placeholder="Title"
               value={title}
-              onChange={setTitle}
+              onChange={handleTitleChange}
               style={styles.input}
               placeholderTextColor="#888"
             />
             <TextInput
               placeholder="Time"
               value={time}
-              onChange={setTime}
+              onChange={handleTimeChange}
               style={styles.input}
               placeholderTextColor="#888"
             />
@@ -131,7 +155,7 @@ const TripScreen = ({ route }) => {
               numberOfLines={4}
               placeholder="Description"
               value={description}
-              onChange={setDescription}
+              onChange={handleDescriptionChange}
               style={styles.input}
               placeholderTextColor="#888"
             />
@@ -139,7 +163,7 @@ const TripScreen = ({ route }) => {
         </ScrollView>
       )}
       <View style={styles.section}>
-        {isItinerary && !isEvent && (
+        {isItinerary && (
           <FlatList
             data={itinerary}
             renderItem={renderActivity}
@@ -148,7 +172,7 @@ const TripScreen = ({ route }) => {
             scrollEnabled={true}
           />
         )}
-        {isPossibility && !isEvent && (
+        {isPossibility && (
           <FlatList
             data={possibility}
             renderItem={renderActivity}
@@ -166,17 +190,10 @@ const TripScreen = ({ route }) => {
             style={styles.button}
           />
         )}
-        {isEvent && isItinerary && (
+        {isEvent && (
           <Button
             title="Post"
-            onPress={handlePostItinerary}
-            style={styles.button}
-          />
-        )}
-        {isEvent && isPossibility && (
-          <Button
-            title="Post"
-            onPress={handlePostPossibility}
+            onPress={handlePostEvent}
             style={styles.button}
           />
         )}
