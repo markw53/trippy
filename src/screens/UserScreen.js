@@ -2,17 +2,20 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, Image, ScrollView } from "react-native";
 import Header from "../components/Header";
 import Button from "../components/Button";
-import { fetchUserDetails } from "../api";
+import { fetchUserDetails, patchUserDetails } from "../api";
 
 export default function UserScreen() {
   const [userName, setUserName] = useState("");
   const [profilePic, setProfilePic] = useState("");
   const [email, setEmail] = useState("");
+  const [originalUserName, setOriginalUserName] = useState("");
+  const [originalProfilePic, setOriginalProfilePic] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const userId = 7;
 
   useEffect(() => {
-    fetchUserDetails(6)
+    fetchUserDetails(userId)
       .then((response) => {
         console.log("API Response:", response.data);
 
@@ -22,6 +25,9 @@ export default function UserScreen() {
         setProfilePic(data.avatar_url || "");
         setEmail(data.email || "");
 
+        setOriginalUserName(data.name || "");
+        setOriginalProfilePic(data.avatar_url || "");
+
         setLoading(false);
       })
       .catch((error) => {
@@ -30,6 +36,29 @@ export default function UserScreen() {
       });
   }, []);
 
+  const handleSubmit = () => {
+    const updateUser = {
+      user_id: userId,
+      name: userName,
+      avatar_url: profilePic,
+    };
+
+    patchUserDetails(updateUser)
+      .then((response) => {
+        alert(`User details updated successfully!`);
+        console.log("User Details:", response.data.user);
+      })
+      .catch((err) => {
+        alert(`Failed to update user details. Please try again.`);
+        console.error(err);
+      });
+  };
+
+  const handleCancel = () => {
+    setUserName(originalUserName);
+    setProfilePic(originalProfilePic);
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -37,8 +66,6 @@ export default function UserScreen() {
       </View>
     );
   }
-
-  const handleSubmit = () => { }
 
   return (
     <View style={styles.container}>
@@ -73,7 +100,6 @@ export default function UserScreen() {
               multiline={false}
               textAlignVertical="center"
               autoCapitalize="none"
-
             />
           </View>
           <View>
@@ -85,10 +111,16 @@ export default function UserScreen() {
             />
           </View>
           <View style={styles.saveChangesbtn}>
-            <Button title="Save Changes" />
+            <Button
+              title="Save Changes"
+              onPress={handleSubmit}
+            />
           </View>
           <View style={styles.cancelbtn}>
-            <Button title="Cancel" />
+            <Button
+              title="Cancel"
+              onPress={handleCancel} // Fixed here
+            />
           </View>
         </ScrollView>
       </View>
@@ -99,23 +131,23 @@ export default function UserScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F7F7"
+    backgroundColor: "#F7F7F7",
   },
   content: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20
+    padding: 20,
   },
   text: {
     fontSize: 24,
     color: "#24565C",
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   label: {
     fontSize: 16,
     marginVertical: 10,
-    color: "#333"
+    color: "#333",
   },
   input: {
     backgroundColor: "#fff",
@@ -123,34 +155,34 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     padding: 12,
-    fontSize: 16
+    fontSize: 16,
   },
   imageContainer: {
-    alignItems: "center"
+    alignItems: "center",
   },
   image: {
     width: 100,
     height: 100,
-    borderRadius: 50
+    borderRadius: 50,
   },
   userNameheading: {
     fontSize: 18,
     fontWeight: "bold",
-    marginTop: 10
+    marginTop: 10,
   },
   saveChangesbtn: {
-    padding: 10
+    padding: 10,
   },
   cancelbtn: {
-    padding: 10
+    padding: 10,
   },
   loadingText: {
     fontSize: 18,
     color: "#999",
-    marginTop: 20
+    marginTop: 20,
   },
   disabledInput: {
     backgroundColor: "#f5f5f5",
-    color: "#fffff",
+    color: "#999",
   },
 });
