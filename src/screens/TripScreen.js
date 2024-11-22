@@ -102,6 +102,7 @@ const TripScreen = ({ route }) => {
         title={activity.item.activity_name}
         time={activity.item.time}
         content={activity.item.description}
+        image={activity.item.activity_img_url}
       />
     );
   };
