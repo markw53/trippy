@@ -1,14 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import DefaultImage from "../assets/placeholder.png"
 
 const Card = ({ title, content, style, onPress, time, image }) => {
+  const [imageUri, setImageUri] = useState(image);
   return (
     <TouchableOpacity onPress={onPress} style={[styles.card, style]}>
       {image && (
         <Image
-          source={{ uri: image }}
+          source={imageUri ? { uri: imageUri } : DefaultImage}
           style={styles.image}
           resizeMode="cover"
+          onError={() => setImageUri(null)}
         />
       )}
       {title && <Text style={styles.title}>{title}</Text>}
