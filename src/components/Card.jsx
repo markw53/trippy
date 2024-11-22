@@ -1,13 +1,23 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import DefaultImage from "../assets/placeholder.png"
 
-const Card = ({ title, content, style, time }) => {
+const Card = ({ title, content, style, onPress, time, image }) => {
+  const [imageUri, setImageUri] = useState(image);
   return (
-    <View style={[styles.card, style]}>
+    <TouchableOpacity onPress={onPress} style={[styles.card, style]}>
+      {image && (
+        <Image
+          source={imageUri ? { uri: imageUri } : DefaultImage}
+          style={styles.image}
+          resizeMode="cover"
+          onError={() => setImageUri(null)}
+        />
+      )}
       {title && <Text style={styles.title}>{title}</Text>}
-      {time && <Text style={styles.time}> {time}</Text>}
+      {time && <Text style={styles.time}>{time}</Text>}
       {content && <Text style={styles.content}>{content}</Text>}
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -22,6 +32,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     marginVertical: 8,
+  },
+  image: {
+    width: "100%", 
+    height: 150,   
+    borderRadius: 10,
+    marginBottom: 8,
   },
   title: {
     fontSize: 18,

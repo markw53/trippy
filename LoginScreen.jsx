@@ -15,15 +15,23 @@ import {
   sendPasswordResetEmail
 } from "firebase/auth";
 import { auth } from "./firebase";
+import { useAuth } from "./AuthContext";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const { user } = useAuth();
+
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then(() => console.log("Logged in successfully"))
+      .then(() => {
+        console.log("Logged in successfully");
+        if (user) {
+          console.log("Logged-in user details:", user);
+        }
+      })
       .catch((err) => setError(err.message));
   };
 
@@ -128,7 +136,7 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: 50,
-    fontFamily: "Gabriola",
+    fontFamily: "DancingScript-Regular",
     fontWeight: "bold",
     color: "#24565C",
     textAlign: "center",
@@ -136,7 +144,7 @@ const styles = StyleSheet.create({
   },
   tagline: {
     fontSize: 16,
-    fontFamily: "Gabriola",
+    fontFamily: "DancingScript-Regular",
     color: "#24565C",
     textAlign: "center",
     marginBottom: 30
