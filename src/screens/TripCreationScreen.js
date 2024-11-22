@@ -113,7 +113,7 @@ const handleSubmit = () => {
       <ScrollView style={styles.content}>
         <Text style={styles.text}>Create Trip</Text>
         <View>
-        <Text>Trip Name</Text>
+        <Text style={styles.label}>Trip Name</Text>
         <TextInput
           style={styles.input}
           onChangeText={setTripName}
@@ -123,7 +123,7 @@ const handleSubmit = () => {
         {/* {tripName === "" && <Text style={styles.errorText}>Trip Name is required.</Text>} */}
         </View>
         <View>
-        <Text>Destination</Text>
+        <Text  style={styles.label}>Destination</Text>
         <TextInput
           style={styles.input}
           onChangeText={setDestination}
@@ -137,8 +137,8 @@ const handleSubmit = () => {
 
             {showPicker && (
                 <DateTimePicker
-                mode="date"
-                display="spinner"
+                mode={"date"}
+                display={"spinner"}
                 value={date}
                 onChange={onStartChange}
                 style={styles.datePicker}
@@ -185,8 +185,8 @@ const handleSubmit = () => {
             
             {showEndPicker && (
                 <DateTimePicker
-                    mode="date"
-                    display="spinner"
+                    mode={"date"}
+                    display={"spinner"}
                     value={date}
                     onChange={onEndchange}
                     style={styles.datePicker}
@@ -230,7 +230,7 @@ const handleSubmit = () => {
 
         </View>
         <View style={styles.tripContainer}>
-        <Text >Trip Description</Text>
+        <Text style={styles.label}>Trip Description</Text>
         <TextInput
           style={[styles.input, styles.multiLineText]}
           onChangeText={setTripDescription}
@@ -241,7 +241,7 @@ const handleSubmit = () => {
         </View>
          <View style={styles.buttonContainer}>
             <Button
-            title="Done"
+            title={"Done"}
             onPress={handleSubmit}
             style={{ alignSelf: "center", paddingHorizontal: 40 }}
             />
@@ -260,6 +260,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+    marginTop: 40,
     
   },
   text: {
@@ -274,13 +275,14 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     color: "#333",
   },
-  input: {
-    height: 40,
-    marginVertical: 10,
-    borderWidth: 1,
+   input: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
     borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 12,
+    fontSize: 16
   },
   multiLineText: {
     minHeight: 100,
@@ -330,7 +332,4 @@ const styles = StyleSheet.create({
   errorText:{
     color: "red"
   },
-  tripContainer:{
-    marginBottom: 30,
-  }
 });
