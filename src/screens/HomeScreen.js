@@ -1,45 +1,77 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import TripCard from "../components/TripCard";
-import { FlatList } from "react-native";
+import { fetchTripById, fetchTrips, fetchUserTrips } from "../api";
+import { useAuth } from "../../AuthContext";
 
-export default function HomeScreen() {
-  const trips = [
-    {
-      id: "1",
-      name: "Paris",
-      imgUrl:
-        "https://media.disneylandparis.com/d4th/en-usd/images/VDP10_2025apr03_world_paris-vedettes-de-paris-Couloir3-VDP10_16-9_tcm1861-251625.jpg",
-    },
-    {
-      id: "2",
-      name: "Hungary",
-      imgUrl:
-        "https://malaysianharmony.com.my/wp-content/uploads/2022/02/Hungary.jpg",
-    },
-    {
-      id: "3",
-      name: "Barcelona",
-      imgUrl:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYkIEdnS0Ouk8ajir-ZQk3NrTHhpa_X9StZw&s",
-    },
-    {
-      id: "4",
-      name: "Greece",
-      imgUrl:
-        "https://static.independent.co.uk/s3fs-public/thumbnails/image/2021/06/02/20/istock-833264986.jpg",
-    },
-  ];
+export default function HomeScreen({ navigation }) {
+  const [trips, setTrips] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(null);
+  const { user, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user?.userId && isLoading) {
+      setIsLoading(true);
+      fetchUserTrips(user.userId) 
+        .then((response) => {
+          const tripsIds = response.data.trips.map((trip) => trip.trip_id);
+
+          const tripDetailPromises = tripsIds.map((id) =>
+            fetchTripById(id)
+          );
+          return Promise.all(tripDetailPromises);
+        })
+        .then((detailedTrips) => {
+          const tripData = detailedTrips.map((response) => response.data.trip);
+          setTrips(tripData);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setIsError("Failed to fetch trips.");
+          setIsLoading(false);
+        });
+    } else if (!isLoading && !user?.userId) {
+      setIsError("User not authenticated.");
+      setIsLoading(false);
+    }
+  }, [user]);
 
   const renderTrip = ({ item }) => (
     <TripCard
-      tripName={item.name}
-      tripImage={item.imgUrl}
-      onPress={() => console.log(`TripCard pressed: ${item.name}`)}
+      tripId={item.trip_id}
+      tripName={item.trip_name}
+      tripImage={item.trip_img_url}
+      onPress={() =>
+        navigation.navigate("Trip", { tripId: item.trip_id, tripName: item.trip_name })
+      }
     />
   );
+
+  if (isLoading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading trips...</Text>
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.error}>{isError}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -50,7 +82,7 @@ export default function HomeScreen() {
       <FlatList
         data={trips}
         renderItem={renderTrip}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.trip_id.toString()}
         numColumns={2}
         contentContainerStyle={styles.cardsContainer}
         scrollEnabled={false}
@@ -81,10 +113,19 @@ const styles = StyleSheet.create({
   cardsContainer: {
     padding: 30,
   },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  error: {
+    fontSize: 16,
+    color: "red",
+  },
   button: {
     marginTop: 50,
     marginBottom: 100,
-    paddingHorizontal: 80, 
-    marginHorizontal: "auto"
+    paddingHorizontal: 80,
+    marginHorizontal: "auto",
   },
 });

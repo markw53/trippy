@@ -12,18 +12,34 @@ import WeatherScreen from "./src/screens/WeatherScreen";
 import UserScreen from "./src/screens/UserScreen";
 import ChatScreen from "./src/screens/ChatScreen";
 import ItineraryScreen from "./src/screens/ItineraryScreen";
+import SignUpScreen from "./src/screens/SignUpScreen";
 import Header from "./src/components/Header";
+import TripScreen from "./src/screens/TripScreen";
 
 export default function MainApp() {
   const { user } = useAuth();
   const Tab = createBottomTabNavigator();
   const Stack = createStackNavigator();
 
+  const HomeStack = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen
+        name="Trip"
+        component={TripScreen}
+        options={{
+          header: () => <Header title="Trip Details" />,
+        }}
+      />
+    </Stack.Navigator>
+  )
+
   if (!user) {
     return (
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -33,7 +49,7 @@ export default function MainApp() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Tabs">
-          {() =>
+          {() => (
             <Tab.Navigator
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
@@ -54,45 +70,46 @@ export default function MainApp() {
                 tabBarStyle: {
                   backgroundColor: "#CCD6D5",
                   borderTopWidth: 0,
-                  height: 70
+                  height: 70,
                 },
                 tabBarLabelStyle: {
                   fontSize: 12,
                   fontWeight: "bold",
-                  color: "#24565C"
+                  color: "#24565C",
                 },
-                headerShown: false
+                headerShown: false,
               })}
             >
               <Tab.Screen
                 name="Home"
-                component={HomeScreen}
+                component={HomeStack}
                 options={{
-                  header: () => <Header title="Home" />
+                  header: () => <Header title="Home" />,
                 }}
               />
               <Tab.Screen
                 name="Weather"
                 component={WeatherScreen}
                 options={{
-                  header: () => <Header title="Weather" />
+                  header: () => <Header title="Weather" />,
                 }}
               />
               <Tab.Screen
                 name="User"
                 component={UserScreen}
                 options={{
-                  header: () => <Header title="User" />
+                  header: () => <Header title="User" />,
                 }}
               />
-            </Tab.Navigator>}
+            </Tab.Navigator>
+          )}
         </Stack.Screen>
 
         <Stack.Screen
           name="Itinerary"
           component={ItineraryScreen}
           options={{
-            header: () => <Header title="Itinerary" />
+            header: () => <Header title="Itinerary" />,
           }}
         />
 
@@ -100,9 +117,10 @@ export default function MainApp() {
           name="Chat"
           component={ChatScreen}
           options={{
-            header: () => <Header title="Chat" />
+            header: () => <Header title="Chat" />,
           }}
         />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
