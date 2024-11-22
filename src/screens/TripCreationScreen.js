@@ -117,7 +117,7 @@ const handleSubmit = () => {
         <TextInput
           style={styles.input}
           onChangeText={setTripName}
-          placeholder="Enter Trip Name"
+          placeholder={"Enter Trip Name"}
           value={tripName}
         />
         {/* {tripName === "" && <Text style={styles.errorText}>Trip Name is required.</Text>} */}
@@ -127,7 +127,7 @@ const handleSubmit = () => {
         <TextInput
           style={styles.input}
           onChangeText={setDestination}
-          placeholder="Enter Destination"
+          placeholder={"Enter Destination"}
           value={destination}
         />
         </View>
@@ -168,10 +168,10 @@ const handleSubmit = () => {
             <Pressable onPress={toggleDatePicker}>
               <TextInput
                 style={styles.input}
-                placeholder="Start Date"
+                placeholder={"Start Date"}
                 value={startDate}
                 onChangeText={setStartDate}
-                placeholderTextColor="#11182744"
+                placeholderTextColor={"#11182744"}
                 editable={false}
                 onPressIn={toggleDatePicker}
               />
@@ -217,10 +217,10 @@ const handleSubmit = () => {
             <Pressable onPress={toggleEndDatePicker}>
               <TextInput
                 style={styles.input}
-                placeholder="End Date"
+                placeholder={"End Date"}
                 value={endDate}
                 onChangeText={setEndDate}
-                placeholderTextColor="#11182744"
+                placeholderTextColor={"#11182744"}
                 editable={false}
                 onPressIn={toggleEndDatePicker}
               />
@@ -229,17 +229,16 @@ const handleSubmit = () => {
         {/* {!endDate && <Text style={styles.errorText}>End Date is required.</Text>} */}
 
         </View>
-        <View>
-        <Text>Trip Description</Text>
+        <View style={styles.tripContainer}>
+        <Text >Trip Description</Text>
         <TextInput
           style={[styles.input, styles.multiLineText]}
           onChangeText={setTripDescription}
-          placeholder="Trip Description"
+          placeholder={"Trip Description"}
           value={description}
           multiline
         />
         </View>
-      </ScrollView>
          <View style={styles.buttonContainer}>
             <Button
             title="Done"
@@ -247,6 +246,7 @@ const handleSubmit = () => {
             style={{ alignSelf: "center", paddingHorizontal: 40 }}
             />
         </View>
+      </ScrollView>
       <Footer text="Icons display here" style={styles.footer} />
     </View>
   );
@@ -260,6 +260,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+    
   },
   text: {
     fontSize: 24,
@@ -322,12 +323,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttonContainer:{
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 50,
+    marginBottom: 50,
+    
   },
   errorText:{
     color: "red"
+  },
+  tripContainer:{
+    marginBottom: 30,
   }
 });
