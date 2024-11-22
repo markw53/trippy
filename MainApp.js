@@ -15,6 +15,7 @@ import ItineraryScreen from "./src/screens/ItineraryScreen";
 import SignUpScreen from "./src/screens/SignUpScreen";
 import Header from "./src/components/Header";
 import TripScreen from "./src/screens/TripScreen";
+import TripCreationScreen from "./src/screens/TripCreationScreen";
 
 export default function MainApp() {
   const { user } = useAuth();
@@ -31,6 +32,7 @@ export default function MainApp() {
           header: () => <Header title="Trip Details" />,
         }}
       />
+      <Stack.Screen name="TripCreationScreen" component={TripCreationScreen} />
     </Stack.Navigator>
   )
 
