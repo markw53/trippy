@@ -23,19 +23,25 @@ const TripScreen = ({ route }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [time, setTime] = useState("");
-  const id = 2;
+
 
   useEffect(() => {
-    fetchItinerary(id).then((response) => {
-      const itineraryList = response.data.activities;
-      setItinerary(itineraryList);
-    });
-    fetchPossibility(id).then((response) => {
-      const possibilityList = response.data.activities;
-      setPossibility(possibilityList);
-    });
-  }, []);
-
+    if (tripId) {
+      fetchItinerary(tripId)
+        .then((response) => {
+          const itineraryList = response.data.activities;
+          setItinerary(itineraryList);
+        })
+        .catch((err) => console.error("Error fetching itinerary:", err));
+  
+      fetchPossibility(tripId)
+        .then((response) => {
+          const possibilityList = response.data.activities;
+          setPossibility(possibilityList);
+        })
+        .catch((err) => console.error("Error fetching possibilities:", err));
+    }
+  }, [tripId]);
   const handleItinerary = () => {
     setIsPossibility(false);
     setIsEvent(false);
