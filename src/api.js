@@ -11,11 +11,11 @@ export const fetchUserTrips = (userId) => {
 };
 
 export const fetchTripById = (tripId) => {
-    return axios.get(`${apiBase}/trips/${tripId}`)
+  return axios.get(`${apiBase}/trips/${tripId}`)
 }
 
 export const createTrip = (tripData) => {
-  return axios.post(`${apiBase}/trips`,tripData)
+  return axios.post(`${apiBase}/trips`, tripData)
 }
 
 export const fetchItinerary = (tripId) => {
@@ -30,3 +30,10 @@ export const postPossibility = (trip_id, possibility) => {
   return axios.post(`${apiBase}/trips/${trip_id}/activities`, possibility);
 };
 
+export const fetchUserDetails = (user_id) => {
+  return axios.get(`${apiBase}/users/${user_id}`);
+}
+
+export const patchUserDetails = (user_id) => {
+  return axios.patch(`${apiBase}/users/${user_id}`);
+}
