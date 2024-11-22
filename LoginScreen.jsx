@@ -27,26 +27,9 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
-        // Log the user in successfully, now user is accessible from the context
         console.log("Logged in successfully");
-        
-        // Optionally, pass the email and UID to your API here
         if (user) {
-          fetch(`https://backend-for-trippy.onrender.com/api/users/email/${currentUser.email}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: user.email,
-              user_id: user.uid,
-            }),
-          })
-          .then(response => response.json())
-          .then(data => {
-            console.log("API Response:", data);
-          })
-          .catch(error => console.error("Error:", error));
+          console.log("Logged-in user details:", user);
         }
       })
       .catch((err) => setError(err.message));

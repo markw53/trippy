@@ -10,33 +10,40 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import TripCard from "../components/TripCard";
 import { fetchTripById, fetchTrips, fetchUserTrips } from "../api";
+import { useAuth } from "../../AuthContext";
 
 export default function HomeScreen({ navigation }) {
   const [trips, setTrips] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(null);
-  const userId = 3;
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    fetchUserTrips(userId)
-      .then((response) => {
-        const tripsIds = response.data.trips.map((trip) => trip.trip_id);
+    if (!authLoading && user?.userId && isLoading) {
+      setIsLoading(true);
+      fetchUserTrips(user.userId) 
+        .then((response) => {
+          const tripsIds = response.data.trips.map((trip) => trip.trip_id);
 
-        const tripDetailPromises = tripsIds.map((id) =>
-          fetchTripById(id)
-        );
-        return Promise.all(tripDetailPromises);
-      })
-      .then((detailedTrips) => {
-        const tripData = detailedTrips.map((response) => response.data.trip)
-        setTrips(tripData);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        setIsError(true);
-        setIsLoading(false);
-      });
-  }, [userId]);
+          const tripDetailPromises = tripsIds.map((id) =>
+            fetchTripById(id)
+          );
+          return Promise.all(tripDetailPromises);
+        })
+        .then((detailedTrips) => {
+          const tripData = detailedTrips.map((response) => response.data.trip);
+          setTrips(tripData);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setIsError("Failed to fetch trips.");
+          setIsLoading(false);
+        });
+    } else if (!isLoading && !user?.userId) {
+      setIsError("User not authenticated.");
+      setIsLoading(false);
+    }
+  }, [user]);
 
   const renderTrip = ({ item }) => (
     <TripCard
