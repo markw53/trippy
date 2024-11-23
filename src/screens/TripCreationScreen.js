@@ -11,11 +11,13 @@ import {
   ScrollView
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { createTrip } from "../api";
+import { GOOGLE_PLACES_API_KEY } from "@env";
 
 export default function TripCreationScreen() {
   const [tripName, setTripName] = useState("");
@@ -28,8 +30,7 @@ export default function TripCreationScreen() {
 
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [endDate, setEndDate] = useState("");
-  //Added
-  //-------------------------------------------------------------------------
+
   const handleSubmit = () => {
     if (!destination || !tripName || !startDate || !endDate) {
       alert("All fields are required!");
@@ -61,7 +62,6 @@ export default function TripCreationScreen() {
         console.error(err);
       });
   };
-  //-------------------------------------------------------------------------
 
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
@@ -69,7 +69,7 @@ export default function TripCreationScreen() {
 
   const onStartChange = ({ type }, selectedDate) => {
     if (type == "set") {
-      const currentDate = selectedDate || date; // added ||date
+      const currentDate = selectedDate || date;
 
       setDate(selectedDate);
       setStartDate(currentDate.toDateString());
@@ -91,7 +91,7 @@ export default function TripCreationScreen() {
 
   const onEndchange = ({ type }, selectedDate) => {
     if (type == "set") {
-      const currentDate = selectedDate || date; // added ||date
+      const currentDate = selectedDate || date;
       setDate(selectedDate);
       setEndDate(currentDate.toDateString());
 
@@ -122,18 +122,24 @@ export default function TripCreationScreen() {
             placeholder={"Enter Trip Name"}
             value={tripName}
           />
-          {/* {tripName === "" && <Text style={styles.errorText}>Trip Name is required.</Text>} */}
         </View>
         <View>
           <Text style={styles.label}>Destination</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={setDestination}
-            placeholder={"Enter Destination"}
-            value={destination}
+          <GooglePlacesAutocomplete
+            placeholder="Search for destination"
+            query={{
+              key: GOOGLE_PLACES_API_KEY,
+              language: "en"
+            }}
+            onPress={(data, details) => {
+              setDestination(data.description); 
+            }}
+            styles={{
+              textInput: styles.input
+            }}
           />
         </View>
-        {/* {destination === "" && <Text style={styles.errorText}>Destination is required.</Text>} */}
+
         <View onPress={toggleDatePicker}>
           <Text style={styles.label}>Start Date</Text>
 
@@ -181,7 +187,6 @@ export default function TripCreationScreen() {
                 onPressIn={toggleDatePicker}
               />
             </Pressable>}
-          {/* {!startDate && <Text style={styles.errorText}>Start Date is required.</Text>} */}
         </View>
 
         <View onPress={toggleDatePicker}>
@@ -228,7 +233,6 @@ export default function TripCreationScreen() {
                 onPressIn={toggleEndDatePicker}
               />
             </Pressable>}
-          {/* {!endDate && <Text style={styles.errorText}>End Date is required.</Text>} */}
         </View>
         <View style={styles.tripContainer}>
           <Text style={styles.label}>Trip Description</Text>
