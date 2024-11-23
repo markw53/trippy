@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  FlatList,
   Platform,
   TouchableOpacity,
   Pressable,
@@ -12,10 +11,8 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-
 import Button from "../components/Button";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
 import { createTrip } from "../api";
 import { GOOGLE_PLACES_API_KEY } from "@env";
 
@@ -23,11 +20,9 @@ export default function TripCreationScreen() {
   const [tripName, setTripName] = useState("");
   const [destination, setDestination] = useState("");
   const [description, setTripDescription] = useState("");
-
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [startDate, setStartDate] = useState("");
-
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [endDate, setEndDate] = useState("");
 
@@ -132,7 +127,7 @@ export default function TripCreationScreen() {
               language: "en"
             }}
             onPress={(data, details) => {
-              setDestination(data.description); 
+              setDestination(data.description);
             }}
             styles={{
               textInput: styles.input
