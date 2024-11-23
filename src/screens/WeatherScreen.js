@@ -10,6 +10,7 @@ import {
 import * as Location from "expo-location";
 import axios from "axios";
 import Header from "../components/Header";
+import { WEATHER_API_KEY } from "@env";
 
 let MapView, Marker;
 if (Platform.OS === "web") {
@@ -40,7 +41,7 @@ export default function WeatherScreen() {
         const { latitude, longitude } = location.coords;
         setLocation({ latitude, longitude });
 
-        const API_KEY = "9bbf52bb91991e0f174188157333b47c";
+        const API_KEY = WEATHER_API_KEY;
         const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
         const response = await axios.get(url);
 
