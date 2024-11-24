@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { WEATHER_API_KEY } from "@env";
 
 const Header = ({ title, style, textStyle }) => {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -36,7 +37,7 @@ const Header = ({ title, style, textStyle }) => {
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
-      const API_KEY = "9bbf52bb91991e0f174188157333b47c";
+      const API_KEY = WEATHER_API_KEY;
       const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
       const response = await axios.get(url);
 
@@ -105,10 +106,10 @@ const Header = ({ title, style, textStyle }) => {
       });
   };
 
-  const handleNavigateToChat = () => {
-    toggleMenu();
-    navigation.navigate("Chat");
-  };
+  // const handleNavigateToChat = () => {
+  //   toggleMenu();
+  //   navigation.navigate("Chat");
+  // };
 
   const handleNavigateToItinerary = () => {
     toggleMenu();
@@ -142,7 +143,7 @@ const Header = ({ title, style, textStyle }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.menu}>
             <Button title="Itinerary" onPress={handleNavigateToItinerary} />
-            <Button title="Chat" onPress={handleNavigateToChat} />
+            {/* <Button title="Chat" onPress={HandleNavigateToChat} /> */}
             <Button title="Logout" onPress={handleLogout} />
             <Button title="Close" onPress={toggleMenu} />
           </View>

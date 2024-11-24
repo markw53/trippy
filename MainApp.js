@@ -6,7 +6,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useAuth } from "./AuthContext";
 import { SafeAreaView } from "react-native";
 
-import LoginScreen from "./LoginScreen";
+import LoginScreen from "./src/screens/LoginScreen";
 import HomeScreen from "./src/screens/HomeScreen";
 import WeatherScreen from "./src/screens/WeatherScreen";
 import UserScreen from "./src/screens/UserScreen";
@@ -15,6 +15,7 @@ import ItineraryScreen from "./src/screens/ItineraryScreen";
 import SignUpScreen from "./src/screens/SignUpScreen";
 import Header from "./src/components/Header";
 import TripScreen from "./src/screens/TripScreen";
+import TripCreationScreen from "./src/screens/TripCreationScreen";
 
 export default function MainApp() {
   const { user } = useAuth();
@@ -31,6 +32,7 @@ export default function MainApp() {
           header: () => <Header title="Trip Details" />,
         }}
       />
+      <Stack.Screen name="TripCreationScreen" component={TripCreationScreen} />
     </Stack.Navigator>
   )
 
@@ -61,6 +63,8 @@ export default function MainApp() {
                     iconName = focused ? "cloud" : "cloud-outline";
                   } else if (route.name === "User") {
                     iconName = focused ? "person" : "person-outline";
+                  } else if (route.name === "Chat") {
+                    iconName = focused ? "chatbubble" : "chatbubble-outline";
                   }
 
                   return <Ionicons name={iconName} size={size} color={color} />;
@@ -95,6 +99,13 @@ export default function MainApp() {
                 }}
               />
               <Tab.Screen
+                name="Chat"
+                component={ChatScreen}
+                options={{
+                  header: () => <Header title="Chat" />,
+                }}
+              />
+              <Tab.Screen
                 name="User"
                 component={UserScreen}
                 options={{
@@ -113,13 +124,13 @@ export default function MainApp() {
           }}
         />
 
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Chat"
           component={ChatScreen}
           options={{
             header: () => <Header title="Chat" />,
           }}
-        />
+        /> */}
 
       </Stack.Navigator>
     </NavigationContainer>

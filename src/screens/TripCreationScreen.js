@@ -1,335 +1,239 @@
-
-
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, FlatList, Platform, TouchableOpacity, Pressable, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Button,
+  Platform,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
-import Button from "../components/Button";
+import MapView, { Marker } from "react-native-maps";
+import axios from "axios";
+import { GOOGLE_PLACES_API_KEY } from "@env";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { createTrip } from "../api";
 
-export default function TripCreationScreen() {
+const API = GOOGLE_PLACES_API_KEY;
+
+export default function TripCreationScreen({ navigation }) {
   const [tripName, setTripName] = useState("");
   const [destination, setDestination] = useState("");
-  const [description, setTripDescription] = useState("");
-
-  const [date, setDate] = useState(new Date());
-  const [showPicker, setShowPicker] = useState(false);
-  const [startDate, setStartDate] = useState("");
-  
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-  const [endDate, setEndDate] = useState("");
-  //Added
- //-------------------------------------------------------------------------
-const handleSubmit = () => {
-  if (!destination || !tripName || !startDate || !endDate) {
-    alert("All fields are required!");
-    return;
-  }
-  if (new Date(endDate).toISOString() < new Date(startDate).toISOString()) {
-      alert("End Date cannot be before Start Date!");
+  const [description, setDescription] = useState("");
+
+  const fetchSuggestions = async (query) => {
+    if (!query) return setSuggestions([]);
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json`,
+        {
+          params: {
+            input: query,
+            key: API,
+          },
+        }
+      );
+      setSuggestions(response.data.predictions);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+    }
+  };
+
+  const handleSelectSuggestion = async (placeId) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/details/json`,
+        {
+          params: {
+            place_id: placeId,
+            key: API,
+          },
+        }
+      );
+      const { location } = response.data.result.geometry;
+      setSelectedLocation({
+        latitude: location.lat,
+        longitude: location.lng,
+      });
+      setDestination(response.data.result.name);
+      setSuggestions([]);
+    } catch (error) {
+      console.error("Error fetching location details:", error);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!tripName || !destination || !description) {
+      alert("Please fill out all fields.");
       return;
     }
-   
-    
-    const userId = 1;
-
     const tripData = {
-      trip_name: tripName,
-      location: destination,
-      description: description,
-      start_date: new Date(startDate).toISOString() ,
-      end_date: new Date(endDate).toISOString(),
-      created_by: userId,
-    }
-
-    createTrip(tripData)
-    .then((response)=>{
-      alert(`Trip Created Successfully`)
-      console.log("Created Trip:", response.data)
-    })
-    .catch((err)=>{
-      alert("Failed to create trip. Please try again");
-      console.error(err)
-  }) 
-};
-//-------------------------------------------------------------------------
-
-  const toggleDatePicker = () => {
-    setShowPicker(!showPicker);
-  };
-
-  const onStartChange = ({type}, selectedDate) => {
-    
-    if (type == "set") {
-        const currentDate = selectedDate || date; // added ||date
-
-      setDate(selectedDate);
-      setStartDate(currentDate.toDateString());
-      
-      if (Platform.OS === "android") {
-        toggleDatePicker();
-      }
-    } else {
-      toggleDatePicker();
-    }
-  };
-
-  const confirmIOSDate = () => {
- 
-    setStartDate(date.toDateString());
-    toggleDatePicker();
-  };
-
-  const toggleEndDatePicker = ()=> setShowEndPicker(!showEndPicker)
-
-  const onEndchange = ({type}, selectedDate) => {
-        
-        if (type == "set") {
-      const currentDate = selectedDate || date; // added ||date
-      setDate(selectedDate);
-      setEndDate(currentDate.toDateString());
-
-
-      if (Platform.OS === "android") {
-        toggleEndDatePicker();
-      }
-    } else {
-      toggleEndDatePicker();
-    }
-  };
-
-  const confirmIOSEndDate = () => {
-   
-    setEndDate(date.toDateString());
-    
-    toggleEndDatePicker();
+      tripName,
+      destination,
+      startDate,
+      endDate,
+      description,
+      location: selectedLocation,
+    };
+    console.log("New Trip:", tripData);
+    alert("Trip created successfully!");
+    navigation.goBack(); // Navigate back to the previous screen
   };
 
   return (
-    <View style={styles.container}>
-      <Header title="Trippy" />
-      <ScrollView style={styles.content}>
-        <Text style={styles.text}>Create Trip</Text>
-        <View>
+    <View style={styles.screen}>
+      <Header title="Create Trip" /> {/* Add the header */}
+
+      <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.label}>Trip Name</Text>
         <TextInput
           style={styles.input}
-          onChangeText={setTripName}
-          placeholder={"Enter Trip Name"}
           value={tripName}
+          onChangeText={setTripName}
+          placeholder="Enter trip name"
         />
-        {/* {tripName === "" && <Text style={styles.errorText}>Trip Name is required.</Text>} */}
-        </View>
-        <View>
-        <Text  style={styles.label}>Destination</Text>
+
+        <Text style={styles.label}>Destination</Text>
         <TextInput
           style={styles.input}
-          onChangeText={setDestination}
-          placeholder={"Enter Destination"}
           value={destination}
+          onChangeText={(text) => {
+            setDestination(text);
+            fetchSuggestions(text);
+          }}
+          placeholder="Search for a destination"
         />
-        </View>
-          {/* {destination === "" && <Text style={styles.errorText}>Destination is required.</Text>} */}
-        <View onPress={toggleDatePicker}>
-            <Text style={styles.label}>Start Date</Text>
+        {suggestions.length > 0 && (
+          <View style={styles.suggestions}>
+            {suggestions.map((suggestion) => (
+              <TouchableOpacity
+                key={suggestion.place_id}
+                onPress={() => handleSelectSuggestion(suggestion.place_id)}
+              >
+                <Text style={styles.suggestionText}>
+                  {suggestion.description}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
-            {showPicker && (
-                <DateTimePicker
-                mode={"date"}
-                display={"spinner"}
-                value={date}
-                onChange={onStartChange}
-                style={styles.datePicker}
-                minimumDate={startDate ? new Date(startDate) : new Date()}
-                />
-            )}
+        <Text style={styles.label}>Start Date</Text>
+        <TouchableOpacity onPress={() => setShowStartPicker(true)}>
+          <Text style={styles.dateText}>
+            {startDate.toDateString()}
+          </Text>
+        </TouchableOpacity>
+        {showStartPicker && (
+          <DateTimePicker
+            value={startDate}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowStartPicker(false);
+              if (selectedDate) setStartDate(selectedDate);
+            }}
+          />
+        )}
 
-            {showPicker && Platform.OS === "ios" && (
-              <View style={styles.iosButtons}>
-                <TouchableOpacity
-                    style={[styles.button, styles.pickerButton, styles.cancelButton]}
-                    onPress={toggleDatePicker}
-                >
-                    <Text style={styles.cancelText}>Cancel</Text>
-                </TouchableOpacity>
+        <Text style={styles.label}>End Date</Text>
+        <TouchableOpacity onPress={() => setShowEndPicker(true)}>
+          <Text style={styles.dateText}>
+            {endDate.toDateString()}
+          </Text>
+        </TouchableOpacity>
+        {showEndPicker && (
+          <DateTimePicker
+            value={endDate}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowEndPicker(false);
+              if (selectedDate) setEndDate(selectedDate);
+            }}
+          />
+        )}
 
-                <TouchableOpacity
-                    style={[styles.button, styles.pickerButton]}
-                    onPress={confirmIOSDate}
-                >
-                    <Text style={styles.buttonText}>Confirm</Text>
-                </TouchableOpacity>
-            </View>
-          )}
-
-          {!showPicker && (
-            <Pressable onPress={toggleDatePicker}>
-              <TextInput
-                style={styles.input}
-                placeholder={"Start Date"}
-                value={startDate}
-                onChangeText={setStartDate}
-                placeholderTextColor={"#11182744"}
-                editable={false}
-                onPressIn={toggleDatePicker}
-              />
-            </Pressable>
-          )}
-        {/* {!startDate && <Text style={styles.errorText}>Start Date is required.</Text>} */}
-        </View>
-
-        <View onPress={toggleDatePicker}>
-            <Text style={styles.label}>End Date</Text>
-            
-            {showEndPicker && (
-                <DateTimePicker
-                    mode={"date"}
-                    display={"spinner"}
-                    value={date}
-                    onChange={onEndchange}
-                    style={styles.datePicker}
-                    minimumDate={endDate ? new Date(endDate) : new Date()}
-
-                />
-            )};
-
-            {showEndPicker && Platform.OS === "ios" && (
-                <View style={styles.iosButtons}>
-                    <TouchableOpacity
-                    style={[styles.button, styles.pickerButton, styles.cancelButton]}
-                    onPress={toggleEndDatePicker}
-                >
-                    <Text style={styles.cancelText}>Cancel</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={[styles.button, styles.pickerButton]}
-                    onPress={confirmIOSEndDate}
-                >
-                    <Text style={styles.buttonText}>Confirm</Text>
-                </TouchableOpacity>
-                </View>
-            
-            )};
-            {!showEndPicker && (
-            <Pressable onPress={toggleEndDatePicker}>
-              <TextInput
-                style={styles.input}
-                placeholder={"End Date"}
-                value={endDate}
-                onChangeText={setEndDate}
-                placeholderTextColor={"#11182744"}
-                editable={false}
-                onPressIn={toggleEndDatePicker}
-              />
-            </Pressable>
-          )}
-        {/* {!endDate && <Text style={styles.errorText}>End Date is required.</Text>} */}
-
-        </View>
-        <View style={styles.tripContainer}>
-        <Text style={styles.label}>Trip Description</Text>
+        <Text style={styles.label}>Description</Text>
         <TextInput
-          style={[styles.input, styles.multiLineText]}
-          onChangeText={setTripDescription}
-          placeholder={"Trip Description"}
+          style={[styles.input, styles.textArea]}
           value={description}
+          onChangeText={setDescription}
+          placeholder="Enter trip description"
           multiline
         />
-        </View>
-         <View style={styles.buttonContainer}>
-            <Button
-            title={"Done"}
-            onPress={handleSubmit}
-            style={{ alignSelf: "center", paddingHorizontal: 40 }}
-            />
-        </View>
+
+        {selectedLocation && (
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              ...selectedLocation,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            }}
+          >
+            <Marker coordinate={selectedLocation} />
+          </MapView>
+        )}
+
+        <Button title="Create Trip" onPress={handleSubmit} />
       </ScrollView>
-      <Footer text="Icons display here" style={styles.footer} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
+    padding: 16,
     backgroundColor: "#F7F7F7",
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    marginTop: 40,
-    
-  },
-  text: {
-    fontSize: 24,
-    color: "#24565C",
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
   },
   label: {
     fontSize: 16,
-    marginVertical: 10,
-    color: "#333",
+    color: "#24565C",
+    marginVertical: 8,
+    fontWeight: "bold",
   },
-   input: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    borderColor: "#ccc",
+  input: {
     borderWidth: 1,
-    marginBottom: 10,
-    padding: 12,
-    fontSize: 16
+    borderColor: "#ddd",
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: "#fff",
   },
-  multiLineText: {
-    minHeight: 100,
+  textArea: {
+    height: 100,
     textAlignVertical: "top",
   },
-  cardsContainer: {
-    paddingVertical: 0
+  suggestions: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    marginTop: 5,
   },
-  footer: {
-    borderTopWidth: 1,
-    borderColor: "#ccc",
+  suggestionText: {
     padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
-  datePicker: {
-    height: 120,
-    marginTop: -10,
-  },
-  iosButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 10,
-  },
-  pickerButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    backgroundColor: "#075985",
-  },
-  cancelButton: {
-    backgroundColor: "#e5e7eb",
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#fff",
+  dateText: {
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
     textAlign: "center",
   },
-  cancelText: {
-    color: "#075985",
-    textAlign: "center",
-  },
-  buttonContainer:{
-    marginTop: 50,
-    marginBottom: 50,
-    
-  },
-  errorText:{
-    color: "red"
+  map: {
+    height: 200,
+    marginVertical: 16,
   },
 });
