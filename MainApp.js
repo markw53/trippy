@@ -63,6 +63,8 @@ export default function MainApp() {
                     iconName = focused ? "cloud" : "cloud-outline";
                   } else if (route.name === "User") {
                     iconName = focused ? "person" : "person-outline";
+                  } else if (route.name === "Chat") {
+                    iconName = focused ? "chatbubble" : "chatbubble-outline";
                   }
 
                   return <Ionicons name={iconName} size={size} color={color} />;
@@ -97,6 +99,13 @@ export default function MainApp() {
                 }}
               />
               <Tab.Screen
+                name="Chat"
+                component={ChatScreen}
+                options={{
+                  header: () => <Header title="Chat" />,
+                }}
+              />
+              <Tab.Screen
                 name="User"
                 component={UserScreen}
                 options={{
@@ -115,13 +124,13 @@ export default function MainApp() {
           }}
         />
 
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Chat"
           component={ChatScreen}
           options={{
             header: () => <Header title="Chat" />,
           }}
-        />
+        /> */}
 
       </Stack.Navigator>
     </NavigationContainer>
