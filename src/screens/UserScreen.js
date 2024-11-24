@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, Image, ScrollView } from "react-native";
+import * as ImagePicker from "expo-image-picker"; // Import Image Picker
 import Header from "../components/Header";
-import Button from "../components/Button";
+import Button from "../components/Button"
 import { fetchUserDetails, patchUserDetails } from "../api";
+import axios from "axios";
+// import { apiBase } from "../api";
+export const apiBase = "https://backend-for-trippy.onrender.com/api";
+
+
 
 export default function UserScreen() {
   const [userName, setUserName] = useState("");
@@ -17,7 +23,7 @@ export default function UserScreen() {
   useEffect(() => {
     fetchUserDetails(userId)
       .then((response) => {
-        console.log("API Response:", response.data);
+        console.log("Line 20: API Response:", response.data);
 
         const data = response.data.user;
 
@@ -40,24 +46,82 @@ export default function UserScreen() {
     const updateUser = {
       user_id: userId,
       name: userName,
-      avatar_url: profilePic,
+      avatar_url: profilePic, // Ensure this matches the backend's expected format
     };
+
+    console.log("Updating user with data:", updateUser); // Debugging payload
 
     patchUserDetails(updateUser)
       .then((response) => {
-        alert(`User details updated successfully!`);
-        console.log("User Details:", response.data.user);
+        alert("User details updated successfully!");
+        console.log("Response from server:", response.data);
       })
       .catch((err) => {
-        alert(`Failed to update user details. Please try again.`);
-        console.error(err);
+        if (err.response) {
+          console.error("Server responded with an error:", err.response.data);
+          alert(`Error: ${err.response.data.message || "Bad Request"}`);
+        } else {
+          console.error("Error updating user details:", err.message);
+        }
       });
   };
+
 
   const handleCancel = () => {
     setUserName(originalUserName);
     setProfilePic(originalProfilePic);
   };
+
+  // Function to pick image from gallery
+  const handleImagePicker = () => {
+    // Request permission for media library access
+    ImagePicker.requestMediaLibraryPermissionsAsync()
+      .then(({ status }) => {
+        if (status !== "granted") {
+          alert("Permission to access gallery is required!");
+          throw new Error("Permission not granted");
+        }
+
+        // Launch the image picker
+        return ImagePicker.launchImageLibraryAsync({
+          mediaType: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          quality: 1,
+        });
+      })
+      .then((result) => {
+        if (result.cancelled) {
+          throw new Error("Image selection cancelled");
+        }
+
+        const formData = new FormData();
+        formData.append("file", {
+          uri: result.uri,
+          name: "profile.jpg",
+          type: "image/jpeg",
+        });
+
+        // Upload image to the server
+        return axios.post(`${apiBase}/upload`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      })
+      .then((response) => {
+        setProfilePic(response.data.url); // Update profile picture URL
+        alert("Image uploaded successfully!");
+      })
+      .catch((error) => {
+        if (error.message === "Permission not granted" || error.message === "Image selection cancelled") {
+          console.warn(error.message);
+        } else {
+          console.error("Image upload failed:", error);
+          alert("Failed to upload image. Please try again.");
+        }
+      });
+  };
+
+
+
 
   if (loading) {
     return (
@@ -75,13 +139,16 @@ export default function UserScreen() {
           <Text style={styles.text}>Welcome to your Profile!</Text>
           <View style={styles.imageContainer}>
             <Image
+              key={profilePic}
               style={styles.image}
               source={{
                 uri: profilePic || "https://reactnative.dev/img/tiny_logo.png",
               }}
+              onError={() => setProfilePic("https://reactnative.dev/img/tiny_logo.png")}
             />
             <Text style={styles.userNameheading}>{userName || "The Goat Coder"}</Text>
           </View>
+
           <View>
             <Text style={styles.label}>Name:</Text>
             <TextInput
@@ -90,18 +157,12 @@ export default function UserScreen() {
               value={userName}
             />
           </View>
+          {/* Profile Picture Picker */}
           <View>
             <Text style={styles.label}>Profile Picture:</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={setProfilePic}
-              value={profilePic}
-              numberOfLines={1}
-              multiline={false}
-              textAlignVertical="center"
-              autoCapitalize="none"
-            />
+            <Button title="Upload Photo" onPress={handleImagePicker} />
           </View>
+
           <View>
             <Text style={styles.label}>Email:</Text>
             <TextInput
@@ -111,16 +172,10 @@ export default function UserScreen() {
             />
           </View>
           <View style={styles.saveChangesbtn}>
-            <Button
-              title="Save Changes"
-              onPress={handleSubmit}
-            />
+            <Button title="Save Changes" onPress={handleSubmit} />
           </View>
           <View style={styles.cancelbtn}>
-            <Button
-              title="Cancel"
-              onPress={handleCancel} // Fixed here
-            />
+            <Button title="Cancel" onPress={handleCancel} />
           </View>
         </ScrollView>
       </View>
@@ -140,6 +195,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   text: {
+    marginBottom: 30,
     fontSize: 24,
     color: "#24565C",
     fontWeight: "bold",
