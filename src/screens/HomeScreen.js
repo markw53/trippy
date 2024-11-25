@@ -22,13 +22,11 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     if (!authLoading && user?.userId && isLoading) {
       setIsLoading(true);
-      fetchUserTrips(user.userId) 
+      fetchUserTrips(user.userId)
         .then((response) => {
           const tripsIds = response.data.trips.map((trip) => trip.trip_id);
 
-          const tripDetailPromises = tripsIds.map((id) =>
-            fetchTripById(id)
-          );
+          const tripDetailPromises = tripsIds.map((id) => fetchTripById(id));
           return Promise.all(tripDetailPromises);
         })
         .then((detailedTrips) => {
@@ -48,21 +46,23 @@ export default function HomeScreen({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      if (navigation.getState()?.routes?.some((route) => route.params?.newTrip)) {
-        const newTrip = navigation.getState().routes.find(
-          (route) => route.params?.newTrip
-        ).params.newTrip;
-  
+      if (
+        navigation.getState()?.routes?.some((route) => route.params?.newTrip)
+      ) {
+        const newTrip = navigation
+          .getState()
+          .routes.find((route) => route.params?.newTrip).params.newTrip;
+
         setTrips((prevTrips) => [newTrip, ...prevTrips]);
-  
+
         navigation.setParams({ newTrip: null });
       }
     }, [navigation])
   );
 
   const handleCreateTrip = () => {
-    navigation.navigate("TripCreationScreen")
-  }
+    navigation.navigate("TripCreationScreen");
+  };
 
   const renderTrip = ({ item }) => (
     <TripCard
@@ -70,7 +70,11 @@ export default function HomeScreen({ navigation }) {
       tripName={item.trip_name}
       tripImage={item.trip_img_url}
       onPress={() =>
-        navigation.navigate("Trip", { tripId: item.trip_id, tripName: item.trip_name })
+        navigation.navigate("Trip", {
+          tripId: item.trip_id,
+          tripName: item.trip_name,
+          navigation: navigation,
+        })
       }
     />
   );
@@ -107,7 +111,11 @@ export default function HomeScreen({ navigation }) {
         scrollEnabled={false}
       />
       <View>
-        <Button title="Add trip" style={styles.button} onPress={handleCreateTrip} />
+        <Button
+          title="Add trip"
+          style={styles.button}
+          onPress={handleCreateTrip}
+        />
       </View>
     </View>
   );

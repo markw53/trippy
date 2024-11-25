@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import Button from "../components/Button";
+import ItineraryButton from "../components/ItineraryButtons";
 import Header from "../components/Header";
 import Card from "../components/Card";
 import { fetchItinerary, fetchPossibility, postPossibility } from "../api";
@@ -17,7 +17,7 @@ import { FlatList, ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const TripScreen = ({ route }) => {
-  const { tripId, tripName } = route.params;
+  const { tripId, tripName, navigation } = route.params;
   const [itinerary, setItinerary] = useState([]);
   const [possibility, setPossibility] = useState([]);
   const [isItinerary, setIsItinerary] = useState(true);
@@ -110,7 +110,7 @@ const TripScreen = ({ route }) => {
         console.log(response.data);
       })
       .catch((err) => {
-        console.log("err >>", err);
+        console.log("Error posting activity:", err);
       });
     setTitle("");
     setTime("");
@@ -136,9 +136,17 @@ const TripScreen = ({ route }) => {
       <Card
         title={activity.item.activity_name}
         time={activity.item.time}
+        votes={activity.item.votes}
         content={activity.item.description}
         image={activity.item.activity_img_url}
         date={readableDate}
+        onPress={() =>
+          navigation.navigate("Activity", {
+            activityId: activity.item.activity_id,
+            tripId: tripId,
+            navigation: navigation,
+          })
+        }
       />
     );
   };
@@ -165,13 +173,13 @@ const TripScreen = ({ route }) => {
           </View>
         </View>
         <View style={styles.tabs}>
-          <Button
+          <ItineraryButton
             title="Itinerary"
             onPress={handleItinerary}
             style={styles.button}
             isActive={isItinerary}
           />
-          <Button
+          <ItineraryButton
             title="Possibility"
             onPress={handlePossibility}
             style={styles.button}
@@ -228,11 +236,10 @@ const TripScreen = ({ route }) => {
                   style={styles.datePicker}
                 />
               )}
-              <Button
+              <ItineraryButton
                 title="Post"
                 onPress={handlePostEvent}
                 style={styles.button}
-                isActive={true}
               />
             </View>
           </ScrollView>
@@ -255,15 +262,15 @@ const TripScreen = ({ route }) => {
             />
           )}
         </View>
-        <View style={styles.section}>
-          {!isEvent && (
-            <Button
+        {!isEvent && (
+          <View style={styles.section}>
+            <ItineraryButton
               title={"Add Event"}
               onPress={handleEvent}
               style={styles.button}
             />
-          )}
-        </View>
+          </View>
+        )}
       </View>
     </KeyboardAvoidingView>
   );
@@ -337,9 +344,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     justifyContent: "center",
     alignItems: "center",
-  },
-  footer: {
-    margin: 0,
   },
 });
 
