@@ -29,3 +29,20 @@ export const fetchPossibility = tripId => {
 export const postPossibility = (trip_id, possibility) => {
   return axios.post(`${apiBase}/trips/${trip_id}/activities`, possibility);
 };
+export const fetchTripMembers = (tripId) => {
+  return axios.get(`${apiBase}/trips/${tripId}/members`);
+};
+export const fetchRoomMessages = (roomId) => {
+  return axios.get(`${apiBase}/rooms/${roomId}/messages`);
+};
+export const postMessage = (roomId, messageData) => {
+  return axios.post(`${apiBase}/rooms/${roomId}/messages`, messageData);
+};
+export const fetchUserName = (userId) => {
+  return axios.get(`${apiBase}/users/${userId}`)
+    .then((response) => response.data.user.name) 
+    .catch((err) => {
+      console.error("Error fetching user name:", err);
+    });
+};
+
