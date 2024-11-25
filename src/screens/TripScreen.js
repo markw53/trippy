@@ -158,6 +158,8 @@ const TripScreen = ({ route }) => {
     >
       <View style={styles.container}>
         <Header title="Trippy" />
+        <ScrollView>
+
         <View style={styles.section}>
           <Text style={styles.title}>{tripName}</Text>
           <View style={styles.image}>
@@ -271,6 +273,7 @@ const TripScreen = ({ route }) => {
             />
           </View>
         )}
+        </ScrollView>
       </View>
     </KeyboardAvoidingView>
   );
