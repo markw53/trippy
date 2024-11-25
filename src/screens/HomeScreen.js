@@ -27,12 +27,22 @@ export default function HomeScreen({ navigation }) {
         .then((response) => {
           const tripsIds = response.data.trips.map((trip) => trip.trip_id);
 
+          if (tripsIds.length === 0) {
+            setTrips([]);
+            setIsLoading(false);
+            return;
+          }
+
           const tripDetailPromises = tripsIds.map((id) => fetchTripById(id));
           return Promise.all(tripDetailPromises);
         })
         .then((detailedTrips) => {
-          const tripData = detailedTrips.map((response) => response.data.trip);
-          setTrips(tripData);
+          if (detailedTrips) {
+            const tripData = detailedTrips.map(
+              (response) => response.data.trip
+            );
+            setTrips(tripData);
+          }
           setIsLoading(false);
         })
         .catch((err) => {
@@ -80,46 +90,49 @@ export default function HomeScreen({ navigation }) {
     />
   );
 
-  if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#24565C" />
-        <Text>Loading trips...</Text>
-      </View>
-    );
-  }
-
-  if (isError) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.error}>{isError}</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
-      <ScrollView>
-        <View style={styles.content}>
-          <Text style={styles.text}>My trips</Text>
+
+      {isLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#24565C" />
+          <Text>Loading trips...</Text>
         </View>
-        <FlatList
-          data={trips}
-          renderItem={renderTrip}
-          keyExtractor={(item) => item.trip_id.toString()}
-          numColumns={2}
-          contentContainerStyle={styles.cardsContainer}
-          scrollEnabled={false}
-        />
-        <View>
-          <Button
-            title="Add trip"
-            style={styles.button}
-            onPress={handleCreateTrip}
+      ) : isError ? (
+        <View style={styles.center}>
+          <Text style={styles.friendlymsg}>You have no trips yet.</Text>
+          <Text style={styles.friendlymsgBold}>Start by adding one!</Text>
+          <View>
+            <Button
+              title="Add trip"
+              style={styles.button}
+              onPress={handleCreateTrip}
+            />
+          </View>
+        </View>
+      ) : (
+        <ScrollView>
+          <View style={styles.content}>
+            <Text style={styles.text}>My trips</Text>
+          </View>
+          <FlatList
+            data={trips}
+            renderItem={renderTrip}
+            keyExtractor={(item) => item.trip_id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.cardsContainer}
+            scrollEnabled={false}
           />
-        </View>
-      </ScrollView>
+          <View>
+            <Button
+              title="Add trip"
+              style={styles.button}
+              onPress={handleCreateTrip}
+            />
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -148,9 +161,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  error: {
+  friendlymsg: {
     fontSize: 16,
-    color: "red",
+    color: "#24565C",
+  },
+  friendlymsgBold: {
+    marginTop: 5,
+    fontSize: 20,
+    color: "#24565C",
+    fontWeight: "bold"
   },
   button: {
     marginTop: 50,
