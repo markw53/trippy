@@ -29,3 +29,12 @@ export const fetchPossibility = tripId => {
 export const postPossibility = (trip_id, possibility) => {
   return axios.post(`${apiBase}/trips/${trip_id}/activities`, possibility);
 };
+
+export const fetchUserDetails = (user_id) => {
+  return axios.get(`${apiBase}/users/${user_id}`);
+}
+
+export const patchUserDetails = (userData) => {
+  return axios.patch(`${apiBase}/users/${userData.user_id}`, userData);
+}
+
