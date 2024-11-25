@@ -14,6 +14,7 @@ import MapView, { Marker } from "react-native-maps";
 import axios from "axios";
 import { GOOGLE_PLACES_API_KEY } from "@env";
 import Header from "../components/Header";
+import { createTrip } from "../api";
 
 const API = GOOGLE_PLACES_API_KEY;
 
@@ -69,24 +70,35 @@ export default function TripCreationScreen({ navigation }) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!tripName || !destination || !description) {
       alert("Please fill out all fields.");
       return;
     }
+    
     const tripData = {
-      tripName,
-      destination,
-      startDate,
-      endDate,
-      description,
-      location: selectedLocation,
+      trip_name: tripName,
+      location: {
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude,
+      },
+      description: description || "No description provided",
+      start_date: startDate.toISOString(),
+      end_date: endDate ? endDate.toISOString() : null,
+      created_by: user?.userId,
+      trip_img_url: tripImageUrl || "https://default-trip-image.com",
     };
-    console.log("New Trip:", tripData);
-    alert("Trip created successfully!");
-    navigation.goBack(); // Navigate back to the previous screen
-  };
-
+    
+    createTrip(tripData)
+      .then((response) => {
+        alert("Trip created successfully!");
+        navigation.navigate("HomeScreen", { newTrip: response.data.trip });
+      })
+      .catch((error) => {
+        console.error("Error creating trip:", error.response?.data || error.message);
+        alert(`Failed to create trip: ${error.response?.data?.msg || "Unknown error"}`);
+      });
+  
   return (
     <View style={styles.screen}>
       <Header title="Create Trip" /> {/* Add the header */}
@@ -237,3 +249,4 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
 });
+}
