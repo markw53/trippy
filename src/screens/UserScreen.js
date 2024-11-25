@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TextInput, Image, ScrollView } from "react-native";
-import * as ImagePicker from "expo-image-picker"; // Import Image Picker
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import Header from "../components/Header";
-import Button from "../components/Button"
+import Button from "../components/Button";
 import { fetchUserDetails, patchUserDetails } from "../api";
-import axios from "axios";
-// import { apiBase } from "../api";
-export const apiBase = "https://backend-for-trippy.onrender.com/api";
-
-
 
 export default function UserScreen() {
   const [userName, setUserName] = useState("");
@@ -20,11 +22,40 @@ export default function UserScreen() {
 
   const userId = 7;
 
+  const isFormValid = userName.trim() !== "" && profilePic.trim() !== "";
+
+  const handleSubmit = () => {
+    const updateUser = {
+      user_id: userId,
+      name: userName,
+      avatar_url: profilePic,
+    };
+
+    patchUserDetails(updateUser)
+      .then((response) => {
+        const updatedUser = response.data.user;
+
+        // Update original values to reflect saved changes
+        setOriginalUserName(updatedUser.name || userName);
+        setOriginalProfilePic(updatedUser.avatar_url || profilePic);
+
+        alert("User details updated successfully!");
+      })
+      .catch((err) => {
+        alert("Failed to update user details. Please try again.");
+        console.error("Error in patching user details:", err);
+      });
+  };
+
+  const handleCancel = () => {
+    // Revert to original values
+    setUserName(originalUserName);
+    setProfilePic(originalProfilePic);
+  };
+
   useEffect(() => {
     fetchUserDetails(userId)
       .then((response) => {
-        console.log("Line 20: API Response:", response.data);
-
         const data = response.data.user;
 
         setUserName(data.name || "");
@@ -42,87 +73,6 @@ export default function UserScreen() {
       });
   }, []);
 
-  const handleSubmit = () => {
-    const updateUser = {
-      user_id: userId,
-      name: userName,
-      avatar_url: profilePic, // Ensure this matches the backend's expected format
-    };
-
-    console.log("Updating user with data:", updateUser); // Debugging payload
-
-    patchUserDetails(updateUser)
-      .then((response) => {
-        alert("User details updated successfully!");
-        console.log("Response from server:", response.data);
-      })
-      .catch((err) => {
-        if (err.response) {
-          console.error("Server responded with an error:", err.response.data);
-          alert(`Error: ${err.response.data.message || "Bad Request"}`);
-        } else {
-          console.error("Error updating user details:", err.message);
-        }
-      });
-  };
-
-
-  const handleCancel = () => {
-    setUserName(originalUserName);
-    setProfilePic(originalProfilePic);
-  };
-
-  // Function to pick image from gallery
-  const handleImagePicker = () => {
-    // Request permission for media library access
-    ImagePicker.requestMediaLibraryPermissionsAsync()
-      .then(({ status }) => {
-        if (status !== "granted") {
-          alert("Permission to access gallery is required!");
-          throw new Error("Permission not granted");
-        }
-
-        // Launch the image picker
-        return ImagePicker.launchImageLibraryAsync({
-          mediaType: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          quality: 1,
-        });
-      })
-      .then((result) => {
-        if (result.cancelled) {
-          throw new Error("Image selection cancelled");
-        }
-
-        const formData = new FormData();
-        formData.append("file", {
-          uri: result.uri,
-          name: "profile.jpg",
-          type: "image/jpeg",
-        });
-
-        // Upload image to the server
-        return axios.post(`${apiBase}/upload`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      })
-      .then((response) => {
-        setProfilePic(response.data.url); // Update profile picture URL
-        alert("Image uploaded successfully!");
-      })
-      .catch((error) => {
-        if (error.message === "Permission not granted" || error.message === "Image selection cancelled") {
-          console.warn(error.message);
-        } else {
-          console.error("Image upload failed:", error);
-          alert("Failed to upload image. Please try again.");
-        }
-      });
-  };
-
-
-
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -139,16 +89,19 @@ export default function UserScreen() {
           <Text style={styles.text}>Welcome to your Profile!</Text>
           <View style={styles.imageContainer}>
             <Image
-              key={profilePic}
               style={styles.image}
               source={{
                 uri: profilePic || "https://reactnative.dev/img/tiny_logo.png",
               }}
-              onError={() => setProfilePic("https://reactnative.dev/img/tiny_logo.png")}
+              onError={(e) => {
+                console.error("Image failed to load:", e.nativeEvent.error);
+                if (!originalProfilePic) {
+                  setProfilePic("https://reactnative.dev/img/tiny_logo.png");
+                }
+              }}
             />
-            <Text style={styles.userNameheading}>{userName || "The Goat Coder"}</Text>
+            <Text style={styles.userNameheading}>{userName || originalUserName}</Text>
           </View>
-
           <View>
             <Text style={styles.label}>Name:</Text>
             <TextInput
@@ -157,12 +110,18 @@ export default function UserScreen() {
               value={userName}
             />
           </View>
-          {/* Profile Picture Picker */}
           <View>
             <Text style={styles.label}>Profile Picture:</Text>
-            <Button title="Upload Photo" onPress={handleImagePicker} />
+            <TextInput
+              style={styles.input}
+              onChangeText={setProfilePic}
+              value={profilePic}
+              numberOfLines={1}
+              multiline={false}
+              textAlignVertical="center"
+              autoCapitalize="none"
+            />
           </View>
-
           <View>
             <Text style={styles.label}>Email:</Text>
             <TextInput
@@ -172,7 +131,16 @@ export default function UserScreen() {
             />
           </View>
           <View style={styles.saveChangesbtn}>
-            <Button title="Save Changes" onPress={handleSubmit} />
+            <TouchableOpacity
+              onPress={handleSubmit}
+              disabled={!isFormValid}
+              style={[
+                styles.button,
+                !isFormValid && styles.buttonDisabled,
+              ]}
+            >
+              <Text style={styles.buttonText}>Save Changes</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.cancelbtn}>
             <Button title="Cancel" onPress={handleCancel} />
@@ -240,5 +208,24 @@ const styles = StyleSheet.create({
   disabledInput: {
     backgroundColor: "#f5f5f5",
     color: "#999",
+  },
+  button: {
+    backgroundColor: "#24565C",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    alignItems: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#ccc",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    alignItems: "center"
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
