@@ -12,6 +12,7 @@ import Button from "../components/Button";
 import TripCard from "../components/TripCard";
 import { fetchTripById, fetchTrips, fetchUserTrips } from "../api";
 import { useAuth } from "../../AuthContext";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function HomeScreen({ navigation }) {
   const [trips, setTrips] = useState([]);
@@ -82,7 +83,7 @@ export default function HomeScreen({ navigation }) {
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#24565C" />
         <Text>Loading trips...</Text>
       </View>
     );
@@ -99,24 +100,26 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
-      <View style={styles.content}>
-        <Text style={styles.text}>My trips</Text>
-      </View>
-      <FlatList
-        data={trips}
-        renderItem={renderTrip}
-        keyExtractor={(item) => item.trip_id.toString()}
-        numColumns={2}
-        contentContainerStyle={styles.cardsContainer}
-        scrollEnabled={false}
-      />
-      <View>
-        <Button
-          title="Add trip"
-          style={styles.button}
-          onPress={handleCreateTrip}
+      <ScrollView>
+        <View style={styles.content}>
+          <Text style={styles.text}>My trips</Text>
+        </View>
+        <FlatList
+          data={trips}
+          renderItem={renderTrip}
+          keyExtractor={(item) => item.trip_id.toString()}
+          numColumns={2}
+          contentContainerStyle={styles.cardsContainer}
+          scrollEnabled={false}
         />
-      </View>
+        <View>
+          <Button
+            title="Add trip"
+            style={styles.button}
+            onPress={handleCreateTrip}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 }
