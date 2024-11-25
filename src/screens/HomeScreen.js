@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -44,6 +45,20 @@ export default function HomeScreen({ navigation }) {
       setIsLoading(false);
     }
   }, [user]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (navigation.getState()?.routes?.some((route) => route.params?.newTrip)) {
+        const newTrip = navigation.getState().routes.find(
+          (route) => route.params?.newTrip
+        ).params.newTrip;
+  
+        setTrips((prevTrips) => [newTrip, ...prevTrips]);
+  
+        navigation.setParams({ newTrip: null });
+      }
+    }, [navigation])
+  );
 
   const handleCreateTrip = () => {
     navigation.navigate("TripCreationScreen")
