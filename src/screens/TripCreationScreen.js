@@ -15,6 +15,7 @@ import { GOOGLE_PLACES_API_KEY } from "@env";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import { createTrip } from "../api";
+import { useAuth } from "../../AuthContext";
 
 const API = GOOGLE_PLACES_API_KEY;
 
@@ -28,6 +29,8 @@ export default function TripCreationScreen({ navigation }) {
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [description, setDescription] = useState("");
+  const [tripImageUrl, setTripImageUrl] = useState("");
+  const { user } = useAuth();
 
   const fetchSuggestions = async (query) => {
     if (!query) return setSuggestions([]);
@@ -71,6 +74,15 @@ export default function TripCreationScreen({ navigation }) {
   };
 
   const handleSubmit = () => {
+    if (!tripImageUrl) {
+      setTripImageUrl("https://default-trip-image.com");
+    }
+
+    if (!user || !user.userId) {
+      alert("User not authenticated.");
+      return;
+    }
+
     if (!tripName || !destination || !description) {
       alert("Please fill out all fields.");
       return;
@@ -79,8 +91,8 @@ export default function TripCreationScreen({ navigation }) {
     const tripData = {
       trip_name: tripName,
       location: {
-        latitude: selectedLocation.latitude,
-        longitude: selectedLocation.longitude,
+        latitude: selectedLocation?.latitude,
+        longitude: selectedLocation?.longitude,
       },
       description: description || "No description provided",
       start_date: startDate.toISOString(),
