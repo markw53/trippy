@@ -1,9 +1,23 @@
 import axios from "axios";
 
 const apiBase = "https://backend-for-trippy.onrender.com/api";
+const googlePlacesApiBase = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
+import { GOOGLE_PLACES_API_KEY } from "@env";
+
+const apiKey = GOOGLE_PLACES_API_KEY;
 
 export const fetchTrips = () => {
   return axios.get(`${apiBase}/trips`);
+};
+
+export const fetchNearbyPlaces = (location, radius) => {
+  return axios.get(googlePlacesApiBase, {
+    params: {
+      location,
+      radius,
+      key: apiKey,
+    },
+  });
 };
 
 export const fetchUserTrips = (userId) => {

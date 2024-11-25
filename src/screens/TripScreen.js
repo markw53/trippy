@@ -8,16 +8,21 @@ import {
   Platform,
   TouchableOpacity,
   TextInput,
+  FlatList,
+  ScrollView,
 } from "react-native";
+import { fetchNearbyPlaces } from "../api"; // Update this to call your Google Places API if necessary
 import ItineraryButton from "../components/ItineraryButtons";
 import Header from "../components/Header";
 import Card from "../components/Card";
 import { fetchItinerary, fetchPossibility, postPossibility } from "../api";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const TripScreen = ({ route }) => {
   const { tripId, tripName, navigation } = route.params;
+  const [radius, setRadius] = useState(500);
+  const [places, setPlaces] = useState([]);
+  const [location, setLocation] = useState({ lat: 52.369358, lng: 4.889258 }); // Default location
   const [itinerary, setItinerary] = useState([]);
   const [possibility, setPossibility] = useState([]);
   const [isItinerary, setIsItinerary] = useState(true);
@@ -28,7 +33,7 @@ const TripScreen = ({ route }) => {
   const [time, setTime] = useState("");
   const [date, setDate] = useState(new Date());
   const [activityImage, setActivityImage] = useState("");
-  const [isShowPicker, setIsShowPicker] = useState(true);
+  const [isShowPicker, setIsShowPicker] = useState(false);
 
   useEffect(() => {
     if (tripId) {
@@ -52,6 +57,29 @@ const TripScreen = ({ route }) => {
     setIsShowPicker(true);
   };
 
+  const handleFetchPlaces = async () => {
+    try {
+      const request = {
+        fields: ["displayName", "location", "businessStatus"],
+        locationRestriction: {
+          center: new google.maps.LatLng(location.lat, location.lng),
+          radius: radius,
+        },
+        includedPrimaryTypes: ["restaurant"],
+        maxResultCount: 5,
+        rankPreference: google.maps.places.RankBy.POPULARITY,
+        language: "en-GB",
+        region: "gb",
+      };
+      // Assuming `Place` is already initialized in the environment
+      //@ts-ignore
+      const { places } = await Place.searchNearby(request);
+      setPlaces(places);
+    } catch (err) {
+      console.error("Error fetching nearby places:", err);
+    }
+  };
+
   const handleItinerary = () => {
     setIsPossibility(false);
     setIsEvent(false);
@@ -70,27 +98,14 @@ const TripScreen = ({ route }) => {
     setIsEvent(true);
   };
 
-  const handleTitleChange = (e) => {
-    setTitle(e.nativeEvent.text);
-  };
-
-  const handleTimeChange = (e) => {
-    setTime(e.nativeEvent.text);
-  };
-
-  const handleDescriptionChange = (e) => {
-    setDescription(e.nativeEvent.text);
-  };
-
-  const handleActivityImageChange = (e) => {
-    setActivityImage(e.nativeEvent.text);
-  };
+  const handleTitleChange = (e) => setTitle(e.nativeEvent.text);
+  const handleTimeChange = (e) => setTime(e.nativeEvent.text);
+  const handleDescriptionChange = (e) => setDescription(e.nativeEvent.text);
+  const handleActivityImageChange = (e) => setActivityImage(e.nativeEvent.text);
 
   const handleDate = ({ type }, selectedDate) => {
     setIsShowPicker(false);
-    if (selectedDate) {
-      setDate(selectedDate);
-    }
+    if (selectedDate) setDate(selectedDate);
   };
 
   const handlePostEvent = () => {
@@ -102,31 +117,23 @@ const TripScreen = ({ route }) => {
       activity_img_url: activityImage,
     };
 
-    console.log("Event being posted: ", newEvent);
-
     postPossibility(tripId, newEvent)
-      .then((response) => {
+      .then(() => {
         alert("Event Created");
-        console.log(response.data);
+        setTitle("");
+        setTime("");
+        setDescription("");
+        setDate(new Date());
+        setActivityImage("");
+        setIsEvent(false);
+        setIsItinerary(true);
       })
-      .catch((err) => {
-        console.log("Error posting activity:", err);
-      });
-    setTitle("");
-    setTime("");
-    setDescription("");
-    setDate(Date.now());
-    setActivityImage("");
-    setIsEvent(false);
-    setIsItinerary(true);
+      .catch((err) => console.log("Error posting activity:", err));
   };
 
   const renderActivity = (activity) => {
     const isoDate = activity.item.date;
-
-    const dateObj = new Date(isoDate);
-
-    const readableDate = dateObj.toLocaleDateString("en-GB", {
+    const readableDate = new Date(isoDate).toLocaleDateString("en-GB", {
       weekday: "short",
       year: "numeric",
       month: "short",
@@ -156,198 +163,55 @@ const TripScreen = ({ route }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
-      <View style={styles.container}>
-        <Header title="Trippy" />
-        <ScrollView>
-
-        <View style={styles.section}>
-          <Text style={styles.title}>{tripName}</Text>
-          <View style={styles.image}>
-            <Text>17C</Text>
-            <Image
-              source={{
-                uri: "https://i.pinimg.com/736x/f1/83/cc/f183ccd0f8be3477c28d4104dc836a97.jpg",
-                width: 50,
-                height: 50,
-                alignItems: "right",
-              }}
-            />
-          </View>
-        </View>
-        <View style={styles.tabs}>
-          <ItineraryButton
-            title="Itinerary"
-            onPress={handleItinerary}
-            style={styles.button}
-            isActive={isItinerary}
-          />
-          <ItineraryButton
-            title="Possibility"
-            onPress={handlePossibility}
-            style={styles.button}
-            isActive={isPossibility}
-          />
-        </View>
-        {isEvent && (
-          <ScrollView>
+      <FlatList
+        ListHeaderComponent={
+          <>
+            <Header title="Trippy" />
             <View style={styles.section}>
-              <TextInput
-                placeholder="Title"
-                value={title}
-                onChange={handleTitleChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                placeholder="Time"
-                value={time}
-                onChange={handleTimeChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                multiline={true}
-                numberOfLines={4}
-                placeholder="Description"
-                value={description}
-                onChange={handleDescriptionChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                placeholder="Image"
-                value={activityImage}
-                onChange={handleActivityImageChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TouchableOpacity
-                style={styles.dateField}
-                onPress={showDatePicker}
-              >
-                <Text style={styles.title}>
-                  {date.toLocaleDateString() || "Select Date"}
-                </Text>
-              </TouchableOpacity>
-              {isShowPicker && (
-                <DateTimePicker
-                  mode="date"
-                  display="spinner"
-                  value={date}
-                  onChange={handleDate}
-                  style={styles.datePicker}
+              <Text style={styles.title}>{tripName}</Text>
+              <View style={styles.image}>
+                <Text>17C</Text>
+                <Image
+                  source={{
+                    uri: "https://i.pinimg.com/736x/f1/83/cc/f183ccd0f8be3477c28d4104dc836a97.jpg",
+                    width: 50,
+                    height: 50,
+                    alignItems: "right",
+                  }}
                 />
-              )}
+              </View>
+            </View>
+            <View style={styles.tabs}>
               <ItineraryButton
-                title="Post"
-                onPress={handlePostEvent}
+                title="Itinerary"
+                onPress={handleItinerary}
                 style={styles.button}
+                isActive={isItinerary}
+              />
+              <ItineraryButton
+                title="Possibility"
+                onPress={handlePossibility}
+                style={styles.button}
+                isActive={isPossibility}
               />
             </View>
-          </ScrollView>
-        )}
-        <View style={styles.cards}>
-          {isItinerary && (
-            <FlatList
-              data={itinerary}
-              renderItem={renderActivity}
-              keyExtractor={(activity) => activity.activity_id.toString()}
-              numColumns={1}
-            />
-          )}
-          {isPossibility && (
-            <FlatList
-              data={possibility}
-              renderItem={renderActivity}
-              keyExtractor={(activity) => activity.activity_id.toString()}
-              numColumns={1}
-            />
-          )}
-        </View>
-        {!isEvent && (
-          <View style={styles.section}>
-            <ItineraryButton
-              title={"Add Event"}
-              onPress={handleEvent}
-              style={styles.button}
-            />
-          </View>
-        )}
-        </ScrollView>
-      </View>
+          </>
+        }
+        data={isItinerary ? itinerary : possibility}
+        renderItem={renderActivity}
+        keyExtractor={(activity) => activity.activity_id.toString()}
+        contentContainerStyle={styles.cards}
+      />
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F7F7F7",
-  },
-  scrollContainer: {
-    padding: 0,
-    flexGrow: 1,
-  },
-  section: {
-    marginTop: 40,
-    marginBottom: 24,
-    marginLeft: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  button: {
-    paddingHorizontal: 40,
-    marginHorizontal: "auto",
-  },
-  date: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  image: {
-    alignSelf: "flex-end",
-    marginRight: 20,
-  },
-  tabs: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    marginBottom: 10,
-    padding: 12,
-    fontSize: 16,
-  },
-  cards: {
-    flex: 1,
-    marginTop: 40,
-    marginBottom: 24,
-    marginLeft: 10,
-  },
-  datePicker: {
-    height: 120,
-    marginTop: -10,
-  },
-  dateField: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    marginBottom: 10,
-    padding: 12,
-    fontSize: 16,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  container: { flex: 1, backgroundColor: "#F7F7F7" },
+  section: { marginTop: 40, marginBottom: 24, marginLeft: 10 },
+  title: { fontSize: 18, fontWeight: "bold", marginBottom: 8 },
+  tabs: { flexDirection: "row", justifyContent: "space-between" },
+  cards: { flex: 1, marginTop: 20 },
 });
 
 export default TripScreen;
