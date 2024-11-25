@@ -8,14 +8,14 @@ import {
   TouchableOpacity,
   Alert
 } from "react-native";
-import RoundedButton from "./src/components/Button";
-import Footer from "./src/components/Footer";
+import RoundedButton from "../components/Button";
+import Footer from "../components/Footer";
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail
 } from "firebase/auth";
-import { auth } from "./firebase";
-import { useAuth } from "./AuthContext";
+import { auth } from "../../firebase";
+import { useAuth } from "../../AuthContext";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
