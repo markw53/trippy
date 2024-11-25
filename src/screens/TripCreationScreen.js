@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Button,
   Platform,
   TouchableOpacity,
   ScrollView,
@@ -14,6 +13,7 @@ import MapView, { Marker } from "react-native-maps";
 import axios from "axios";
 import { GOOGLE_PLACES_API_KEY } from "@env";
 import Header from "../components/Header";
+import Button from "../components/Button";
 import { createTrip } from "../api";
 
 const API = GOOGLE_PLACES_API_KEY;
@@ -70,12 +70,12 @@ export default function TripCreationScreen({ navigation }) {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!tripName || !destination || !description) {
       alert("Please fill out all fields.");
       return;
     }
-    
+
     const tripData = {
       trip_name: tripName,
       location: {
@@ -88,22 +88,30 @@ export default function TripCreationScreen({ navigation }) {
       created_by: user?.userId,
       trip_img_url: tripImageUrl || "https://default-trip-image.com",
     };
-    
+
     createTrip(tripData)
       .then((response) => {
         alert("Trip created successfully!");
         navigation.navigate("HomeScreen", { newTrip: response.data.trip });
       })
       .catch((error) => {
-        console.error("Error creating trip:", error.response?.data || error.message);
-        alert(`Failed to create trip: ${error.response?.data?.msg || "Unknown error"}`);
+        console.error(
+          "Error creating trip:",
+          error.response?.data || error.message
+        );
+        alert(
+          `Failed to create trip: ${
+            error.response?.data?.msg || "Unknown error"
+          }`
+        );
       });
-  
-  return (
-    <View style={styles.screen}>
-      <Header title="Create Trip" /> {/* Add the header */}
+  };
 
-      <ScrollView contentContainerStyle={styles.container}>
+  return (
+    <View style={styles.container}>
+      <Header title="Trippy" />
+
+      <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.label}>Trip Name</Text>
         <TextInput
           style={styles.input}
@@ -136,42 +144,43 @@ export default function TripCreationScreen({ navigation }) {
             ))}
           </View>
         )}
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={styles.dateButton}
+            onPress={() => setShowStartPicker(true)}
+          >
+            <Text style={styles.label}>Start Date</Text>
+            {/* <Text style={styles.dateText}>{startDate.toDateString()}</Text> */}
+            {showStartPicker && (
+              <DateTimePicker
+                value={startDate}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  if (selectedDate) setStartDate(selectedDate);
+                }}
+              />
+            )}
+          </TouchableOpacity>
 
-        <Text style={styles.label}>Start Date</Text>
-        <TouchableOpacity onPress={() => setShowStartPicker(true)}>
-          <Text style={styles.dateText}>
-            {startDate.toDateString()}
-          </Text>
-        </TouchableOpacity>
-        {showStartPicker && (
-          <DateTimePicker
-            value={startDate}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowStartPicker(false);
-              if (selectedDate) setStartDate(selectedDate);
-            }}
-          />
-        )}
-
-        <Text style={styles.label}>End Date</Text>
-        <TouchableOpacity onPress={() => setShowEndPicker(true)}>
-          <Text style={styles.dateText}>
-            {endDate.toDateString()}
-          </Text>
-        </TouchableOpacity>
-        {showEndPicker && (
-          <DateTimePicker
-            value={endDate}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowEndPicker(false);
-              if (selectedDate) setEndDate(selectedDate);
-            }}
-          />
-        )}
+          <TouchableOpacity
+            style={styles.dateButton}
+            onPress={() => setShowEndPicker(true)}
+          >
+            <Text style={styles.label}>End Date</Text>
+            {/* <Text style={styles.dateText}>{endDate.toDateString()}</Text> */}
+            {showEndPicker && (
+              <DateTimePicker
+                value={endDate}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  if (selectedDate) setEndDate(selectedDate);
+                }}
+              />
+            )}
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.label}>Description</Text>
         <TextInput
@@ -195,7 +204,7 @@ export default function TripCreationScreen({ navigation }) {
           </MapView>
         )}
 
-        <Button title="Create Trip" onPress={handleSubmit} />
+        <Button title="Done" onPress={handleSubmit} style={styles.button} />
       </ScrollView>
     </View>
   );
@@ -203,9 +212,13 @@ export default function TripCreationScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 16,
+    flex: 1,
     backgroundColor: "#F7F7F7",
+  },
+  content: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    marginTop: 30,
   },
   label: {
     fontSize: 16,
@@ -236,17 +249,28 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
   },
-  dateText: {
-    padding: 10,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    textAlign: "center",
+  dateButton: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  dateButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  button: {
+    alignSelf: "center",
+    paddingHorizontal: 40,
+    marginBottom: 30,
+    marginTop: 30,
   },
   map: {
     height: 200,
     marginVertical: 16,
   },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
 });
-}
