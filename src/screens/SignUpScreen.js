@@ -11,6 +11,7 @@ import RoundedButton from "../components/Button";
 import Footer from "../components/Footer";
 import { auth } from "../../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import axios from "axios";
 
 export default function SignUpScreen({ navigation }) {
   const [firstname, setFirstname] = useState("");
@@ -32,10 +33,31 @@ export default function SignUpScreen({ navigation }) {
     }
 
     createUserWithEmailAndPassword(auth, email, password)
-      .then(() => console.log("Account created successfully"))
-      .catch(err => setError(err.message));
-  };
+    .then((userCredential) => {
+      const { uid, email } = userCredential.user;
 
+      
+      axios
+        .post("https://backend-for-trippy.onrender.com/api/users", {
+          email: email,
+          name: `${firstname} ${lastname}`,
+          avatar_url:
+            "https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", 
+        })
+        .then(() => {
+          console.log("User added to the database");
+          navigation.navigate("Login"); 
+        })
+        .catch((err) => {
+          console.error("Failed to add user to the database:", err);
+          setError("Failed to complete signup. Please try again.");
+        });
+    })
+    .catch((err) => {
+      setError(err.message);
+      console.error("Firebase signup error:", err);
+    });
+};
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
