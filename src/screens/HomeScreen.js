@@ -74,6 +74,7 @@ export default function HomeScreen({ navigation }) {
         navigation.navigate("Trip", {
           tripId: item.trip_id,
           tripName: item.trip_name,
+          navigation: navigation,
         })
       }
     />
