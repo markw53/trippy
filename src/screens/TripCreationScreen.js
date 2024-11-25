@@ -199,7 +199,7 @@ export default function TripCreationScreen({ navigation }) {
       </ScrollView>
     </View>
   );
-}}
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -249,3 +249,4 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
 });
+}
