@@ -174,12 +174,17 @@ export default function ChatScreen() {
           horizontal
         />
       </View>
-      <FlatList
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={(item, index) => index.toString()}
-        style={styles.messagesContainer}
-      />
+      <View style={styles.messagesContainer}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <FlatList
+            data={messages}
+            renderItem={renderMessage}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        )}
+      </View>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
