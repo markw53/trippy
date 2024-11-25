@@ -62,7 +62,7 @@ export default function SignUpScreen({ navigation }) {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.appName}>Trippy</Text>
-        <Text style={styles.tagline}>Addicted to Travelling</Text>
+        <Text style={styles.tagline}>Addiction to Travelling</Text>
 
         <View style={styles.inputContainer}>
           <View style={styles.row}>

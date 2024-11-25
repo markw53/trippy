@@ -127,15 +127,7 @@ export default function MainApp() {
             options={{
               header: () => <Header title="Itinerary" />,
             }}
-          />
-
-          {/* <Stack.Screen
-          name="Chat"
-          component={ChatScreen}
-          options={{
-            header: () => <Header title="Chat" />,
-          }}
-        /> */}
+          />         
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
