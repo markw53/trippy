@@ -57,15 +57,14 @@ export default function HomeScreen({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      if (
-        navigation.getState()?.routes?.some((route) => route.params?.newTrip)
-      ) {
-        const newTrip = navigation
-          .getState()
-          .routes.find((route) => route.params?.newTrip).params.newTrip;
-
+      const newTrip = navigation
+        .getState()
+        ?.routes?.find((route) => route.name === "HomeScreen")?.params?.newTrip;
+  
+      if (newTrip) {
         setTrips((prevTrips) => [newTrip, ...prevTrips]);
-
+  
+        // Clear the `newTrip` parameter after handling it
         navigation.setParams({ newTrip: null });
       }
     }, [navigation])
