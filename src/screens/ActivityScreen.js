@@ -55,27 +55,50 @@ const ActivityScreen = ({ route }) => {
 
   const handleVote = () => {
     if (hasVoted) {
-      Alert.alert("You have already voted for this activity.");
-      return;
-    }
-    setVotes((currVotes) => currVotes + 1);
-
-    activityVote(tripId, activityId, votes)
-    .then(() =>  {
-
-     AsyncStorage.getItem("votedActivities")
-          .then((votedActivities) => {
-            const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
-            votedSet.push(activityId);
-            return AsyncStorage.setItem("votedActivities", JSON.stringify(votedSet));
-          })
-          .then(() => {
-            setHasVoted(true);
-          })})
-    .catch((err) => {
-      console.log("Error with voting", err);
       setVotes((currVotes) => currVotes - 1);
-    });
+  
+      activityVote(tripId, activityId, votes - 1)
+        .then(() => {
+          AsyncStorage.getItem("votedActivities")
+            .then((votedActivities) => {
+              const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
+              const updatedSet = votedSet.filter((id) => id !== activityId);
+              return AsyncStorage.setItem("votedActivities", JSON.stringify(updatedSet));
+            })
+            .then(() => {
+              setHasVoted(false);
+            })
+            .catch((err) => {
+              console.log("Error updating vote storage:", err);
+            });
+        })
+        .catch((err) => {
+          console.log("Error with removing vote:", err);
+          setVotes((currVotes) => currVotes + 1); 
+        });
+    } else {
+      setVotes((currVotes) => currVotes + 1);
+  
+      activityVote(tripId, activityId, votes + 1)
+        .then(() => {
+          AsyncStorage.getItem("votedActivities")
+            .then((votedActivities) => {
+              const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
+              votedSet.push(activityId);
+              return AsyncStorage.setItem("votedActivities", JSON.stringify(votedSet));
+            })
+            .then(() => {
+              setHasVoted(true);
+            })
+            .catch((err) => {
+              console.log("Error updating vote storage:", err);
+            });
+        })
+        .catch((err) => {
+          console.log("Error with voting:", err);
+          setVotes((currVotes) => currVotes - 1);
+        });
+    }
   };
 
   const handleDelete = () => {
