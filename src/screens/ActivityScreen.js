@@ -11,9 +11,7 @@ import {
 } from "../api";
 import Card from "../components/Card";
 import Button from "../components/Button";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-
 
 const ActivityScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -28,7 +26,7 @@ const ActivityScreen = ({ route }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasVoted, setHasVoted] = useState(false);
 
-   //CALLUM TESTING
+  //CALLUM TESTING
   useEffect(() => {
     AsyncStorage.getItem("votedActivities")
       .then((votedActivities) => {
@@ -41,7 +39,6 @@ const ActivityScreen = ({ route }) => {
         console.log("Error reading voting status:", err);
       });
   }, [activityId]);
-
 
   useEffect(() => {
     getActivity(tripId, activityId).then((response) => {
@@ -60,14 +57,19 @@ const ActivityScreen = ({ route }) => {
   const handleVote = () => {
     if (hasVoted) {
       setVotes((currVotes) => currVotes - 1);
-  
+
       activityVote(tripId, activityId, votes - 1)
         .then(() => {
           AsyncStorage.getItem("votedActivities")
             .then((votedActivities) => {
-              const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
+              const votedSet = votedActivities
+                ? JSON.parse(votedActivities)
+                : [];
               const updatedSet = votedSet.filter((id) => id !== activityId);
-              return AsyncStorage.setItem("votedActivities", JSON.stringify(updatedSet));
+              return AsyncStorage.setItem(
+                "votedActivities",
+                JSON.stringify(updatedSet)
+              );
             })
             .then(() => {
               setHasVoted(false);
@@ -78,18 +80,23 @@ const ActivityScreen = ({ route }) => {
         })
         .catch((err) => {
           console.log("Error with removing vote:", err);
-          setVotes((currVotes) => currVotes + 1); 
+          setVotes((currVotes) => currVotes + 1);
         });
     } else {
       setVotes((currVotes) => currVotes + 1);
-  
+
       activityVote(tripId, activityId, votes + 1)
         .then(() => {
           AsyncStorage.getItem("votedActivities")
             .then((votedActivities) => {
-              const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
+              const votedSet = votedActivities
+                ? JSON.parse(votedActivities)
+                : [];
               votedSet.push(activityId);
-              return AsyncStorage.setItem("votedActivities", JSON.stringify(votedSet));
+              return AsyncStorage.setItem(
+                "votedActivities",
+                JSON.stringify(votedSet)
+              );
             })
             .then(() => {
               setHasVoted(true);
