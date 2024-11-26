@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/Header";
 import {
   activityVote,
@@ -9,6 +10,7 @@ import {
 } from "../api";
 import Card from "../components/Card";
 import Button from "../components/Button";
+
 
 const ActivityScreen = ({ route }) => {
   const { activityId, tripId, navigation } = route.params;
@@ -20,6 +22,22 @@ const ActivityScreen = ({ route }) => {
   const [date, setDate] = useState("");
   const [inItinerary, setInItinerary] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasVoted, setHasVoted] = useState(false);
+
+   //CALLUM TESTING
+  useEffect(() => {
+    AsyncStorage.getItem("votedActivities")
+      .then((votedActivities) => {
+        if (votedActivities) {
+          const votedSet = JSON.parse(votedActivities);
+          setHasVoted(votedSet.includes(activityId));
+        }
+      })
+      .catch((err) => {
+        console.log("Error reading voting status:", err);
+      });
+  }, [activityId]);
+
 
   useEffect(() => {
     getActivity(tripId, activityId).then((response) => {
@@ -36,8 +54,25 @@ const ActivityScreen = ({ route }) => {
   }, [tripId, activityId]);
 
   const handleVote = () => {
+    if (hasVoted) {
+      Alert.alert("You have already voted for this activity.");
+      return;
+    }
     setVotes((currVotes) => currVotes + 1);
-    activityVote(tripId, activityId, votes).catch((err) => {
+
+    activityVote(tripId, activityId, votes)
+    .then(() =>  {
+
+     AsyncStorage.getItem("votedActivities")
+          .then((votedActivities) => {
+            const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
+            votedSet.push(activityId);
+            return AsyncStorage.setItem("votedActivities", JSON.stringify(votedSet));
+          })
+          .then(() => {
+            setHasVoted(true);
+          })})
+    .catch((err) => {
       console.log("Error with voting", err);
       setVotes((currVotes) => currVotes - 1);
     });
@@ -99,7 +134,12 @@ const ActivityScreen = ({ route }) => {
         image={image}
         date={readableDate}
       />
-      <Button title="Vote" onPress={handleVote} style={styles.button} />
+      <Button
+        title={hasVoted ? "Already Voted" : "Vote"}
+        onPress={handleVote}
+        style={styles.button}
+        disabled={hasVoted}
+      />
       <Button title="Delete" onPress={handleDelete} style={styles.button} />
       {!inItinerary && (
         <Button
