@@ -13,7 +13,12 @@ import {
 import ItineraryButton from "../components/ItineraryButtons";
 import Header from "../components/Header";
 import Card from "../components/Card";
-import { fetchItinerary, fetchPossibility, postPossibility } from "../api";
+import {
+  fetchItinerary,
+  fetchPossibility,
+  fetchTripById,
+  postPossibility,
+} from "../api";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
@@ -23,6 +28,8 @@ import { WEATHER_API_KEY } from "@env";
 const TripScreen = ({ route }) => {
   const navigation = useNavigation();
   const { tripId, tripName, tripImage, location } = route.params;
+  const [tripStart, setTripStart] = useState("");
+  const [tripEnd, setTripEnd] = useState("");
   const [itinerary, setItinerary] = useState([]);
   const [possibility, setPossibility] = useState([]);
   const [isItinerary, setIsItinerary] = useState(true);
@@ -39,7 +46,7 @@ const TripScreen = ({ route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
-  const { latitude, longitude } = location
+  const { latitude, longitude } = location;
 
   useEffect(() => {
     if (tripId) {
@@ -68,6 +75,18 @@ const TripScreen = ({ route }) => {
             setIsError(true);
           }
         });
+      fetchTripById(tripId)
+        .then((response) => {
+          const tripDetails = response.data.trip;
+          setTripStart(tripDetails.start_date);
+          setTripEnd(tripDetails.end_date);
+        })
+        .catch((err) => {
+          console.error("Error fetching trip details:", err);
+          if (!isError) {
+            setIsError(true);
+          }
+        });
     }
   }, [tripId, isRefresh]);
 
@@ -86,7 +105,7 @@ const TripScreen = ({ route }) => {
     if (tripName) {
       fetchWeather();
     }
-  }, [tripName]);
+  }, [tripName, tripId]);
 
   const showDatePicker = () => {
     setIsShowPicker(true);
@@ -138,7 +157,7 @@ const TripScreen = ({ route }) => {
     }
   };
 
-  const handlePostEvent = () => {
+  const handlePostEvent = async () => {
     const newEvent = {
       activity_name: title,
       description: description,
@@ -147,7 +166,7 @@ const TripScreen = ({ route }) => {
       activity_img_url: activityImage,
     };
 
-    postPossibility(tripId, newEvent)
+    await postPossibility(tripId, newEvent)
       .then((response) => {
         alert("Event Created");
         console.log(response.data);
@@ -196,7 +215,20 @@ const TripScreen = ({ route }) => {
     );
   };
 
+  const startObj = new Date(tripStart);
+  const endObj = new Date(tripEnd);
 
+  const tripStartDate = startObj.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  const tripEndDate = endObj.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
   return (
     <KeyboardAvoidingView
@@ -208,12 +240,17 @@ const TripScreen = ({ route }) => {
         <ScrollView>
           <View style={styles.section}>
             <Text style={styles.title}>{tripName}</Text>
+            <Text>
+              {tripStartDate} --- {tripEndDate}
+            </Text>
             {weatherData && (
               <View style={styles.weather}>
                 <Text>{weatherData.main.temp}°C</Text>
                 <Image
                   source={{
-                    uri: `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}.png`}} style={{
+                    uri: `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}.png`,
+                  }}
+                  style={{
                     width: 50,
                     height: 50,
                     alignItems: "right",
@@ -238,39 +275,39 @@ const TripScreen = ({ route }) => {
           </View>
 
           {/* Dynamic section: show loading, error, or data */}
-            {isLoading ? (
-              <View style={styles.center}>
-                <ActivityIndicator size="small" color="#24565C" />
-                <Text>Loading activities...</Text>
-              </View>
-            ) : itinerary.length === 0 && possibility.length === 0 ? (
-              <View style={styles.center}>
-                <Text style={styles.friendlymsg}>
-                  No activities found for this trip.
-                </Text>
-                <Text style={styles.friendlymsgBold}>Add one!</Text>
-              </View>
-            ) : (
-              <View style={styles.cards}>
-                {isItinerary && (
-                  <FlatList
-                    data={itinerary}
-                    renderItem={renderActivity}
-                    keyExtractor={(activity) => activity.activity_id.toString()}
-                    numColumns={1}
-                  />
-                )}
-                {isPossibility && (
-                  <FlatList
-                    data={possibility}
-                    renderItem={renderActivity}
-                    keyExtractor={(activity) => activity.activity_id.toString()}
-                    numColumns={1}
-                  />
-                )}
-              </View>
-            )}
-            
+          {isLoading ? (
+            <View style={styles.center}>
+              <ActivityIndicator size="small" color="#24565C" />
+              <Text>Loading activities...</Text>
+            </View>
+          ) : itinerary.length === 0 && possibility.length === 0 ? (
+            <View style={styles.center}>
+              <Text style={styles.friendlymsg}>
+                No activities found for this trip.
+              </Text>
+              <Text style={styles.friendlymsgBold}>Add one!</Text>
+            </View>
+          ) : (
+            <View style={styles.cards}>
+              {isItinerary && (
+                <FlatList
+                  data={itinerary}
+                  renderItem={renderActivity}
+                  keyExtractor={(activity) => activity.activity_id.toString()}
+                  numColumns={1}
+                />
+              )}
+              {isPossibility && (
+                <FlatList
+                  data={possibility}
+                  renderItem={renderActivity}
+                  keyExtractor={(activity) => activity.activity_id.toString()}
+                  numColumns={1}
+                />
+              )}
+            </View>
+          )}
+
           {isEvent && (
             <ScrollView>
               <View style={styles.section}>
@@ -368,7 +405,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 60,
-    marginBottom: 25
+    marginBottom: 25,
   },
   section: {
     marginTop: 40,

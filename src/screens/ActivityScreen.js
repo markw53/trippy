@@ -25,6 +25,7 @@ const ActivityScreen = ({ route }) => {
   const [inItinerary, setInItinerary] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasVoted, setHasVoted] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
 
   //CALLUM TESTING
   useEffect(() => {
@@ -73,6 +74,7 @@ const ActivityScreen = ({ route }) => {
             })
             .then(() => {
               setHasVoted(false);
+              setIsRefresh(!isRefresh);
             })
             .catch((err) => {
               console.log("Error updating vote storage:", err);
@@ -100,6 +102,7 @@ const ActivityScreen = ({ route }) => {
             })
             .then(() => {
               setHasVoted(true);
+              setIsRefresh(!isRefresh);
             })
             .catch((err) => {
               console.log("Error updating vote storage:", err);
@@ -110,6 +113,10 @@ const ActivityScreen = ({ route }) => {
           setVotes((currVotes) => currVotes - 1);
         });
     }
+  };
+
+  const handlePrompt = () => {
+    setIsDelete(true);
   };
 
   const handleDelete = () => {
@@ -185,7 +192,16 @@ const ActivityScreen = ({ route }) => {
         style={styles.button}
         disabled={hasVoted}
       />
-      <Button title="Delete" onPress={handleDelete} style={styles.button} />
+      {!isDelete && (
+        <Button title="Delete" onPress={handlePrompt} style={styles.button} />
+      )}
+      {isDelete && (
+        <Button
+          title="Are you sure?"
+          onPress={handleDelete}
+          style={styles.button}
+        />
+      )}
       {!inItinerary && (
         <Button
           title="Add to Itinerary"
