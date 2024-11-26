@@ -61,7 +61,7 @@ export const postMessage = (roomId, messageData) => {
 };
 export const fetchUserName = (userId) => {
   return axios.get(`${apiBase}/users/${userId}`)
-    .then((response) => response.data.user.name) 
+    .then((response) => response.data.user.name)
     .catch((err) => {
       console.error("Error fetching user name:", err);
     });
@@ -75,4 +75,8 @@ export const patchUserDetails = (userData) => {
   return axios.patch(`${apiBase}/users/${userData.user_id}`, userData);
 }
 
+
+export const patchTripDetails = (tripData) => {
+  return axois.patch(`${apiBase}/trip/${tripData.trip_id}`, tripData)
+}
 
