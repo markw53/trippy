@@ -7,9 +7,9 @@ import {
     Image,
     ScrollView,
     TouchableOpacity,
+    FlatList
 } from "react-native";
-import { FlatList } from "react-native-web";
-import { fetchTripById, patchTripDetails, fetchTripMembers, getUserIdByEmail } from "../api";
+import { fetchTripById, patchTripDetails, fetchTripMembers, getUserIdByEmail, postTripMembers } from "../api";
 
 import Header from "../components/Header";
 import Button from "../components/Button";
@@ -28,6 +28,7 @@ export default function AddMembersScreen() {
     const [originalTripDescription, setOriginalTripDescription] = useState("")
 
     const [members, setMembers] = useState("");
+    const [userEmail, setUserEmail] = useState("");
 
     const tripId = 8;
 
@@ -86,7 +87,7 @@ export default function AddMembersScreen() {
             })
         fetchTripMembers(tripId)
             .then((response) => {
-                const data = response.data.member;
+                const data = response.data.members;
                 setMembers(data)
             })
             .catch((error) => {
@@ -94,14 +95,27 @@ export default function AddMembersScreen() {
                 setIsError(true)
                 setIsLoading(false)
             })
-    }, [])
+    }, [members])
 
     const renderMembers = ({ item }) => (
         <Card
             title={item.name}
-            onPress={() => console.log(`MemberCard Pressed: ${item.name}`)}
         />
     );
+
+    const addMember = () => {
+        getUserIdByEmail(userEmail)
+            .then((response) => {
+                const userId = response.data.userId.user_id;
+                const newMember = {
+                    "user_id": userId,
+                }
+                postTripMembers(tripId, newMember)
+                    .catch((err) => {
+                        console.log("Error adding member:", err);
+                    })
+            })
+    }
 
     if (isLoading) {
         return (
@@ -171,13 +185,13 @@ export default function AddMembersScreen() {
                     </View>
                     <View>
                         <Text style={styles.textCurrentMembers}>Current Members</Text>
+
                         <FlatList
                             data={members}
                             renderItem={renderMembers}
                             keyExtractor={(item) => item.name.toString()}
                             contentContainerStyle={styles.cardsContainer}
                         //   scrollEnabled={false}
-
                         />
                     </View>
                     <View>
@@ -185,14 +199,18 @@ export default function AddMembersScreen() {
                         <Text style={styles.label}>Members Email:</Text>
                         <TextInput
                             style={styles.input}
+                            onChangeText={setUserEmail}
                             numberOfLines={1}
                             multiline={false}
                             textAlignVertical="center"
                             autoCapitalize="none"
+                            value={userEmail}
+
                         />
                         <View style={styles.addMemberbtn}>
                             <Button title="Add Member"
                                 style={styles.button}
+                                onPress={addMember}
                             />
                         </View>
                     </View>
