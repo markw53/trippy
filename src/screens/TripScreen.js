@@ -80,8 +80,6 @@ const TripScreen = ({ route }) => {
   };
 
   const handleEvent = () => {
-    // setIsItinerary(false);
-    // setIsPossibility(false);
     setIsEvent(true);
   };
 
@@ -164,37 +162,7 @@ const TripScreen = ({ route }) => {
     );
   };
 
-  // if (isLoading) {
-  //   return (
-  //     <View style={styles.center}>
-  //       <ActivityIndicator size="large" color="#24565C" />
-  //       <Text>Loading activities...</Text>
-  //     </View>
-  //   );
-  // }
 
-  // if (isError) {
-  //   return (
-  //     <View style={styles.center}>
-  //       <Text style={styles.friendlymsg}>Failed to fetch activities.</Text>
-  //       <Text style={styles.friendlymsgBold}>Try again.</Text>
-  //     </View>
-  //   );
-  // }
-
-  // if (!isItinerary && !isPossibility && itinerary.length === 0 && possibility.length === 0) {
-  //   return (
-  //     <View style={styles.center}>
-  //       <Text style={styles.friendlymsg}>No activities found.</Text>
-  //       <Text style={styles.friendlymsgBold}>Start by adding an activity!</Text>
-  //       <ItineraryButton
-  //         title="Add Event"
-  //         onPress={() => setIsEvent(true)}
-  //         style={styles.button}
-  //       />
-  //     </View>
-  //   );
-  // }
 
   return (
     <KeyboardAvoidingView
@@ -235,19 +203,10 @@ const TripScreen = ({ route }) => {
           </View>
 
           {/* Dynamic section: show loading, error, or data */}
-          {/* <View style={styles.cards}> */}
-          {/* <View style={styles.center}> */}
             {isLoading ? (
               <View style={styles.center}>
                 <ActivityIndicator size="small" color="#24565C" />
                 <Text>Loading activities...</Text>
-              </View>
-            ) : isError ? (
-              <View style={styles.center}>
-                <Text style={styles.friendlymsg}>
-                  Failed to fetch activities.
-                </Text>
-                <Text style={styles.friendlymsgBold}>Try again.</Text>
               </View>
             ) : itinerary.length === 0 && possibility.length === 0 ? (
               <View style={styles.center}>
@@ -276,38 +235,6 @@ const TripScreen = ({ route }) => {
                 )}
               </View>
             )}
-          {/* </View> */}
-
-          {/* {!isLoading && isError && (
-              <View style={styles.center}>
-                <Text style={styles.friendlymsg}>Failed to fetch activities.</Text>
-                <Text>Please check your connection and try again.</Text>
-              </View>
-            )}
-
-            {!isLoading &&
-              !isError &&
-              isItinerary &&
-              itinerary.length === 0 && (
-                <View style={styles.center}>
-                  <Text style={styles.friendlymsg}>No itinerary items found.</Text>
-                  <Text style={styles.friendly}>
-                    Start by adding an activity!
-                  </Text>
-                </View>
-              )}
-
-            {!isLoading &&
-              !isError &&
-              isPossibility &&
-              possibility.length === 0 && (
-                <View style={styles.center}>
-                  <Text style={styles.friendly}>
-                    No possibilities added yet.
-                  </Text>
-                </View>
-              )} */}
-
           {isEvent && (
             <ScrollView>
               <View style={styles.section}>
@@ -367,7 +294,7 @@ const TripScreen = ({ route }) => {
             </ScrollView>
           )}
           {!isEvent && (
-            <View style={styles.section}>
+            <View style={styles.eventBotton}>
               <ItineraryButton
                 title={"Add Event"}
                 onPress={handleEvent}
@@ -394,11 +321,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 60,
+    marginBottom: 25
   },
   section: {
     marginTop: 40,
     marginBottom: 24,
     marginLeft: 10,
+  },
+  eventBotton: {
+    marginTop: 5,
+    marginBottom: 30,
   },
   title: {
     fontSize: 18,
