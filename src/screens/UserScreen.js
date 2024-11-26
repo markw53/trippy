@@ -11,14 +11,17 @@ import {
 import Header from "../components/Header";
 import Button from "../components/Button";
 import { fetchUserDetails, patchUserDetails } from "../api";
+import { useAuth } from "../../AuthContext";
 
 export default function UserScreen() {
+  const { user, loading: authLoading } = useAuth();
   const [userName, setUserName] = useState("");
   const [profilePic, setProfilePic] = useState("");
   const [email, setEmail] = useState("");
   const [originalUserName, setOriginalUserName] = useState("");
   const [originalProfilePic, setOriginalProfilePic] = useState("");
   const [loading, setLoading] = useState(true);
+  
 
   const userId = 7;
 
@@ -26,7 +29,7 @@ export default function UserScreen() {
 
   const handleSubmit = () => {
     const updateUser = {
-      user_id: userId,
+      user_id: user.userId,
       name: userName,
       avatar_url: profilePic,
     };
@@ -35,7 +38,6 @@ export default function UserScreen() {
       .then((response) => {
         const updatedUser = response.data.user;
 
-        // Update original values to reflect saved changes
         setOriginalUserName(updatedUser.name || userName);
         setOriginalProfilePic(updatedUser.avatar_url || profilePic);
 
@@ -48,13 +50,12 @@ export default function UserScreen() {
   };
 
   const handleCancel = () => {
-    // Revert to original values
     setUserName(originalUserName);
     setProfilePic(originalProfilePic);
   };
 
   useEffect(() => {
-    fetchUserDetails(userId)
+    fetchUserDetails(user.userId)
       .then((response) => {
         const data = response.data.user;
 
@@ -71,9 +72,9 @@ export default function UserScreen() {
         console.error("Error fetching user details:", error);
         setLoading(false);
       });
-  }, []);
+  }, [authLoading, user]);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <View style={styles.container}>
         <Text style={styles.loadingText}>Loading user details...</Text>
@@ -91,7 +92,7 @@ export default function UserScreen() {
             <Image
               style={styles.image}
               source={{
-                uri: profilePic || "https://reactnative.dev/img/tiny_logo.png",
+                uri: originalProfilePic || "https://reactnative.dev/img/tiny_logo.png",
               }}
               onError={(e) => {
                 console.error("Image failed to load:", e.nativeEvent.error);
@@ -100,7 +101,7 @@ export default function UserScreen() {
                 }
               }}
             />
-            <Text style={styles.userNameheading}>{userName || originalUserName}</Text>
+            <Text style={styles.userNameheading}>{ originalUserName}</Text>
           </View>
           <View>
             <Text style={styles.label}>Name:</Text>

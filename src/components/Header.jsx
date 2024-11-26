@@ -106,16 +106,6 @@ const Header = ({ title, style, textStyle }) => {
       });
   };
 
-  // const handleNavigateToChat = () => {
-  //   toggleMenu();
-  //   navigation.navigate("Chat");
-  // };
-
-  const handleNavigateToItinerary = () => {
-    toggleMenu();
-    navigation.navigate("Itinerary");
-  };
-
   return (
     <View style={[styles.header, style]}>
       <Text style={[styles.title, textStyle]}>{title}</Text>
@@ -142,8 +132,6 @@ const Header = ({ title, style, textStyle }) => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.menu}>
-            <Button title="Itinerary" onPress={handleNavigateToItinerary} />
-            {/* <Button title="Chat" onPress={HandleNavigateToChat} /> */}
             <Button title="Logout" onPress={handleLogout} />
             <Button title="Close" onPress={toggleMenu} />
           </View>
@@ -157,8 +145,8 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
     marginTop: 0,
-    paddingTop: 0,
-    paddingBottom: 20,
+    paddingTop: 40,
+    paddingBottom: 10,
     paddingHorizontal: 20,
     backgroundColor: "#24565C",
     alignItems: "center",
