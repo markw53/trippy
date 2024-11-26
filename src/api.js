@@ -77,6 +77,6 @@ export const patchUserDetails = (userData) => {
 
 
 export const patchTripDetails = (tripData) => {
-  return axois.patch(`${apiBase}/trip/${tripData.trip_id}`, tripData)
+  return axios.patch(`${apiBase}/trips/${tripData.trip_id}`, tripData)
 }
 
