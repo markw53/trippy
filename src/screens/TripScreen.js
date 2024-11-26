@@ -15,9 +15,11 @@ import Card from "../components/Card";
 import { fetchItinerary, fetchPossibility, postPossibility } from "../api";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useNavigation } from "@react-navigation/native";
 
 const TripScreen = ({ route }) => {
-  const { tripId, tripName, navigation } = route.params;
+  const navigation = useNavigation();
+  const { tripId, tripName } = route.params;
   const [itinerary, setItinerary] = useState([]);
   const [possibility, setPossibility] = useState([]);
   const [isItinerary, setIsItinerary] = useState(true);
@@ -25,10 +27,12 @@ const TripScreen = ({ route }) => {
   const [isEvent, setIsEvent] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState(new Date());
   const [date, setDate] = useState(new Date());
   const [activityImage, setActivityImage] = useState("");
-  const [isShowPicker, setIsShowPicker] = useState(true);
+  const [isShowPicker, setIsShowPicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [isRefresh, setIsRefresh] = useState(false);
 
   useEffect(() => {
     if (tripId) {
@@ -46,10 +50,14 @@ const TripScreen = ({ route }) => {
         })
         .catch((err) => console.error("Error fetching possibilities:", err));
     }
-  }, [tripId]);
+  }, [tripId, isRefresh]);
 
   const showDatePicker = () => {
     setIsShowPicker(true);
+  };
+
+  const handleShowTimePicker = () => {
+    setShowTimePicker(true);
   };
 
   const handleItinerary = () => {
@@ -74,8 +82,11 @@ const TripScreen = ({ route }) => {
     setTitle(e.nativeEvent.text);
   };
 
-  const handleTimeChange = (e) => {
-    setTime(e.nativeEvent.text);
+  const handleTimeChange = ({ type }, selectedDate) => {
+    setShowTimePicker(false);
+    if (selectedDate) {
+      setTime(selectedDate);
+    }
   };
 
   const handleDescriptionChange = (e) => {
@@ -98,7 +109,7 @@ const TripScreen = ({ route }) => {
       activity_name: title,
       description: description,
       date: date.toISOString(),
-      time: time,
+      time: time.toTimeString(),
       activity_img_url: activityImage,
     };
 
@@ -113,11 +124,12 @@ const TripScreen = ({ route }) => {
         console.log("Error posting activity:", err);
       });
     setTitle("");
-    setTime("");
+    setTime(Date.now());
     setDescription("");
     setDate(Date.now());
     setActivityImage("");
     setIsEvent(false);
+    setIsRefresh(!isRefresh);
     setIsItinerary(true);
   };
 
@@ -144,7 +156,8 @@ const TripScreen = ({ route }) => {
           navigation.navigate("Activity", {
             activityId: activity.item.activity_id,
             tripId: tripId,
-            navigation: navigation,
+            setIsRefresh: setIsRefresh,
+            isRefresh: isRefresh,
           })
         }
       />
@@ -159,120 +172,129 @@ const TripScreen = ({ route }) => {
       <View style={styles.container}>
         <Header title="Trippy" />
         <ScrollView>
-
-        <View style={styles.section}>
-          <Text style={styles.title}>{tripName}</Text>
-          <View style={styles.image}>
-            <Text>17C</Text>
-            <Image
-              source={{
-                uri: "https://i.pinimg.com/736x/f1/83/cc/f183ccd0f8be3477c28d4104dc836a97.jpg",
-                width: 50,
-                height: 50,
-                alignItems: "right",
-              }}
+          <View style={styles.section}>
+            <Text style={styles.title}>{tripName}</Text>
+            <View style={styles.image}>
+              <Text>17C</Text>
+              <Image
+                source={{
+                  uri: "https://i.pinimg.com/736x/f1/83/cc/f183ccd0f8be3477c28d4104dc836a97.jpg",
+                  width: 50,
+                  height: 50,
+                  alignItems: "right",
+                }}
+              />
+            </View>
+          </View>
+          <View style={styles.tabs}>
+            <ItineraryButton
+              title="Itinerary"
+              onPress={handleItinerary}
+              style={styles.button}
+              isActive={isItinerary}
+            />
+            <ItineraryButton
+              title="Possibility"
+              onPress={handlePossibility}
+              style={styles.button}
+              isActive={isPossibility}
             />
           </View>
-        </View>
-        <View style={styles.tabs}>
-          <ItineraryButton
-            title="Itinerary"
-            onPress={handleItinerary}
-            style={styles.button}
-            isActive={isItinerary}
-          />
-          <ItineraryButton
-            title="Possibility"
-            onPress={handlePossibility}
-            style={styles.button}
-            isActive={isPossibility}
-          />
-        </View>
-        {isEvent && (
-          <ScrollView>
-            <View style={styles.section}>
-              <TextInput
-                placeholder="Title"
-                value={title}
-                onChange={handleTitleChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                placeholder="Time"
-                value={time}
-                onChange={handleTimeChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                multiline={true}
-                numberOfLines={4}
-                placeholder="Description"
-                value={description}
-                onChange={handleDescriptionChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                placeholder="Image"
-                value={activityImage}
-                onChange={handleActivityImageChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TouchableOpacity
-                style={styles.dateField}
-                onPress={showDatePicker}
-              >
-                <Text style={styles.title}>
-                  {date.toLocaleDateString() || "Select Date"}
-                </Text>
-              </TouchableOpacity>
-              {isShowPicker && (
-                <DateTimePicker
-                  mode="date"
-                  display="spinner"
-                  value={date}
-                  onChange={handleDate}
-                  style={styles.datePicker}
+          {isEvent && (
+            <ScrollView>
+              <View style={styles.section}>
+                <TextInput
+                  placeholder="Title"
+                  value={title}
+                  onChange={handleTitleChange}
+                  style={styles.input}
+                  placeholderTextColor="#888"
                 />
-              )}
+                <TouchableOpacity
+                  style={styles.dateField}
+                  onPress={handleShowTimePicker}
+                >
+                  <Text style={styles.title}>
+                    {time.toLocaleTimeString() || "Select Time"}
+                  </Text>
+                </TouchableOpacity>
+                {showTimePicker && (
+                  <DateTimePicker
+                    mode="time"
+                    display="spinner"
+                    value={time}
+                    onChange={handleTimeChange}
+                    style={styles.datePicker}
+                  />
+                )}
+                <TextInput
+                  multiline={true}
+                  numberOfLines={4}
+                  placeholder="Description"
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  style={styles.input}
+                  placeholderTextColor="#888"
+                />
+                <TextInput
+                  placeholder="Image"
+                  value={activityImage}
+                  onChange={handleActivityImageChange}
+                  style={styles.input}
+                  placeholderTextColor="#888"
+                />
+                <TouchableOpacity
+                  style={styles.dateField}
+                  onPress={showDatePicker}
+                >
+                  <Text style={styles.title}>
+                    {date.toLocaleDateString() || "Select Date"}
+                  </Text>
+                </TouchableOpacity>
+                {isShowPicker && (
+                  <DateTimePicker
+                    mode="date"
+                    display="spinner"
+                    value={date}
+                    onChange={handleDate}
+                    style={styles.datePicker}
+                  />
+                )}
+                <ItineraryButton
+                  title="Post"
+                  onPress={handlePostEvent}
+                  style={styles.button}
+                />
+              </View>
+            </ScrollView>
+          )}
+          <View style={styles.cards}>
+            {isItinerary && (
+              <FlatList
+                data={itinerary}
+                renderItem={renderActivity}
+                keyExtractor={(activity) => activity.activity_id.toString()}
+                numColumns={1}
+              />
+            )}
+            {isPossibility && (
+              <FlatList
+                data={possibility}
+                renderItem={renderActivity}
+                keyExtractor={(activity) => activity.activity_id.toString()}
+                numColumns={1}
+              />
+            )}
+          </View>
+          {!isEvent && (
+            <View style={styles.section}>
               <ItineraryButton
-                title="Post"
-                onPress={handlePostEvent}
+                title={"Add Event"}
+                onPress={handleEvent}
                 style={styles.button}
               />
             </View>
-          </ScrollView>
-        )}
-        <View style={styles.cards}>
-          {isItinerary && (
-            <FlatList
-              data={itinerary}
-              renderItem={renderActivity}
-              keyExtractor={(activity) => activity.activity_id.toString()}
-              numColumns={1}
-            />
           )}
-          {isPossibility && (
-            <FlatList
-              data={possibility}
-              renderItem={renderActivity}
-              keyExtractor={(activity) => activity.activity_id.toString()}
-              numColumns={1}
-            />
-          )}
-        </View>
-        {!isEvent && (
-          <View style={styles.section}>
-            <ItineraryButton
-              title={"Add Event"}
-              onPress={handleEvent}
-              style={styles.button}
-            />
-          </View>
-        )}
         </ScrollView>
       </View>
     </KeyboardAvoidingView>

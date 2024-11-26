@@ -6,12 +6,16 @@ import {
   deleteActivity,
   getActivity,
   moveToItinerary,
+  moveToPossibility,
 } from "../api";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 const ActivityScreen = ({ route }) => {
-  const { activityId, tripId, navigation } = route.params;
+  const navigation = useNavigation();
+  const { activityId, tripId, setIsRefresh, isRefresh } = route.params;
   const [activityName, setActivityName] = useState("");
   const [time, setTime] = useState("");
   const [votes, setVotes] = useState("");
@@ -33,19 +37,24 @@ const ActivityScreen = ({ route }) => {
       setInItinerary(activityData.in_itinerary);
       setIsLoading(false);
     });
-  }, [tripId, activityId]);
+  }, [tripId, activityId, isRefresh]);
 
   const handleVote = () => {
     setVotes((currVotes) => currVotes + 1);
-    activityVote(tripId, activityId, votes).catch((err) => {
-      console.log("Error with voting", err);
-      setVotes((currVotes) => currVotes - 1);
-    });
+
+    activityVote(tripId, activityId, votes)
+      .then(() => {
+        setIsRefresh(!isRefresh);
+      })
+      .catch((err) => {
+        console.log("Error while voting:", err);
+      });
   };
 
   const handleDelete = () => {
     deleteActivity(tripId, activityId)
       .then(() => {
+        setIsRefresh(!isRefresh);
         navigation.goBack();
       })
       .catch((err) => {
@@ -53,13 +62,25 @@ const ActivityScreen = ({ route }) => {
       });
   };
 
-  const handleMove = () => {
+  const handleMoveToItin = () => {
     moveToItinerary(tripId, activityId)
       .then(() => {
+        setIsRefresh(!isRefresh);
         navigation.goBack();
       })
       .catch((err) => {
         console.log("Error with moving to itinerary:", err);
+      });
+  };
+
+  const handleMoveToPossib = () => {
+    moveToPossibility(tripId, activityId)
+      .then(() => {
+        setIsRefresh(!isRefresh);
+        navigation.goBack();
+      })
+      .catch((err) => {
+        console.log("Error with moving to possibility:", err);
       });
   };
 
@@ -104,7 +125,14 @@ const ActivityScreen = ({ route }) => {
       {!inItinerary && (
         <Button
           title="Add to Itinerary"
-          onPress={handleMove}
+          onPress={handleMoveToItin}
+          style={styles.button}
+        />
+      )}
+      {inItinerary && (
+        <Button
+          title="Return to Possibility"
+          onPress={handleMoveToPossib}
           style={styles.button}
         />
       )}
