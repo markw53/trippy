@@ -80,10 +80,13 @@ export default function HomeScreen({ navigation }) {
       tripId={item.trip_id}
       tripName={item.trip_name}
       tripImage={item.trip_img_url}
+      location={item.location}
       onPress={() =>
         navigation.navigate("Trip", {
           tripId: item.trip_id,
           tripName: item.trip_name,
+          tripImage: item.trip_img_url,
+          location: item.location,
         })
       }
     />
