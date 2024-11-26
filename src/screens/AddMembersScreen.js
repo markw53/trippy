@@ -88,7 +88,7 @@ export default function AddMembersScreen() {
 
     const renderTripMembers = ({ item }) => (
         <Card
-
+        // userId={ }
         />
     )
 
@@ -110,7 +110,7 @@ export default function AddMembersScreen() {
                         <Image
                             style={styles.image}
                             source={{
-                                uri: tripPic || "https://reactnative.dev/img/tiny_logo.png"
+                                uri: originalTripPic || "https://reactnative.dev/img/tiny_logo.png"
                             }}
                             onError={(e) => {
                                 console.error("Image failed to load:", e.nativeEvent.error);
@@ -120,7 +120,7 @@ export default function AddMembersScreen() {
                             }}
                         />
                         <Text style={styles.tripNameheading}
-                        >{tripName || originalTripName}</Text>
+                        >{originalTripName}</Text>
                     </View>
                     <View>
                         <Text style={styles.label}>Change Trip Name:</Text>
@@ -155,7 +155,7 @@ export default function AddMembersScreen() {
                             numberOfLines={5}
                             scrollEnabled={true}
                             multiline={true}
-                            textAlignVertical="center"
+                            // textAlignVertical="center"
                             autoCapitalize="none"
                         />
                     </View>
@@ -220,6 +220,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         color: "#24565C",
         fontWeight: "bold",
+        textAlign: "center",
     },
     label: {
         fontSize: 16,
@@ -310,6 +311,17 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         textAlign: "center"
     },
+    tripDescription: {
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        borderColor: "#ccc",
+        borderWidth: 1,
+        padding: 12,
+        fontSize: 16,
+        height: 100, // Adjust height to fit multiline content
+        textAlignVertical: "top"
+
+    }
 
     // container: {
     //     flex: 1,
