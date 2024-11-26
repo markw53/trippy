@@ -158,7 +158,7 @@ const ActivityScreen = ({ route }) => {
         date={readableDate}
       />
       <Button
-        title={hasVoted ? "Already Voted" : "Vote"}
+        title={hasVoted ? "Remove Vote" : "Vote"}
         onPress={handleVote}
         style={styles.button}
         disabled={hasVoted}
