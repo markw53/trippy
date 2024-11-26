@@ -27,9 +27,9 @@ export default function LoginScreen({ navigation }) {
   const { user } = useAuth();
 
   const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password)
     setIsLogIn(true)
-      .then(() => {
+    signInWithEmailAndPassword(auth, email, password)
+          .then(() => {
         console.log("Logged in successfully");
         if (user) {
           console.log("Logged-in user details:", user);
@@ -46,10 +46,10 @@ export default function LoginScreen({ navigation }) {
   const handleGuestLogin = () => {
     const guestEmail = "guest@example.com";
     const guestPassword = "trippy";
+    setIsGuestLogIn(true)
 
     signInWithEmailAndPassword(auth, guestEmail, guestPassword) 
-    setIsGuestLogIn(true)
-      .then(() => {
+        .then(() => {
         setIsGuestLogIn(false)
         console.log("Guest logged in successfully")
   })

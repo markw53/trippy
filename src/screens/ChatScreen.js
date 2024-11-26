@@ -188,10 +188,10 @@ export default function ChatScreen() {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Type a message..."
+          placeholder={rooms.length === 0 ? "Please create or join a trip to start chatting." :"Type a message..."}
           value={currentMessage}
           onChangeText={setCurrentMessage}
-          editable={!posting}
+          editable={!posting && rooms.length > 0}
         />
         <TouchableOpacity
           onPress={handleSendMessage}
