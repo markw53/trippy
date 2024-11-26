@@ -67,8 +67,6 @@ export default function AddMembersScreen() {
             .then((response) => {
                 const data = response.data.trip;
 
-                // console.log("Fetched trip data:", data);
-
                 setTripName(data.trip_name || "");
                 setTripPic(data.trip_img_url || "");
                 setTripDescription(data.description || "");
@@ -123,7 +121,7 @@ export default function AddMembersScreen() {
                         >{originalTripName}</Text>
                     </View>
                     <View>
-                        <Text style={styles.label}>Change Trip Name:</Text>
+                        <Text style={styles.label}>Trip Name:</Text>
                         <TextInput
                             style={styles.input}
                             onChangeText={setTripName}
@@ -135,7 +133,7 @@ export default function AddMembersScreen() {
                         />
                     </View>
                     <View>
-                        <Text style={styles.label}>Change Trip Picture:</Text>
+                        <Text style={styles.label}>Trip Picture:</Text>
                         <TextInput
                             style={styles.input}
                             onChangeText={setTripPic}
@@ -147,7 +145,7 @@ export default function AddMembersScreen() {
                         />
                     </View>
                     <View>
-                        <Text style={styles.label}>Change Trip Description:</Text>
+                        <Text style={styles.label}>Trip Description:</Text>
                         <TextInput
                             style={[styles.input, styles.tripDescription]}
                             onChangeText={setTripDescription}
@@ -239,9 +237,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     image: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 250,
+        height: 150,
+        borderRadius: 10,
     },
     userNameheading: {
         fontSize: 18,
@@ -318,112 +316,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         padding: 12,
         fontSize: 16,
-        height: 100, // Adjust height to fit multiline content
+        height: 100,
         textAlignVertical: "top"
 
     }
 
-    // container: {
-    //     flex: 1,
-    //     backgroundColor: "#F7F7F7",
-    // },
-    // content: {
-    //     flex: 1,
-    //     justifyContent: "center",
-    //     alignItems: "center",
-    //     padding: 30,
-    // },
-    // text: {
-    //     marginBottom: 30,
-    //     fontSize: 24,
-    //     color: "#24565C",
-    //     fontWeight: "bold",
-    //     textAlign: "center"
-    // },
-    // tripNameheading: {
-    //     fontSize: 18,
-    //     fontWeight: "bold",
-    //     marginTop: 20,
-    //     marginBottom: 20,
-    // },
-    // textCurrentMembers: {
-    //     marginTop: 20,
-    //     marginBottom: 10,
-    //     fontSize: 20,
-    //     color: "#24565C",
-    //     fontWeight: "bold",
-    //     textAlign: "center"
-    // },
-    // textAddMembers: {
-    //     marginTop: 20,
-    //     marginBottom: 5,
-    //     fontSize: 20,
-    //     color: "#24565C",
-    //     fontWeight: "bold",
-    //     textAlign: "center"
-    // },
-    // label: {
-    //     paddingHorizontal: 50,
-    //     fontSize: 16,
-    //     marginVertical: 10, // Keep vertical spacing
-    //     color: "#333",
-    //     textAlign: "left", // Align the text to the left
-    //     alignSelf: "flex-start", // Align the label itself to the start of its parent container
-    // },
-    // input: {
-    //     backgroundColor: "#fff",
-    //     borderRadius: 10,
-    //     borderColor: "#ccc",
-    //     borderWidth: 1,
-    //     marginBottom: 10,
-    //     padding: 12,
-    //     fontSize: 16,
-    //     width: "100%",
-    // },
-    // imageContainer: {
-    //     alignItems: "center",
-    // },
-    // image: {
-    //     width: 100, // Ensure non-zero values
-    //     height: 100,
-    //     borderRadius: 50,
-    //     backgroundColor: "#ccc", // Optional: Placeholder background
-    // },
-    // button: {
-    //     backgroundColor: "#24565C",
-    //     paddingVertical: 10,
-    //     paddingHorizontal: 20,
-    //     borderRadius: 25,
-    //     alignItems: "center",
-    // },
-    // buttonText: {
-    //     color: "#fff",
-    //     fontSize: 16,
-    //     fontWeight: "bold",
-    // },
-    // confirmationbtnsContainer: {
-    //     marginTop: 50,
-    //     color: "#fff",
-    // },
-    // confirmationbtn: {
-    //     marginTop: 20
-    // },
-    // loadingText: {
-    //     fontSize: 18,
-    //     color: "#999",
-    //     marginTop: 20,
-    // },
-    // buttonDisabled: {
-    //     backgroundColor: "#ccc",
-    //     paddingVertical: 10,
-    //     paddingHorizontal: 20,
-    //     borderRadius: 25,
-    //     alignItems: "center"
-    // },
-    // saveChangesbtn: {
-    //     padding: 10,
-    // },
-    // cancelbtn: {
-    //     padding: 10,
-    // },
 });
