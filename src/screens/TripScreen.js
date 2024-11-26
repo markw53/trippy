@@ -8,6 +8,7 @@ import {
   Platform,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import ItineraryButton from "../components/ItineraryButtons";
 import Header from "../components/Header";
@@ -29,22 +30,36 @@ const TripScreen = ({ route }) => {
   const [date, setDate] = useState(new Date());
   const [activityImage, setActivityImage] = useState("");
   const [isShowPicker, setIsShowPicker] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     if (tripId) {
+      setIsLoading(true);
+      setIsError(false);
+
       fetchItinerary(tripId)
         .then((response) => {
           const itineraryList = response.data.activities;
           setItinerary(itineraryList);
         })
-        .catch((err) => console.error("Error fetching itinerary:", err));
+        .catch((err) => {
+          console.error("Error fetching itinerary:", err);
+          setIsError(true);
+        })
+        .finally(() => setIsLoading(false));
 
       fetchPossibility(tripId)
         .then((response) => {
           const possibilityList = response.data.activities;
           setPossibility(possibilityList);
         })
-        .catch((err) => console.error("Error fetching possibilities:", err));
+        .catch((err) => {
+          console.error("Error fetching possibilities:", err);
+          if (!isError) {
+            setIsError(true);
+          }
+        });
     }
   }, [tripId]);
 
@@ -65,8 +80,8 @@ const TripScreen = ({ route }) => {
   };
 
   const handleEvent = () => {
-    setIsItinerary(false);
-    setIsPossibility(false);
+    // setIsItinerary(false);
+    // setIsPossibility(false);
     setIsEvent(true);
   };
 
@@ -101,8 +116,6 @@ const TripScreen = ({ route }) => {
       time: time,
       activity_img_url: activityImage,
     };
-
-    console.log("Event being posted: ", newEvent);
 
     postPossibility(tripId, newEvent)
       .then((response) => {
@@ -151,6 +164,38 @@ const TripScreen = ({ route }) => {
     );
   };
 
+  // if (isLoading) {
+  //   return (
+  //     <View style={styles.center}>
+  //       <ActivityIndicator size="large" color="#24565C" />
+  //       <Text>Loading activities...</Text>
+  //     </View>
+  //   );
+  // }
+
+  // if (isError) {
+  //   return (
+  //     <View style={styles.center}>
+  //       <Text style={styles.friendlymsg}>Failed to fetch activities.</Text>
+  //       <Text style={styles.friendlymsgBold}>Try again.</Text>
+  //     </View>
+  //   );
+  // }
+
+  // if (!isItinerary && !isPossibility && itinerary.length === 0 && possibility.length === 0) {
+  //   return (
+  //     <View style={styles.center}>
+  //       <Text style={styles.friendlymsg}>No activities found.</Text>
+  //       <Text style={styles.friendlymsgBold}>Start by adding an activity!</Text>
+  //       <ItineraryButton
+  //         title="Add Event"
+  //         onPress={() => setIsEvent(true)}
+  //         style={styles.button}
+  //       />
+  //     </View>
+  //   );
+  // }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -159,120 +204,177 @@ const TripScreen = ({ route }) => {
       <View style={styles.container}>
         <Header title="Trippy" />
         <ScrollView>
+          <View style={styles.section}>
+            <Text style={styles.title}>{tripName}</Text>
+            <View style={styles.image}>
+              <Text>17C</Text>
+              <Image
+                source={{
+                  uri: "https://i.pinimg.com/736x/f1/83/cc/f183ccd0f8be3477c28d4104dc836a97.jpg",
+                  width: 50,
+                  height: 50,
+                  alignItems: "right",
+                }}
+              />
+            </View>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={styles.title}>{tripName}</Text>
-          <View style={styles.image}>
-            <Text>17C</Text>
-            <Image
-              source={{
-                uri: "https://i.pinimg.com/736x/f1/83/cc/f183ccd0f8be3477c28d4104dc836a97.jpg",
-                width: 50,
-                height: 50,
-                alignItems: "right",
-              }}
+          <View style={styles.tabs}>
+            <ItineraryButton
+              title="Itinerary"
+              onPress={handleItinerary}
+              style={styles.button}
+              isActive={isItinerary}
+            />
+            <ItineraryButton
+              title="Possibility"
+              onPress={handlePossibility}
+              style={styles.button}
+              isActive={isPossibility}
             />
           </View>
-        </View>
-        <View style={styles.tabs}>
-          <ItineraryButton
-            title="Itinerary"
-            onPress={handleItinerary}
-            style={styles.button}
-            isActive={isItinerary}
-          />
-          <ItineraryButton
-            title="Possibility"
-            onPress={handlePossibility}
-            style={styles.button}
-            isActive={isPossibility}
-          />
-        </View>
-        {isEvent && (
-          <ScrollView>
-            <View style={styles.section}>
-              <TextInput
-                placeholder="Title"
-                value={title}
-                onChange={handleTitleChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                placeholder="Time"
-                value={time}
-                onChange={handleTimeChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                multiline={true}
-                numberOfLines={4}
-                placeholder="Description"
-                value={description}
-                onChange={handleDescriptionChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TextInput
-                placeholder="Image"
-                value={activityImage}
-                onChange={handleActivityImageChange}
-                style={styles.input}
-                placeholderTextColor="#888"
-              />
-              <TouchableOpacity
-                style={styles.dateField}
-                onPress={showDatePicker}
-              >
-                <Text style={styles.title}>
-                  {date.toLocaleDateString() || "Select Date"}
+
+          {/* Dynamic section: show loading, error, or data */}
+          {/* <View style={styles.cards}> */}
+          {/* <View style={styles.center}> */}
+            {isLoading ? (
+              <View style={styles.center}>
+                <ActivityIndicator size="small" color="#24565C" />
+                <Text>Loading activities...</Text>
+              </View>
+            ) : isError ? (
+              <View style={styles.center}>
+                <Text style={styles.friendlymsg}>
+                  Failed to fetch activities.
                 </Text>
-              </TouchableOpacity>
-              {isShowPicker && (
-                <DateTimePicker
-                  mode="date"
-                  display="spinner"
-                  value={date}
-                  onChange={handleDate}
-                  style={styles.datePicker}
-                />
+                <Text style={styles.friendlymsgBold}>Try again.</Text>
+              </View>
+            ) : itinerary.length === 0 && possibility.length === 0 ? (
+              <View style={styles.center}>
+                <Text style={styles.friendlymsg}>
+                  No activities found for this trip.
+                </Text>
+                <Text style={styles.friendlymsgBold}>Add one!</Text>
+              </View>
+            ) : (
+              <View style={styles.cards}>
+                {isItinerary && (
+                  <FlatList
+                    data={itinerary}
+                    renderItem={renderActivity}
+                    keyExtractor={(activity) => activity.activity_id.toString()}
+                    numColumns={1}
+                  />
+                )}
+                {isPossibility && (
+                  <FlatList
+                    data={possibility}
+                    renderItem={renderActivity}
+                    keyExtractor={(activity) => activity.activity_id.toString()}
+                    numColumns={1}
+                  />
+                )}
+              </View>
+            )}
+          {/* </View> */}
+
+          {/* {!isLoading && isError && (
+              <View style={styles.center}>
+                <Text style={styles.friendlymsg}>Failed to fetch activities.</Text>
+                <Text>Please check your connection and try again.</Text>
+              </View>
+            )}
+
+            {!isLoading &&
+              !isError &&
+              isItinerary &&
+              itinerary.length === 0 && (
+                <View style={styles.center}>
+                  <Text style={styles.friendlymsg}>No itinerary items found.</Text>
+                  <Text style={styles.friendly}>
+                    Start by adding an activity!
+                  </Text>
+                </View>
               )}
+
+            {!isLoading &&
+              !isError &&
+              isPossibility &&
+              possibility.length === 0 && (
+                <View style={styles.center}>
+                  <Text style={styles.friendly}>
+                    No possibilities added yet.
+                  </Text>
+                </View>
+              )} */}
+
+          {isEvent && (
+            <ScrollView>
+              <View style={styles.section}>
+                <TextInput
+                  placeholder="Title"
+                  value={title}
+                  onChange={handleTitleChange}
+                  style={styles.input}
+                  placeholderTextColor="#888"
+                />
+                <TextInput
+                  placeholder="Time"
+                  value={time}
+                  onChange={handleTimeChange}
+                  style={styles.input}
+                  placeholderTextColor="#888"
+                />
+                <TextInput
+                  multiline={true}
+                  numberOfLines={4}
+                  placeholder="Description"
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  style={styles.input}
+                  placeholderTextColor="#888"
+                />
+                <TextInput
+                  placeholder="Image"
+                  value={activityImage}
+                  onChange={handleActivityImageChange}
+                  style={styles.input}
+                  placeholderTextColor="#888"
+                />
+                <TouchableOpacity
+                  style={styles.dateField}
+                  onPress={showDatePicker}
+                >
+                  <Text style={styles.title}>
+                    {date.toLocaleDateString() || "Select Date"}
+                  </Text>
+                </TouchableOpacity>
+                {isShowPicker && (
+                  <DateTimePicker
+                    mode="date"
+                    display="spinner"
+                    value={date}
+                    onChange={handleDate}
+                    style={styles.datePicker}
+                  />
+                )}
+                <ItineraryButton
+                  title="Post"
+                  onPress={handlePostEvent}
+                  style={styles.button}
+                />
+              </View>
+            </ScrollView>
+          )}
+          {!isEvent && (
+            <View style={styles.section}>
               <ItineraryButton
-                title="Post"
-                onPress={handlePostEvent}
+                title={"Add Event"}
+                onPress={handleEvent}
                 style={styles.button}
               />
             </View>
-          </ScrollView>
-        )}
-        <View style={styles.cards}>
-          {isItinerary && (
-            <FlatList
-              data={itinerary}
-              renderItem={renderActivity}
-              keyExtractor={(activity) => activity.activity_id.toString()}
-              numColumns={1}
-            />
           )}
-          {isPossibility && (
-            <FlatList
-              data={possibility}
-              renderItem={renderActivity}
-              keyExtractor={(activity) => activity.activity_id.toString()}
-              numColumns={1}
-            />
-          )}
-        </View>
-        {!isEvent && (
-          <View style={styles.section}>
-            <ItineraryButton
-              title={"Add Event"}
-              onPress={handleEvent}
-              style={styles.button}
-            />
-          </View>
-        )}
         </ScrollView>
       </View>
     </KeyboardAvoidingView>
@@ -287,6 +389,11 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 0,
     flexGrow: 1,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   section: {
     marginTop: 40,
@@ -307,6 +414,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 8,
     textAlign: "center",
+  },
+  friendlymsg: {
+    fontSize: 16,
+    color: "#24565C",
+  },
+  friendlymsgBold: {
+    marginTop: 5,
+    fontSize: 20,
+    color: "#24565C",
+    fontWeight: "bold",
   },
   image: {
     alignSelf: "flex-end",
