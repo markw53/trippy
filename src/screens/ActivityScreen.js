@@ -156,15 +156,6 @@ const ActivityScreen = ({ route }) => {
     day: "numeric",
   });
 
-  if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading trips...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
@@ -173,14 +164,21 @@ const ActivityScreen = ({ route }) => {
         onPress={() => navigation.goBack()}
         style={[styles.button, styles.back]}
       />
-      <Card
-        title={activityName}
-        time={time}
-        votes={votes}
-        content={description}
-        image={image}
-        date={readableDate}
-      />
+      {isLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text>Loading trips...</Text>
+        </View>
+      ) : (
+        <Card
+          title={activityName}
+          time={time}
+          votes={votes}
+          content={description}
+          image={image}
+          date={readableDate}
+        />
+      )}
       <Button
         title={hasVoted ? "Remove Vote" : "Vote"}
         onPress={handleVote}
