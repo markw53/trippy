@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
 } from "react-native";
 import { FlatList } from "react-native-web";
-import { fetchTripById, patchTripDetails } from "../api";
+import { fetchTripById, patchTripDetails, fetchTripMembers, getUserIdByEmail } from "../api";
 
 import Header from "../components/Header";
 import Button from "../components/Button";
@@ -26,6 +26,8 @@ export default function AddMembersScreen() {
     const [originalTripName, setOriginalTripName] = useState("")
     const [originalTripPic, setOriginalTripPic] = useState("")
     const [originalTripDescription, setOriginalTripDescription] = useState("")
+
+    const [members, setMembers] = useState("");
 
     const tripId = 8;
 
@@ -82,13 +84,24 @@ export default function AddMembersScreen() {
                 setIsError(true)
                 setIsLoading(false)
             })
+        fetchTripMembers(tripId)
+            .then((response) => {
+                const data = response.data.member;
+                setMembers(data)
+            })
+            .catch((error) => {
+                console.error("Error fetching member details:", error);
+                setIsError(true)
+                setIsLoading(false)
+            })
     }, [])
 
-    const renderTripMembers = ({ item }) => (
+    const renderMembers = ({ item }) => (
         <Card
-        // userId={ }
+            title={item.name}
+            onPress={() => console.log(`MemberCard Pressed: ${item.name}`)}
         />
-    )
+    );
 
     if (isLoading) {
         return (
@@ -153,13 +166,19 @@ export default function AddMembersScreen() {
                             numberOfLines={5}
                             scrollEnabled={true}
                             multiline={true}
-                            // textAlignVertical="center"
                             autoCapitalize="none"
                         />
                     </View>
                     <View>
                         <Text style={styles.textCurrentMembers}>Current Members</Text>
-                        {/* <FlatList></FlatList> */}
+                        <FlatList
+                            data={members}
+                            renderItem={renderMembers}
+                            keyExtractor={(item) => item.name.toString()}
+                            contentContainerStyle={styles.cardsContainer}
+                        //   scrollEnabled={false}
+
+                        />
                     </View>
                     <View>
                         <Text style={styles.textAddMembers}>Add Member</Text>
@@ -318,7 +337,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         height: 100,
         textAlignVertical: "top"
-
-    }
+    },
+    cardsContainer: {
+        paddingVertical: 0
+    },
 
 });
