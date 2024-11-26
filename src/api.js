@@ -81,3 +81,7 @@ export const moveToPossibility = (tripId, activityId) => {
     in_itinerary: false,
   });
 };
+
+export const patchTripDetails = (tripData) => {
+  return axois.patch(`${apiBase}/trip/${tripData.trip_id}`, tripData)
+}

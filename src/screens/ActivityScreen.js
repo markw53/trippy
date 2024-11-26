@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/Header";
 import {
   activityVote,
@@ -13,6 +14,7 @@ import Button from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
+
 const ActivityScreen = ({ route }) => {
   const navigation = useNavigation();
   const { activityId, tripId, setIsRefresh, isRefresh } = route.params;
@@ -24,6 +26,22 @@ const ActivityScreen = ({ route }) => {
   const [date, setDate] = useState("");
   const [inItinerary, setInItinerary] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasVoted, setHasVoted] = useState(false);
+
+   //CALLUM TESTING
+  useEffect(() => {
+    AsyncStorage.getItem("votedActivities")
+      .then((votedActivities) => {
+        if (votedActivities) {
+          const votedSet = JSON.parse(votedActivities);
+          setHasVoted(votedSet.includes(activityId));
+        }
+      })
+      .catch((err) => {
+        console.log("Error reading voting status:", err);
+      });
+  }, [activityId]);
+
 
   useEffect(() => {
     getActivity(tripId, activityId).then((response) => {
@@ -40,15 +58,51 @@ const ActivityScreen = ({ route }) => {
   }, [tripId, activityId, isRefresh]);
 
   const handleVote = () => {
-    setVotes((currVotes) => currVotes + 1);
-
-    activityVote(tripId, activityId, votes)
-      .then(() => {
-        setIsRefresh(!isRefresh);
-      })
-      .catch((err) => {
-        console.log("Error while voting:", err);
-      });
+    if (hasVoted) {
+      setVotes((currVotes) => currVotes - 1);
+  
+      activityVote(tripId, activityId, votes - 1)
+        .then(() => {
+          AsyncStorage.getItem("votedActivities")
+            .then((votedActivities) => {
+              const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
+              const updatedSet = votedSet.filter((id) => id !== activityId);
+              return AsyncStorage.setItem("votedActivities", JSON.stringify(updatedSet));
+            })
+            .then(() => {
+              setHasVoted(false);
+            })
+            .catch((err) => {
+              console.log("Error updating vote storage:", err);
+            });
+        })
+        .catch((err) => {
+          console.log("Error with removing vote:", err);
+          setVotes((currVotes) => currVotes + 1); 
+        });
+    } else {
+      setVotes((currVotes) => currVotes + 1);
+  
+      activityVote(tripId, activityId, votes + 1)
+        .then(() => {
+          AsyncStorage.getItem("votedActivities")
+            .then((votedActivities) => {
+              const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
+              votedSet.push(activityId);
+              return AsyncStorage.setItem("votedActivities", JSON.stringify(votedSet));
+            })
+            .then(() => {
+              setHasVoted(true);
+            })
+            .catch((err) => {
+              console.log("Error updating vote storage:", err);
+            });
+        })
+        .catch((err) => {
+          console.log("Error with voting:", err);
+          setVotes((currVotes) => currVotes - 1);
+        });
+    }
   };
 
   const handleDelete = () => {
@@ -120,7 +174,12 @@ const ActivityScreen = ({ route }) => {
         image={image}
         date={readableDate}
       />
-      <Button title="Vote" onPress={handleVote} style={styles.button} />
+      <Button
+        title={hasVoted ? "Remove Vote" : "Vote"}
+        onPress={handleVote}
+        style={styles.button}
+        disabled={hasVoted}
+      />
       <Button title="Delete" onPress={handleDelete} style={styles.button} />
       {!inItinerary && (
         <Button

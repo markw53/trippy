@@ -21,27 +21,42 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLogIn, setIsLogIn] = useState(false)
+  const [isGuestLogIn, setIsGuestLogIn] = useState(false)
 
   const { user } = useAuth();
 
   const handleLogin = () => {
+    setIsLogIn(true)
     signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
+          .then(() => {
         console.log("Logged in successfully");
         if (user) {
           console.log("Logged-in user details:", user);
         }
+        setIsLogIn(false)
       })
-      .catch((err) => setError(err.message));
+      .catch((err) => {
+       setIsLogIn(false)
+       setError(err.message)
+      })
+
   };
 
   const handleGuestLogin = () => {
     const guestEmail = "guest@example.com";
     const guestPassword = "trippy";
+    setIsGuestLogIn(true)
 
-    signInWithEmailAndPassword(auth, guestEmail, guestPassword)
-      .then(() => console.log("Guest logged in successfully"))
-      .catch((err) => setError(err.message));
+    signInWithEmailAndPassword(auth, guestEmail, guestPassword) 
+        .then(() => {
+        setIsGuestLogIn(false)
+        console.log("Guest logged in successfully")
+  })
+      .catch((err) => {
+        setIsGuestLogIn(false)
+        setError(err.message)}
+      )
   };
 
   const handleForgetPassword = () => {
@@ -69,7 +84,7 @@ export default function LoginScreen({ navigation }) {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.appName}>Trippy</Text>
-        <Text style={styles.tagline}>Addicted to Travelling</Text>
+        <Text style={styles.tagline}>Addiction to Travelling</Text>
         <View style={styles.inputContainer}>
           <TextInput
             placeholder="Username"
@@ -93,7 +108,7 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <RoundedButton
-          title="Log In"
+          title={isLogIn ? "Logging in..." : "Log In"}
           onPress={handleLogin}
           style={styles.loginButton}
           textStyle={styles.buttonText}
@@ -101,7 +116,7 @@ export default function LoginScreen({ navigation }) {
 
         <View style={styles.linkRowContainer}>
           <TouchableOpacity onPress={handleGuestLogin} style={styles.guestLink}>
-            <Text style={styles.guestText}>Sign in as Guest</Text>
+            <Text style={styles.guestText}>{isGuestLogIn ?" Signing In..." : "Sign in as Guest"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("SignUp")}

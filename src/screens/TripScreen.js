@@ -8,6 +8,7 @@ import {
   Platform,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import ItineraryButton from "../components/ItineraryButtons";
 import Header from "../components/Header";
@@ -33,22 +34,36 @@ const TripScreen = ({ route }) => {
   const [isShowPicker, setIsShowPicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [isRefresh, setIsRefresh] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     if (tripId) {
+      setIsLoading(true);
+      setIsError(false);
+
       fetchItinerary(tripId)
         .then((response) => {
           const itineraryList = response.data.activities;
           setItinerary(itineraryList);
         })
-        .catch((err) => console.error("Error fetching itinerary:", err));
+        .catch((err) => {
+          console.error("Error fetching itinerary:", err);
+          setIsError(true);
+        })
+        .finally(() => setIsLoading(false));
 
       fetchPossibility(tripId)
         .then((response) => {
           const possibilityList = response.data.activities;
           setPossibility(possibilityList);
         })
-        .catch((err) => console.error("Error fetching possibilities:", err));
+        .catch((err) => {
+          console.error("Error fetching possibilities:", err);
+          if (!isError) {
+            setIsError(true);
+          }
+        });
     }
   }, [tripId, isRefresh]);
 
@@ -73,8 +88,6 @@ const TripScreen = ({ route }) => {
   };
 
   const handleEvent = () => {
-    setIsItinerary(false);
-    setIsPossibility(false);
     setIsEvent(true);
   };
 
@@ -112,8 +125,6 @@ const TripScreen = ({ route }) => {
       time: time.toTimeString(),
       activity_img_url: activityImage,
     };
-
-    console.log("Event being posted: ", newEvent);
 
     postPossibility(tripId, newEvent)
       .then((response) => {
@@ -164,6 +175,8 @@ const TripScreen = ({ route }) => {
     );
   };
 
+
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -185,6 +198,7 @@ const TripScreen = ({ route }) => {
                 }}
               />
             </View>
+
           </View>
           <View style={styles.tabs}>
             <ItineraryButton
@@ -200,6 +214,41 @@ const TripScreen = ({ route }) => {
               isActive={isPossibility}
             />
           </View>
+
+          {/* Dynamic section: show loading, error, or data */}
+            {isLoading ? (
+              <View style={styles.center}>
+                <ActivityIndicator size="small" color="#24565C" />
+                <Text>Loading activities...</Text>
+              </View>
+            ) : itinerary.length === 0 && possibility.length === 0 ? (
+              <View style={styles.center}>
+                <Text style={styles.friendlymsg}>
+                  No activities found for this trip.
+                </Text>
+                <Text style={styles.friendlymsgBold}>Add one!</Text>
+              </View>
+            ) : (
+              <View style={styles.cards}>
+                {isItinerary && (
+                  <FlatList
+                    data={itinerary}
+                    renderItem={renderActivity}
+                    keyExtractor={(activity) => activity.activity_id.toString()}
+                    numColumns={1}
+                  />
+                )}
+                {isPossibility && (
+                  <FlatList
+                    data={possibility}
+                    renderItem={renderActivity}
+                    keyExtractor={(activity) => activity.activity_id.toString()}
+                    numColumns={1}
+                  />
+                )}
+              </View>
+            )}
+            
           {isEvent && (
             <ScrollView>
               <View style={styles.section}>
@@ -268,26 +317,8 @@ const TripScreen = ({ route }) => {
               </View>
             </ScrollView>
           )}
-          <View style={styles.cards}>
-            {isItinerary && (
-              <FlatList
-                data={itinerary}
-                renderItem={renderActivity}
-                keyExtractor={(activity) => activity.activity_id.toString()}
-                numColumns={1}
-              />
-            )}
-            {isPossibility && (
-              <FlatList
-                data={possibility}
-                renderItem={renderActivity}
-                keyExtractor={(activity) => activity.activity_id.toString()}
-                numColumns={1}
-              />
-            )}
-          </View>
           {!isEvent && (
-            <View style={styles.section}>
+            <View style={styles.eventBotton}>
               <ItineraryButton
                 title={"Add Event"}
                 onPress={handleEvent}
@@ -310,10 +341,21 @@ const styles = StyleSheet.create({
     padding: 0,
     flexGrow: 1,
   },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 60,
+    marginBottom: 25
+  },
   section: {
     marginTop: 40,
     marginBottom: 24,
     marginLeft: 10,
+  },
+  eventBotton: {
+    marginTop: 5,
+    marginBottom: 30,
   },
   title: {
     fontSize: 18,
@@ -329,6 +371,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 8,
     textAlign: "center",
+  },
+  friendlymsg: {
+    fontSize: 16,
+    color: "#24565C",
+  },
+  friendlymsgBold: {
+    marginTop: 5,
+    fontSize: 20,
+    color: "#24565C",
+    fontWeight: "bold",
   },
   image: {
     alignSelf: "flex-end",
