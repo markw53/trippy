@@ -104,7 +104,7 @@ export default function TripCreationScreen({ navigation }) {
     createTrip(tripData)
       .then((response) => {
         alert("Trip created successfully!");
-        navigation.navigate("HomeScreen", { newTrip: response.data.trip });
+        navigation.navigate("HomeScreen", { newTrip: createdTrip });
       })
       .catch((error) => {
         console.error(
