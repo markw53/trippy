@@ -38,3 +38,6 @@ export const patchUserDetails = (userData) => {
   return axios.patch(`${apiBase}/users/${userData.user_id}`, userData);
 }
 
+export const patchTripDetails = (tripData) => {
+  return axois.patch(`${apiBase}/trip/${tripData.trip_id}`, tripData)
+}
