@@ -22,7 +22,7 @@ const Header = ({ title, style, textStyle }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [weather, setWeather] = useState(null);
   const { setUser } = useAuth();
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   const WEATHER_CACHE_KEY = "weather_data";
   const WEATHER_CACHE_EXPIRY_KEY = "weather_cache_expiry";
