@@ -12,6 +12,7 @@ import Button from "../components/Button";
 import TripCard from "../components/TripCard";
 import { fetchTripById, fetchTrips, fetchUserTrips } from "../api";
 import { useAuth } from "../../AuthContext";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function HomeScreen({ navigation }) {
   const [trips, setTrips] = useState([]);
@@ -22,18 +23,26 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     if (!authLoading && user?.userId && isLoading) {
       setIsLoading(true);
-      fetchUserTrips(user.userId) 
+      fetchUserTrips(user.userId)
         .then((response) => {
           const tripsIds = response.data.trips.map((trip) => trip.trip_id);
 
-          const tripDetailPromises = tripsIds.map((id) =>
-            fetchTripById(id)
-          );
+          if (tripsIds.length === 0) {
+            setTrips([]);
+            setIsLoading(false);
+            return;
+          }
+
+          const tripDetailPromises = tripsIds.map((id) => fetchTripById(id));
           return Promise.all(tripDetailPromises);
         })
         .then((detailedTrips) => {
-          const tripData = detailedTrips.map((response) => response.data.trip);
-          setTrips(tripData);
+          if (detailedTrips) {
+            const tripData = detailedTrips.map(
+              (response) => response.data.trip
+            );
+            setTrips(tripData);
+          }
           setIsLoading(false);
         })
         .catch((err) => {
@@ -48,21 +57,23 @@ export default function HomeScreen({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      if (navigation.getState()?.routes?.some((route) => route.params?.newTrip)) {
-        const newTrip = navigation.getState().routes.find(
-          (route) => route.params?.newTrip
-        ).params.newTrip;
-  
+      if (
+        navigation.getState()?.routes?.some((route) => route.params?.newTrip)
+      ) {
+        const newTrip = navigation
+          .getState()
+          .routes.find((route) => route.params?.newTrip).params.newTrip;
+
         setTrips((prevTrips) => [newTrip, ...prevTrips]);
-  
+
         navigation.setParams({ newTrip: null });
       }
     }, [navigation])
   );
 
   const handleCreateTrip = () => {
-    navigation.navigate("TripCreationScreen")
-  }
+    navigation.navigate("TripCreationScreen");
+  };
 
   const renderTrip = ({ item }) => (
     <TripCard
@@ -70,45 +81,58 @@ export default function HomeScreen({ navigation }) {
       tripName={item.trip_name}
       tripImage={item.trip_img_url}
       onPress={() =>
-        navigation.navigate("Trip", { tripId: item.trip_id, tripName: item.trip_name })
+        navigation.navigate("Trip", {
+          tripId: item.trip_id,
+          tripName: item.trip_name,
+          navigation: navigation,
+        })
       }
     />
   );
 
-  if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading trips...</Text>
-      </View>
-    );
-  }
-
-  if (isError) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.error}>{isError}</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
-      <View style={styles.content}>
-        <Text style={styles.text}>My trips</Text>
-      </View>
-      <FlatList
-        data={trips}
-        renderItem={renderTrip}
-        keyExtractor={(item) => item.trip_id.toString()}
-        numColumns={2}
-        contentContainerStyle={styles.cardsContainer}
-        scrollEnabled={false}
-      />
-      <View>
-        <Button title="Add trip" style={styles.button} onPress={handleCreateTrip} />
-      </View>
+
+      {isLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#24565C" />
+          <Text>Loading trips...</Text>
+        </View>
+      ) : isError ? (
+        <View style={styles.center}>
+          <Text style={styles.friendlymsg}>You have no trips yet.</Text>
+          <Text style={styles.friendlymsgBold}>Start by adding one!</Text>
+          <View>
+            <Button
+              title="Add trip"
+              style={styles.button}
+              onPress={handleCreateTrip}
+            />
+          </View>
+        </View>
+      ) : (
+        <ScrollView>
+          <View style={styles.content}>
+            <Text style={styles.text}>My trips</Text>
+          </View>
+          <FlatList
+            data={trips}
+            renderItem={renderTrip}
+            keyExtractor={(item) => item.trip_id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.cardsContainer}
+            scrollEnabled={false}
+          />
+          <View>
+            <Button
+              title="Add trip"
+              style={styles.button}
+              onPress={handleCreateTrip}
+            />
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -137,9 +161,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  error: {
+  friendlymsg: {
     fontSize: 16,
-    color: "red",
+    color: "#24565C",
+  },
+  friendlymsgBold: {
+    marginTop: 5,
+    fontSize: 20,
+    color: "#24565C",
+    fontWeight: "bold"
   },
   button: {
     marginTop: 50,
