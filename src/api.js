@@ -53,6 +53,11 @@ export const moveToItinerary = (tripId, activityId) => {
 export const fetchTripMembers = (tripId) => {
   return axios.get(`${apiBase}/trips/${tripId}/members`);
 };
+
+export const postTripMembers = (tripId, userId) => {
+  return axios.post(`${apiBase}/trips/${tripId}/members`, userId)
+};
+
 export const fetchRoomMessages = (roomId) => {
   return axios.get(`${apiBase}/rooms/${roomId}/messages`);
 };
@@ -69,14 +74,17 @@ export const fetchUserName = (userId) => {
 
 export const fetchUserDetails = (user_id) => {
   return axios.get(`${apiBase}/users/${user_id}`);
-}
+};
 
 export const patchUserDetails = (userData) => {
   return axios.patch(`${apiBase}/users/${userData.user_id}`, userData);
-}
-
+};
 
 export const patchTripDetails = (tripData) => {
   return axios.patch(`${apiBase}/trips/${tripData.trip_id}`, tripData)
-}
+};
+
+export const getUserIdByEmail = (userEmail) => {
+  return axios.get(`${apiBase}/users/email/${userEmail}`, userEmail)
+};
 
