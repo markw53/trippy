@@ -11,7 +11,6 @@ import {
 } from "../api";
 import Card from "../components/Card";
 import Button from "../components/Button";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
 

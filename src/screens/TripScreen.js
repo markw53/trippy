@@ -17,10 +17,12 @@ import { fetchItinerary, fetchPossibility, postPossibility } from "../api";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import { WEATHER_API_KEY } from "@env";
 
 const TripScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { tripId, tripName } = route.params;
+  const { tripId, tripName, tripImage, location } = route.params;
   const [itinerary, setItinerary] = useState([]);
   const [possibility, setPossibility] = useState([]);
   const [isItinerary, setIsItinerary] = useState(true);
@@ -36,6 +38,8 @@ const TripScreen = ({ route }) => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [weatherData, setWeatherData] = useState(null);
+  const { latitude, longitude } = location
 
   useEffect(() => {
     if (tripId) {
@@ -66,6 +70,23 @@ const TripScreen = ({ route }) => {
         });
     }
   }, [tripId, isRefresh]);
+
+  useEffect(() => {
+    const fetchWeather = async () => {
+      try {
+        const weatherResponse = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
+        );
+        setWeatherData(weatherResponse.data);
+      } catch (error) {
+        console.error("Error fetching weather:", error);
+      }
+    };
+
+    if (tripName) {
+      fetchWeather();
+    }
+  }, [tripName]);
 
   const showDatePicker = () => {
     setIsShowPicker(true);
@@ -187,18 +208,19 @@ const TripScreen = ({ route }) => {
         <ScrollView>
           <View style={styles.section}>
             <Text style={styles.title}>{tripName}</Text>
-            <View style={styles.image}>
-              <Text>17C</Text>
-              <Image
-                source={{
-                  uri: "https://i.pinimg.com/736x/f1/83/cc/f183ccd0f8be3477c28d4104dc836a97.jpg",
-                  width: 50,
-                  height: 50,
-                  alignItems: "right",
-                }}
-              />
-            </View>
-
+            {weatherData && (
+              <View style={styles.weather}>
+                <Text>{weatherData.main.temp}°C</Text>
+                <Image
+                  source={{
+                    uri: `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}.png`}} style={{
+                    width: 50,
+                    height: 50,
+                    alignItems: "right",
+                  }}
+                />
+              </View>
+            )}
           </View>
           <View style={styles.tabs}>
             <ItineraryButton
