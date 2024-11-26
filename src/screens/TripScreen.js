@@ -16,9 +16,11 @@ import Card from "../components/Card";
 import { fetchItinerary, fetchPossibility, postPossibility } from "../api";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useNavigation } from "@react-navigation/native";
 
 const TripScreen = ({ route }) => {
-  const { tripId, tripName, navigation } = route.params;
+  const navigation = useNavigation();
+  const { tripId, tripName } = route.params;
   const [itinerary, setItinerary] = useState([]);
   const [possibility, setPossibility] = useState([]);
   const [isItinerary, setIsItinerary] = useState(true);
@@ -26,10 +28,12 @@ const TripScreen = ({ route }) => {
   const [isEvent, setIsEvent] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState(new Date());
   const [date, setDate] = useState(new Date());
   const [activityImage, setActivityImage] = useState("");
-  const [isShowPicker, setIsShowPicker] = useState(true);
+  const [isShowPicker, setIsShowPicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [isRefresh, setIsRefresh] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -61,10 +65,14 @@ const TripScreen = ({ route }) => {
           }
         });
     }
-  }, [tripId]);
+  }, [tripId, isRefresh]);
 
   const showDatePicker = () => {
     setIsShowPicker(true);
+  };
+
+  const handleShowTimePicker = () => {
+    setShowTimePicker(true);
   };
 
   const handleItinerary = () => {
@@ -87,8 +95,11 @@ const TripScreen = ({ route }) => {
     setTitle(e.nativeEvent.text);
   };
 
-  const handleTimeChange = (e) => {
-    setTime(e.nativeEvent.text);
+  const handleTimeChange = ({ type }, selectedDate) => {
+    setShowTimePicker(false);
+    if (selectedDate) {
+      setTime(selectedDate);
+    }
   };
 
   const handleDescriptionChange = (e) => {
@@ -111,7 +122,7 @@ const TripScreen = ({ route }) => {
       activity_name: title,
       description: description,
       date: date.toISOString(),
-      time: time,
+      time: time.toTimeString(),
       activity_img_url: activityImage,
     };
 
@@ -124,11 +135,12 @@ const TripScreen = ({ route }) => {
         console.log("Error posting activity:", err);
       });
     setTitle("");
-    setTime("");
+    setTime(Date.now());
     setDescription("");
     setDate(Date.now());
     setActivityImage("");
     setIsEvent(false);
+    setIsRefresh(!isRefresh);
     setIsItinerary(true);
   };
 
@@ -155,7 +167,8 @@ const TripScreen = ({ route }) => {
           navigation.navigate("Activity", {
             activityId: activity.item.activity_id,
             tripId: tripId,
-            navigation: navigation,
+            setIsRefresh: setIsRefresh,
+            isRefresh: isRefresh,
           })
         }
       />
@@ -185,8 +198,8 @@ const TripScreen = ({ route }) => {
                 }}
               />
             </View>
-          </View>
 
+          </View>
           <View style={styles.tabs}>
             <ItineraryButton
               title="Itinerary"
@@ -235,6 +248,7 @@ const TripScreen = ({ route }) => {
                 )}
               </View>
             )}
+            
           {isEvent && (
             <ScrollView>
               <View style={styles.section}>
@@ -245,13 +259,23 @@ const TripScreen = ({ route }) => {
                   style={styles.input}
                   placeholderTextColor="#888"
                 />
-                <TextInput
-                  placeholder="Time"
-                  value={time}
-                  onChange={handleTimeChange}
-                  style={styles.input}
-                  placeholderTextColor="#888"
-                />
+                <TouchableOpacity
+                  style={styles.dateField}
+                  onPress={handleShowTimePicker}
+                >
+                  <Text style={styles.title}>
+                    {time.toLocaleTimeString() || "Select Time"}
+                  </Text>
+                </TouchableOpacity>
+                {showTimePicker && (
+                  <DateTimePicker
+                    mode="time"
+                    display="spinner"
+                    value={time}
+                    onChange={handleTimeChange}
+                    style={styles.datePicker}
+                  />
+                )}
                 <TextInput
                   multiline={true}
                   numberOfLines={4}
