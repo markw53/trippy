@@ -103,8 +103,9 @@ export default function TripCreationScreen({ navigation }) {
 
     createTrip(tripData)
       .then((response) => {
+        console.log(tripData);
         alert("Trip created successfully!");
-        navigation.navigate("HomeScreen", { newTrip: createdTrip });
+        navigation.navigate("Home");
       })
       .catch((error) => {
         console.error(
@@ -156,6 +157,15 @@ export default function TripCreationScreen({ navigation }) {
             ))}
           </View>
         )}
+
+        <Text style={styles.label}>Image</Text>
+        <TextInput
+          style={styles.input}
+          value={tripImageUrl}
+          onChangeText={setTripImageUrl}
+          placeholder="Enter image url"
+        />
+
         <View style={styles.row}>
           <TouchableOpacity
             style={styles.dateButton}
@@ -169,6 +179,7 @@ export default function TripCreationScreen({ navigation }) {
                 mode="date"
                 display="default"
                 onChange={(event, selectedDate) => {
+                  setShowStartPicker(false);
                   if (selectedDate) setStartDate(selectedDate);
                 }}
               />
@@ -187,6 +198,7 @@ export default function TripCreationScreen({ navigation }) {
                 mode="date"
                 display="default"
                 onChange={(event, selectedDate) => {
+                  setShowEndPicker(false);
                   if (selectedDate) setEndDate(selectedDate);
                 }}
               />
