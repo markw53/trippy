@@ -181,7 +181,6 @@ const TripScreen = ({ route }) => {
     return (
       <Card
         title={activity.item.activity_name}
-        a
         time={activity.item.time}
         votes={activity.item.votes}
         content={activity.item.description}
