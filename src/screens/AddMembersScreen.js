@@ -21,6 +21,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import Card from "../components/Card";
+import BackButton from "../components/BackButton";
 
 export default function AddMembersScreen() {
   const navigation = useNavigation();
@@ -147,9 +148,7 @@ export default function AddMembersScreen() {
       <Header title="Trippy" />
       <View style={styles.content}>
         <ScrollView>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={{ color: "#24565C", fontSize: 16 }}>Back</Text>
-          </TouchableOpacity>
+          <BackButton title={"Back"} onPress={() => navigation.goBack()} />
           <Text style={styles.text}>Trip Settings</Text>
           <View style={styles.imageContainer}>
             <Image
