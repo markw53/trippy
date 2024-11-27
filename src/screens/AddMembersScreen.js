@@ -28,21 +28,17 @@ export default function AddMembersScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { tripId } = route.params;
-
   const [tripName, setTripName] = useState("");
   const [tripPic, setTripPic] = useState("");
   const [tripDescription, setTripDescription] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
-
   const [originalTripName, setOriginalTripName] = useState("");
   const [originalTripPic, setOriginalTripPic] = useState("");
   const [originalTripDescription, setOriginalTripDescription] = useState("");
-
-  const [members, setMembers] = useState("");
+  const [members, setMembers] = useState([]);
   const [userEmail, setUserEmail] = useState("");
-
   const isFormValid = tripName.trim() !== "" && tripPic.trim() !== "";
 
   const handleSubmit = () => {
@@ -79,15 +75,12 @@ export default function AddMembersScreen() {
     fetchTripById(tripId)
       .then((response) => {
         const data = response.data.trip;
-
         setTripName(data.trip_name || "");
         setTripPic(data.trip_img_url || "");
         setTripDescription(data.description || "");
-
         setOriginalTripName(data.trip_name || "");
         setOriginalTripPic(data.trip_img_url || "");
         setOriginalTripDescription(data.description || "");
-
         setIsLoading(false);
       })
       .catch((error) => {
@@ -105,19 +98,37 @@ export default function AddMembersScreen() {
         setIsError(true);
         setIsLoading(false);
       });
-  }, [members]);
+  }, []);
 
   const renderMembers = ({ item }) => <Card title={item.name} />;
 
+  const isValidEmail = (email) => {
+    const regex = /\S+@\S+\.\S+/;
+    return regex.test(email);
+  };
+
   const addMember = () => {
+    if (!isValidEmail(userEmail)) {
+      alert("Please enter a valid email.");
+      return;
+    }
+
     getUserIdByEmail(userEmail).then((response) => {
       const userId = response.data.userId.user_id;
       const newMember = {
         user_id: userId,
       };
-      postTripMembers(tripId, newMember).catch((err) => {
+      postTripMembers(tripId, newMember)
+      .then(() => {
+        alert("Menber added successfully!");
+      })
+      .catch((err) => {
         console.log("Error adding member:", err);
+        alert("Failed to add member.");
       });
+    }).catch((err) => {
+      console.log("Error fetching user ID:", err);
+      alert("Invalid email address.");
     });
   };
 
@@ -146,7 +157,6 @@ export default function AddMembersScreen() {
     <View style={styles.container}>
       <Header title="Trippy" />
       <View style={styles.content}>
-
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Text style={{ color: "#24565C", fontSize: 16 }}>Back</Text>
           </TouchableOpacity>
@@ -211,7 +221,7 @@ export default function AddMembersScreen() {
             <FlatList
               data={members}
               renderItem={renderMembers}
-              keyExtractor={(item) => item.name.toString()}
+              keyExtractor={(item) => item.id.toString()}
               contentContainerStyle={styles.cardsContainer}
               //   scrollEnabled={false}
             />
