@@ -36,7 +36,7 @@ export const getActivity = (tripId, activityId) => {
 
 export const activityVote = (tripId, activityId, votes) => {
   return axios.patch(`${apiBase}/trips/${tripId}/activities/${activityId}`, {
-    votes: votes + 1,
+    votes: votes,
   });
 };
 
