@@ -18,6 +18,7 @@ import {
 } from "../api";
 import { useAuth } from "../../AuthContext";
 import Header from "../components/Header";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 export default function ChatScreen() {
   const { user, loading: authLoading } = useAuth(); 
@@ -148,10 +149,7 @@ export default function ChatScreen() {
 
   if (authLoading || loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-        <Text>Loading...</Text>
-      </View>
+      <LoadingIndicator />
     );
   }
 
