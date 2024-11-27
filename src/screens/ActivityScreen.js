@@ -15,7 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 
 const ActivityScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { activityId, tripId, setIsRefresh, isRefresh } = route.params;
+  const { activityId, tripId, isRefresh } = route.params;
   const [activityName, setActivityName] = useState("");
   const [time, setTime] = useState("");
   const [votes, setVotes] = useState("");
@@ -27,7 +27,20 @@ const ActivityScreen = ({ route }) => {
   const [hasVoted, setHasVoted] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
 
-  //CALLUM TESTING
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Button
+          title="Refresh"
+          onPress={() => {
+            // Trigger the refresh logic here, if needed
+            // Example: trigger a state update in the parent component
+          }}
+        />
+      ),
+    });
+  }, [navigation]);
+
   useEffect(() => {
     AsyncStorage.getItem("votedActivities")
       .then((votedActivities) => {
@@ -153,9 +166,7 @@ const ActivityScreen = ({ route }) => {
   };
 
   const isoDate = date;
-
   const dateObj = new Date(isoDate);
-
   const readableDate = dateObj.toLocaleDateString("en-GB", {
     weekday: "short",
     year: "numeric",

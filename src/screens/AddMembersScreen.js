@@ -129,7 +129,6 @@ export default function AddMembersScreen() {
     <View style={styles.container}>
       <Header title="Trippy" />
       <View style={styles.content}>
-        <ScrollView>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Text style={{ color: "#24565C", fontSize: 16 }}>Back</Text>
           </TouchableOpacity>
@@ -232,8 +231,7 @@ export default function AddMembersScreen() {
               <Button title="Cancel" onPress={handleCancel} />
             </View>
           </View>
-        </ScrollView>
-      </View>
+        </View>
     </View>
   );
 }
