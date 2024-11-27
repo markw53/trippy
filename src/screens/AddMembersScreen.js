@@ -165,9 +165,21 @@ export default function AddMembersScreen() {
     const handlePrompt = (userId) => {
         setDeleteState((previousState) => ({
             ...previousState,
-            [userId]: !previousState[userId],
-        }))
-    }
+            [userId]: true,
+        }));
+        n
+        setTimeout(() => {
+            setDeleteState((previousState) => {
+                if (previousState[userId]) {
+                    return {
+                        ...previousState,
+                        [userId]: false
+                    };
+                }
+                return previousState;
+            });
+        }, 5000);
+    };
 
     const renderMembers = ({ item }) => {
         const isDelete = deleteState[item.user_id] || false
