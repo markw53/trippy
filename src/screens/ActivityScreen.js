@@ -20,7 +20,6 @@ const ActivityScreen = ({ route }) => {
   const {
     activityId,
     tripId,
-    isRefresh,
     tripName,
     tripImage,
     location
@@ -35,22 +34,20 @@ const ActivityScreen = ({ route }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasVoted, setHasVoted] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(
-    () => {
+  useEffect(() => {
       navigation.setOptions({
-        headerRight: () =>
+        headerRight: () => (
           <Button
             title="Refresh"
             onPress={() => {
-              // Trigger the refresh logic here, if needed
-              // Example: trigger a state update in the parent component
+              setRefreshKey((prevKey) => prevKey + 1);
             }}
           />
-      });
-    },
-    [navigation]
-  );
+      ),
+    });
+   }, [navigation]);
 
   useEffect(
     () => {
@@ -68,9 +65,9 @@ const ActivityScreen = ({ route }) => {
     [activityId]
   );
 
-  useEffect(
-    () => {
-      getActivity(tripId, activityId).then(response => {
+  useEffect(() => {
+      getActivity(tripId, activityId)
+      .then((response) => {
         const activityData = response.data.activity;
         setActivityName(activityData.activity_name);
         setTime(activityData.time);
@@ -80,31 +77,26 @@ const ActivityScreen = ({ route }) => {
         setDate(activityData.date);
         setInItinerary(activityData.in_itinerary);
         setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log("Error fetching activity:", err);
       });
-    },
-    [tripId, activityId, isRefresh]
-  );
+    },[tripId, activityId, refreshKey]);
 
   const handleVote = () => {
     if (hasVoted) {
       setVotes(currVotes => currVotes - 1);
-
       activityVote(tripId, activityId, votes - 1)
         .then(() => {
           AsyncStorage.getItem("votedActivities")
             .then(votedActivities => {
-              const votedSet = votedActivities
-                ? JSON.parse(votedActivities)
-                : [];
+              const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
               const updatedSet = votedSet.filter(id => id !== activityId);
-              return AsyncStorage.setItem(
-                "votedActivities",
-                JSON.stringify(updatedSet)
-              );
+              return AsyncStorage.setItem("votedActivities", JSON.stringify(updatedSet));
             })
             .then(() => {
               setHasVoted(false);
-              setIsRefresh(!isRefresh);
+              setRefreshKey((prevKey) => prevKey + 1);
             })
             .catch(err => {
               console.log("Error updating vote storage:", err);
@@ -116,7 +108,6 @@ const ActivityScreen = ({ route }) => {
         });
     } else {
       setVotes(currVotes => currVotes + 1);
-
       activityVote(tripId, activityId, votes + 1)
         .then(() => {
           AsyncStorage.getItem("votedActivities")
@@ -132,7 +123,7 @@ const ActivityScreen = ({ route }) => {
             })
             .then(() => {
               setHasVoted(true);
-              setIsRefresh(!isRefresh);
+              setRefreshKey((prevKey) => prevKey + 1);
             })
             .catch(err => {
               console.log("Error updating vote storage:", err);
@@ -152,10 +143,9 @@ const ActivityScreen = ({ route }) => {
   const handleDelete = () => {
     deleteActivity(tripId, activityId)
       .then(() => {
-        setIsRefresh(!isRefresh);
         navigation.goBack();
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("Error deleting activity:", err);
       });
   };
@@ -174,7 +164,6 @@ const ActivityScreen = ({ route }) => {
   const handleMoveToPossib = () => {
     moveToPossibility(tripId, activityId)
       .then(() => {
-        setIsRefresh(!isRefresh);
         navigation.goBack();
       })
       .catch(err => {
@@ -205,16 +194,18 @@ const ActivityScreen = ({ route }) => {
           })}
         style={[styles.button, styles.back]}
       />
-      {isLoading
-        ? <LoadingIndicator />
-        : <Card
+      {isLoading ? ( 
+        <LoadingIndicator />
+      ) : (
+         <Card
             title={activityName}
             time={time}
             votes={votes}
             content={description}
             image={image}
             date={readableDate}
-          />}
+          />
+        )}
       <Button
         title={hasVoted ? "Remove Vote" : "Vote"}
         onPress={handleVote}
@@ -229,18 +220,20 @@ const ActivityScreen = ({ route }) => {
           onPress={handleDelete}
           style={styles.button}
         />}
-      {!inItinerary &&
+      {!inItinerary && (
         <Button
           title="Add to Itinerary"
           onPress={handleMoveToItin}
           style={styles.button}
-        />}
-      {inItinerary &&
+        />
+      )}
+      {inItinerary && (
         <Button
           title="Return to Possibility"
           onPress={handleMoveToPossib}
           style={styles.button}
-        />}
+        />
+        )}
     </View>
   );
 };
