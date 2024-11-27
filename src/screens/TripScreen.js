@@ -10,6 +10,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons"; 
 import ItineraryButton from "../components/ItineraryButtons";
 import Header from "../components/Header";
 import Card from "../components/Card";
@@ -107,6 +108,10 @@ const TripScreen = ({ route }) => {
     }
   }, [tripName, tripId]);
 
+  const handleNavigationToSettings = () => {
+    navigation.navigate("AddMembersScreen", { tripId, tripName });
+  };
+
   const showDatePicker = () => {
     setIsShowPicker(true);
   };
@@ -197,7 +202,7 @@ const TripScreen = ({ route }) => {
     });
     return (
       <Card
-        title={activity.item.activity_name}
+        title={activity.item.activity_name}a
         time={activity.item.time}
         votes={activity.item.votes}
         content={activity.item.description}
@@ -238,6 +243,9 @@ const TripScreen = ({ route }) => {
       <View style={styles.container}>
         <Header title="Trippy" />
         <ScrollView>
+          <TouchableOpacity onPress={handleNavigationToSettings}>
+            <MaterialIcons name="settings" size={24} colour="#24565C" />
+          </TouchableOpacity>
           <View style={styles.section}>
             <Text style={styles.title}>{tripName}</Text>
             <Text>
