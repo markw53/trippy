@@ -16,6 +16,7 @@ import {
     getUserIdByEmail,
     postTripMembers,
     deleteTripById,
+    deleteMemberFromTrip,
 } from "../api";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Header from "../components/Header";
@@ -33,13 +34,82 @@ export default function AddMembersScreen() {
     const [tripDescription, setTripDescription] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
-    const [isDelete, setIsDelete] = useState(false);
+
+    const [deleteUserState, setDeleteUserState] = useState({}); // Separate state for members
+    const [isTripDelete, setIsTripDelete] = useState(false);    // Separate state for trip
+
     const [originalTripName, setOriginalTripName] = useState("");
     const [originalTripPic, setOriginalTripPic] = useState("");
     const [originalTripDescription, setOriginalTripDescription] = useState("");
     const [members, setMembers] = useState([]);
     const [userEmail, setUserEmail] = useState("");
     const isFormValid = tripName.trim() !== "" && tripPic.trim() !== "";
+
+    // useEffect(() => {
+    //     fetchTripById(tripId)
+    //         .then((response) => {
+    //             const data = response.data.trip;
+
+    //             setTripName(data.trip_name || "");
+    //             setTripPic(data.trip_img_url || "");
+    //             setTripDescription(data.description || "");
+
+    //             setOriginalTripName(data.trip_name || "");
+    //             setOriginalTripPic(data.trip_img_url || "");
+    //             setOriginalTripDescription(data.description || "");
+
+    //             setIsLoading(false)
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error fetching trip details:", error);
+    //             setIsError(true)
+    //             setIsLoading(false)
+    //         })
+    //     fetchTripMembers(tripId)
+    //         .then((response) => {
+    //             const data = response.data.members;
+    //             setMembers(data)
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error fetching member details:", error);
+    //             setIsError(true)
+    //             setIsLoading(false)
+    //         })
+    // }, [])
+    useEffect(() => {
+        fetchTripById(tripId)
+            .then((response) => {
+                const data = response.data.trip;
+
+                setTripName(data.trip_name || "");
+                setTripPic(data.trip_img_url || "");
+                setTripDescription(data.description || "");
+
+                setOriginalTripName(data.trip_name || "");
+                setOriginalTripPic(data.trip_img_url || "");
+                setOriginalTripDescription(data.description || "");
+
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.error("Error fetching trip details:", error);
+                setIsError(true);
+                setIsLoading(false);
+            });
+    }, []); // Only fetch the trip details on component mount.
+
+    useEffect(() => {
+        fetchTripMembers(tripId)
+            .then((response) => {
+                setMembers(response.data.members);
+            })
+            .catch((error) => {
+                console.error("Error fetching member details:", error);
+                setIsError(true);
+                setIsLoading(false);
+            });
+    }, [members]); // Fetch members when `tripId` changes.
+
 
     const handleSubmit = () => {
         const updateTrip = {
@@ -70,72 +140,39 @@ export default function AddMembersScreen() {
         setTripPic(originalTripPic);
         setOriginalTripDescription(originalTripDescription)
         setUserEmail("")
-        setDeleteState({});
+        setDeleteUserState({});
+        setIsTripDelete(false);
     };
 
-    useEffect(() => {
-        fetchTripById(tripId)
-            .then((response) => {
-                const data = response.data.trip;
-
-                setTripName(data.trip_name || "");
-                setTripPic(data.trip_img_url || "");
-                setTripDescription(data.description || "");
-
-                setOriginalTripName(data.trip_name || "");
-                setOriginalTripPic(data.trip_img_url || "");
-                setOriginalTripDescription(data.description || "");
-
-                setIsLoading(false)
-            })
-            .catch((error) => {
-                console.error("Error fetching trip details:", error);
-                setIsError(true)
-                setIsLoading(false)
-            })
-        fetchTripMembers(tripId)
-            .then((response) => {
-                const data = response.data.members;
-                setMembers(data)
-            })
-            .catch((error) => {
-                console.error("Error fetching member details:", error);
-                setIsError(true)
-                setIsLoading(false)
-            })
-    }, [members])
-
-
-
-    const handlePrompt = (userId) => {
-        setDeleteState((previousState) => ({
+    const handleUserDelete = (userId) => {
+        setDeleteUserState((previousState) => ({
             ...previousState,
             [userId]: true,
         }));
 
         setTimeout(() => {
-            setDeleteState((previousState) => {
-                if (previousState[userId]) {
-                    return {
-                        ...previousState,
-                        [userId]: false
-                    };
-                }
-                return previousState;
+            setDeleteUserState((previousState) => {
+                const newState = { ...previousState };
+                delete newState[userId];
+                return newState;
             });
         }, 5000);
     };
 
+    const handleTripDeleteConfirm = () => {
+        setIsTripDelete(true);
+    }
+
     const renderMembers = ({ item }) => {
-        const isDelete = deleteState[item.user_id] || false
+        const isUserDelete = deleteUserState[item.user_id] || false
         return (
             <View style={styles.memberCardContainer}>
                 <View style={styles.cardContent}>
                     <Text style={styles.memberCardTitle}>{item.name}</Text>
                 </View>
-                {!isDelete ? (<TouchableOpacity
+                {!isUserDelete ? (<TouchableOpacity
                     style={styles.deleteButton}
-                    onPress={() => handlePrompt(item.user_id)}
+                    onPress={() => handleUserDelete(item.user_id)}
                 >
                     <Text style={styles.deleteButtonText}>Delete</Text>
                 </TouchableOpacity>
@@ -169,13 +206,11 @@ export default function AddMembersScreen() {
     }
 
     const handleDeleteMember = (memberId) => {
-        console.log("Line 129:", tripId)
-        console.log("Line 139:", memberId)
         const removeUser = { user_id: memberId }
         deleteMemberFromTrip(tripId, removeUser)
 
             .then((response) => {
-                setDeleteState({})
+                setDeleteUserState({})
                 alert(response.data.msg)
             })
             .catch((error) => {
@@ -194,6 +229,8 @@ export default function AddMembersScreen() {
                 console.log("Error deleting trip:", err);
             });
     };
+
+
 
     if (isLoading) {
         return (
@@ -306,6 +343,15 @@ export default function AddMembersScreen() {
                             <Button title="Cancel"
                                 onPress={handleCancel}
                             />
+                        </View>
+                        <View style={styles.deletebtn}>
+                            {!isTripDelete ? (
+                                <Button title="Delete" onPress={handleTripDeleteConfirm} />
+                            ) : (
+                                <>
+                                    <Button title="Are you sure?" onPress={handleDeleteTrip} />
+                                </>
+                            )}
                         </View>
                     </View>
                 </ScrollView>
