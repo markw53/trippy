@@ -22,6 +22,7 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import BackButton from "../components/BackButton";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 export default function AddMembersScreen() {
   const navigation = useNavigation();
@@ -137,9 +138,7 @@ export default function AddMembersScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>Loading trip details...</Text>
-      </View>
+        <LoadingIndicator />
     );
   }
 

@@ -11,6 +11,7 @@ import * as Location from "expo-location";
 import axios from "axios";
 import Header from "../components/Header";
 import { WEATHER_API_KEY } from "@env";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 let MapView, Marker;
 if (Platform.OS === "web") {
@@ -76,9 +77,7 @@ export default function WeatherScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#24565C" />
-      </View>
+      <LoadingIndicator />
     );
   }
 

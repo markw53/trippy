@@ -13,6 +13,7 @@ import TripCard from "../components/TripCard";
 import { fetchTripById, fetchTrips, fetchUserTrips } from "../api";
 import { useAuth } from "../../AuthContext";
 import { ScrollView } from "react-native-gesture-handler";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 export default function HomeScreen({ navigation }) {
   const [trips, setTrips] = useState([]);
@@ -96,10 +97,7 @@ export default function HomeScreen({ navigation }) {
       <Header title="Trippy" />
 
       {isLoading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color="#24565C" />
-          <Text>Loading trips...</Text>
-        </View>
+        <LoadingIndicator />
       ) : isError ? (
         <View style={styles.center}>
           <Text style={styles.friendlymsg}>You have no trips yet.</Text>
