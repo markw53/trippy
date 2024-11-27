@@ -11,7 +11,6 @@ import HomeScreen from "./src/screens/HomeScreen";
 import WeatherScreen from "./src/screens/WeatherScreen";
 import UserScreen from "./src/screens/UserScreen";
 import ChatScreen from "./src/screens/ChatScreen";
-import ItineraryScreen from "./src/screens/ItineraryScreen";
 import SignUpScreen from "./src/screens/SignUpScreen";
 import Header from "./src/components/Header";
 import TripScreen from "./src/screens/TripScreen";
@@ -121,15 +120,7 @@ export default function MainApp() {
                 />
               </Tab.Navigator>
             )}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="Itinerary"
-            component={ItineraryScreen}
-            options={{
-              header: () => <Header title="Itinerary" />,
-            }}
-          />         
+          </Stack.Screen>         
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
