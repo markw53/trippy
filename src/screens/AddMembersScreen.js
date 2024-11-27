@@ -15,6 +15,7 @@ import {
   fetchTripMembers,
   getUserIdByEmail,
   postTripMembers,
+  deleteTripById,
 } from "../api";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Header from "../components/Header";
@@ -31,6 +32,7 @@ export default function AddMembersScreen() {
   const [tripDescription, setTripDescription] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
 
   const [originalTripName, setOriginalTripName] = useState("");
   const [originalTripPic, setOriginalTripPic] = useState("");
@@ -115,6 +117,21 @@ export default function AddMembersScreen() {
         console.log("Error adding member:", err);
       });
     });
+  };
+
+  const handlePrompt = () => {
+    setIsDelete(true);
+  };
+
+  const handleDelete = () => {
+    deleteTripById(tripId)
+      .then(() => {
+        alert("Trip deleted successfully!");
+        navigation.navigate("Home");
+      })
+      .catch((err) => {
+        console.log("Error deleting trip:", err);
+      });
   };
 
   if (isLoading) {
@@ -231,6 +248,16 @@ export default function AddMembersScreen() {
             <View style={styles.cancelbtn}>
               <Button title="Cancel" onPress={handleCancel} />
             </View>
+            <View style={styles.deletebtn}>
+              {!isDelete && <Button title="Delete" onPress={handlePrompt} />}
+              {isDelete && (
+                <Button
+                  title="Are you sure?"
+                  onPress={handleDelete}
+                  style={styles.deletebtnColour}
+                />
+              )}
+            </View>
           </View>
         </ScrollView>
       </View>
@@ -290,6 +317,12 @@ const styles = StyleSheet.create({
   },
   cancelbtn: {
     padding: 10,
+  },
+  deletebtn: {
+    padding: 10,
+  },
+  deletebtnColour: {
+    backgroundColor: "red",
   },
   loadingText: {
     fontSize: 18,
