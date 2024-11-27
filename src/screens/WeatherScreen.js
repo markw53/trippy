@@ -23,9 +23,15 @@ if (Platform.OS === "web") {
   MapView = MapContainer;
   Marker = LeafletMarker;
 } else {
+  try {
   const RNMaps = require("react-native-maps");
   MapView = RNMaps.default;
   Marker = RNMaps.Marker;
+  } catch (error) {
+    console.error("Error loading react-native-maps:", error.message);
+    MapView = null;
+    Marker = null;
+  }
 }
 
 export default function WeatherScreen() {
@@ -79,9 +85,7 @@ export default function WeatherScreen() {
   if (error) {
     return (
       <View style={styles.container}>
-        <Text style={styles.error}>
-          Error: {error}
-        </Text>
+        <Text style={styles.error}>Error: {error}</Text>
       </View>
     );
   }
@@ -93,56 +97,64 @@ export default function WeatherScreen() {
         {weatherData.city.name}, {weatherData.city.country}
       </Text>
 
-      {location &&
-        (Platform.OS === "web"
-          ? <MapView
-              center={[location.latitude, location.longitude]}
-              zoom={13}
-              style={styles.map}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; <a href=&quot;https://www.openstreetmap.org/copyright&quot;>OpenStreetMap</a> contributors"
-              />
-              <Marker position={[location.latitude, location.longitude]}>
-                <Popup>Your Location</Popup>
-              </Marker>
-            </MapView>
-          : <MapView
-              style={styles.map}
-              initialRegion={{
+      {/* Map Component */}
+      {location && MapView ? (
+        Platform.OS === "web" ? (
+          <MapView
+            center={[location.latitude, location.longitude]}
+            zoom={13}
+            style={styles.map}
+          >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <Marker position={[location.latitude, location.longitude]}>
+              <Popup>Your Location</Popup>
+            </Marker>
+          </MapView>
+        ) : (
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: location.latitude,
+              longitude: location.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          >
+            <Marker
+              coordinate={{
                 latitude: location.latitude,
                 longitude: location.longitude,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421
               }}
-            >
-              <Marker
-                coordinate={{
-                  latitude: location.latitude,
-                  longitude: location.longitude
-                }}
-                title="Your Location"
-                description="Current location"
-              />
-            </MapView>)}
+              title="Your Location"
+              description="Current location"
+            />
+          </MapView>
+        )
+      ) : (
+        <Text style={styles.error}>Map component is not available</Text>
+      )}
 
+      {/* Weather Forecast */}
       <FlatList
         data={weatherData.forecast}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) =>
+        keyExtractor={(_, index) => index.toString()}
+        renderItem={({ item }) => (
           <View style={styles.forecastItem}>
             <Text style={styles.date}>
-              {new Date(item.dt * 1000).toDateString()}
+              {new Date(item.dt * 1000).toLocaleDateString(undefined, {
+                weekday: "long",
+                month: "short",
+                day: "numeric",
+              })}
             </Text>
-            <Text style={styles.temp}>
-              Temp: {item.main.temp}°C
-            </Text>
+            <Text style={styles.temp}>Temp: {item.main.temp}°C</Text>
             <Text style={styles.description}>
-              {item.weather[0].description.charAt(0).toUpperCase() +
-                item.weather[0].description.slice(1)}
+              {item.weather[0].description
+                .charAt(0)
+                .toUpperCase() + item.weather[0].description.slice(1)}
             </Text>
-          </View>}
+          </View>
+        )}
         contentContainerStyle={styles.list}
       />
     </View>
