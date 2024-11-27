@@ -51,7 +51,7 @@ export default function MainApp() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    // <SafeAreaView style={{ flex: 1 }}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Tabs">
@@ -123,6 +123,6 @@ export default function MainApp() {
           </Stack.Screen>         
         </Stack.Navigator>
       </NavigationContainer>
-    </SafeAreaView>
+    // </SafeAreaView>
   );
 }
