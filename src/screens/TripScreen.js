@@ -29,6 +29,7 @@ const TripScreen = ({ route }) => {
   const { tripId, tripName, tripImage, location } = route.params;
   const [tripStart, setTripStart] = useState("");
   const [tripEnd, setTripEnd] = useState("");
+  const [tripDesc, setTripDesc] = useState("");
   const [itinerary, setItinerary] = useState([]);
   const [possibility, setPossibility] = useState([]);
   const [isItinerary, setIsItinerary] = useState(true);
@@ -78,6 +79,7 @@ const TripScreen = ({ route }) => {
           const tripDetails = response.data.trip;
           setTripStart(tripDetails.start_date);
           setTripEnd(tripDetails.end_date);
+          setTripDesc(tripDetails.description);
         })
         .catch((err) => {
           console.error("Error fetching trip details:", err);
@@ -192,6 +194,9 @@ const TripScreen = ({ route }) => {
             tripId: tripId,
             setIsRefresh: setIsRefresh,
             isRefresh: isRefresh,
+            tripName: tripName,
+            tripImage: tripImage,
+            location: location,
           })
         }
       />
@@ -240,6 +245,7 @@ const TripScreen = ({ route }) => {
                   <Text>
                     {tripStartDate} --- {tripEndDate}
                   </Text>
+                  <Text>{tripDesc}</Text>
                 </View>
               ),
             },
