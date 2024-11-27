@@ -30,6 +30,8 @@ export default function AddMembersScreen() {
     const [members, setMembers] = useState("");
     const [userEmail, setUserEmail] = useState("");
 
+    const [deleteState, setDeleteState] = useState({});
+
     const tripId = 4;
 
     const isFormValid = tripName.trim() !== "" && tripPic.trim() !== "";
@@ -62,7 +64,8 @@ export default function AddMembersScreen() {
         setTripName(originalTripName);
         setTripPic(originalTripPic);
         setOriginalTripDescription(originalTripDescription)
-
+        setUserEmail("")
+        setDeleteState({});
     };
 
     useEffect(() => {
@@ -97,19 +100,39 @@ export default function AddMembersScreen() {
             })
     }, [members])
 
-    const renderMembers = ({ item }) => (
-        <View style={styles.memberCardContainer}>
-            <View style={styles.cardContent}>
-                <Text style={styles.memberCardTitle}>{item.name}</Text>
+
+
+    const handlePrompt = (userId) => {
+        setDeleteState((previousState) => ({
+            ...previousState,
+            [userId]: !previousState[userId],
+        }))
+    }
+
+    const renderMembers = ({ item }) => {
+        const isDelete = deleteState[item.user_id] || false
+        return (
+            <View style={styles.memberCardContainer}>
+                <View style={styles.cardContent}>
+                    <Text style={styles.memberCardTitle}>{item.name}</Text>
+                </View>
+                {!isDelete ? (<TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handlePrompt(item.user_id)}
+                >
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                </TouchableOpacity>
+                )
+                    : (<TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => handleDeleteMember(item.user_id)}
+                    >
+                        <Text style={styles.deleteButtonText}>Are you sure?</Text>
+                    </TouchableOpacity>
+                    )}
             </View>
-            <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => { handleDeleteMember(item.user_id) }}
-            >
-                <Text style={styles.deleteButtonText}>Delete</Text>
-            </TouchableOpacity>
-        </View>
-    );
+        );
+    }
 
     const addMember = () => {
         getUserIdByEmail(userEmail)
@@ -119,6 +142,9 @@ export default function AddMembersScreen() {
                     "user_id": userId,
                 }
                 postTripMembers(tripId, newMember)
+                    .then(() => {
+                        setUserEmail("")
+                    })
                     .catch((err) => {
                         console.log("Error adding member:", err);
                     })
@@ -132,6 +158,7 @@ export default function AddMembersScreen() {
         deleteMemberFromTrip(tripId, removeUser)
 
             .then((response) => {
+                setDeleteState({})
                 alert(response.data.msg)
             })
             .catch((error) => {

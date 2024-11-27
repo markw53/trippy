@@ -97,5 +97,5 @@ export const getUserIdByEmail = (userEmail) => {
 };
 
 export const deleteMemberFromTrip = (tripId, removeUser) => {
-  return axios.delete(`${apiBase}/trips/4/members/`, removeUser);
+  return axios.delete(`${apiBase}/trips/${tripId}/members/`, { data: removeUser });
 }
