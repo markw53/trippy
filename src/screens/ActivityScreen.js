@@ -17,7 +17,8 @@ import LoadingIndicator from "../components/LoadingIndicator";
 
 const ActivityScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { activityId, tripId, isRefresh } = route.params;
+  const { activityId, tripId, isRefresh, tripName, tripImage, location } =
+    route.params;
   const [activityName, setActivityName] = useState("");
   const [time, setTime] = useState("");
   const [votes, setVotes] = useState("");
@@ -181,7 +182,14 @@ const ActivityScreen = ({ route }) => {
       <Header title="Trippy" />
       <BackButton
         title="Back"
-        onPress={() => navigation.goBack()}
+        onPress={() =>
+          navigation.navigate("Trip", {
+            tripId: tripId,
+            tripName: tripName,
+            tripImage: tripImage,
+            location: location,
+          })
+        }
         style={[styles.button, styles.back]}
       />
       {isLoading ? (
