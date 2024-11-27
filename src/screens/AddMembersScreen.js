@@ -147,8 +147,11 @@ export default function AddMembersScreen() {
     <View style={styles.container}>
       <Header title="Trippy" />
       <View style={styles.content}>
-        <ScrollView>
-          <BackButton title={"Back"} onPress={() => navigation.goBack()} />
+
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={{ color: "#24565C", fontSize: 16 }}>Back</Text>
+          </TouchableOpacity>
+
           <Text style={styles.text}>Trip Settings</Text>
           <View style={styles.imageContainer}>
             <Image
@@ -258,8 +261,7 @@ export default function AddMembersScreen() {
               )}
             </View>
           </View>
-        </ScrollView>
-      </View>
+        </View>
     </View>
   );
 }

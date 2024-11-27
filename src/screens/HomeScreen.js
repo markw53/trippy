@@ -94,7 +94,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
-
+  
       {isLoading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#24565C" />
@@ -113,26 +113,27 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
       ) : (
-        <ScrollView>
-          <View style={styles.content}>
-            <Text style={styles.text}>My trips</Text>
-          </View>
-          <FlatList
-            data={trips}
-            renderItem={renderTrip}
-            keyExtractor={(item) => item.trip_id.toString()}
-            numColumns={2}
-            contentContainerStyle={styles.cardsContainer}
-            scrollEnabled={false}
-          />
-          <View>
-            <Button
-              title="Add trip"
-              style={styles.button}
-              onPress={handleCreateTrip}
-            />
-          </View>
-        </ScrollView>
+        <FlatList
+          data={trips}
+          renderItem={renderTrip}
+          keyExtractor={(item) => item.trip_id.toString()}
+          numColumns={2}
+          contentContainerStyle={styles.cardsContainer}
+          ListHeaderComponent={
+            <View style={styles.content}>
+              <Text style={styles.text}>My trips</Text>
+            </View>
+          }
+          ListFooterComponent={
+            <View>
+              <Button
+                title="Add trip"
+                style={styles.button}
+                onPress={handleCreateTrip}
+              />
+            </View>
+          }
+        />
       )}
     </View>
   );
