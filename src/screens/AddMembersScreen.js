@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
     FlatList
 } from "react-native";
-import { fetchTripById, patchTripDetails, fetchTripMembers, getUserIdByEmail, postTripMembers } from "../api";
+import { fetchTripById, patchTripDetails, fetchTripMembers, getUserIdByEmail, postTripMembers, deleteMemberFromTrip } from "../api";
 
 import Header from "../components/Header";
 import Button from "../components/Button";
@@ -30,7 +30,7 @@ export default function AddMembersScreen() {
     const [members, setMembers] = useState("");
     const [userEmail, setUserEmail] = useState("");
 
-    const tripId = 8;
+    const tripId = 4;
 
     const isFormValid = tripName.trim() !== "" && tripPic.trim() !== "";
 
@@ -98,9 +98,18 @@ export default function AddMembersScreen() {
     }, [members])
 
     const renderMembers = ({ item }) => (
-        <Card
-            title={item.name}
-        />
+        <View style={styles.memberCardContainer}>
+            <View style={styles.cardContent}>
+                <Text style={styles.memberCardTitle}>{item.name}</Text>
+            </View>
+            <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDeleteMember}
+            >
+                <Text style={styles.deleteButtonText}>Delete</Text>
+            </TouchableOpacity>
+            console.log(item.id);
+        </View>
     );
 
     const addMember = () => {
@@ -114,6 +123,17 @@ export default function AddMembersScreen() {
                     .catch((err) => {
                         console.log("Error adding member:", err);
                     })
+            })
+    }
+
+    const handleDeleteMember = () => {
+        deleteMemberFromTrip(tripId, memberId)
+            .then((response) => {
+                alert(response.data.msg)
+            })
+            .catch((error) => {
+                console.error("Error removing member:", error)
+                alert("Failed to remove member. Please try again.")
             })
     }
 
@@ -190,8 +210,7 @@ export default function AddMembersScreen() {
                             data={members}
                             renderItem={renderMembers}
                             keyExtractor={(item) => item.name.toString()}
-                            contentContainerStyle={styles.cardsContainer}
-                        //   scrollEnabled={false}
+                            contentContainerStyle={styles.memberardsContainer}
                         />
                     </View>
                     <View>
@@ -209,7 +228,7 @@ export default function AddMembersScreen() {
                         />
                         <View style={styles.addMemberbtn}>
                             <Button title="Add Member"
-                                style={styles.button}
+                                style={styles.addMemberbutton}
                                 onPress={addMember}
                             />
                         </View>
@@ -322,6 +341,7 @@ const styles = StyleSheet.create({
     },
     confirmationbtnsContainer: {
         marginTop: 50,
+        marginBottom: 10,
         color: "#fff",
     },
     tripNameheading: {
@@ -332,7 +352,7 @@ const styles = StyleSheet.create({
     },
     textCurrentMembers: {
         marginTop: 20,
-        marginBottom: 10,
+        marginBottom: 5,
         fontSize: 20,
         color: "#24565C",
         fontWeight: "bold",
@@ -340,7 +360,7 @@ const styles = StyleSheet.create({
     },
     textAddMembers: {
         marginTop: 20,
-        marginBottom: 5,
+        marginBottom: 1,
         fontSize: 20,
         color: "#24565C",
         fontWeight: "bold",
@@ -356,8 +376,43 @@ const styles = StyleSheet.create({
         height: 100,
         textAlignVertical: "top"
     },
-    cardsContainer: {
+    memberardsContainer: {
         paddingVertical: 0
+    },
+    memberCardContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginVertical: 8,
+        padding: 16,
+        backgroundColor: "#fff",
+        borderRadius: 8,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        borderWidth: 1.5,
+        borderColor: "#24565C",
+
+    },
+    memberCardContent: {
+        flex: 1,
+    },
+    memberCardTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#333",
+    },
+    deleteButton: {
+        backgroundColor: "#ff4d4d",
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 4,
+    },
+    deleteButtonText: {
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: 14,
     },
 
 });
