@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
- } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons"; 
+} from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import ItineraryButton from "../components/ItineraryButtons";
 import Header from "../components/Header";
 import Card from "../components/Card";
@@ -180,7 +180,8 @@ const TripScreen = ({ route }) => {
     });
     return (
       <Card
-        title={activity.item.activity_name}a
+        title={activity.item.activity_name}
+        a
         time={activity.item.time}
         votes={activity.item.votes}
         content={activity.item.description}
@@ -220,26 +221,31 @@ const TripScreen = ({ route }) => {
     >
       <View style={styles.container}>
         <Header title="Trippy" />
-        <TouchableOpacity onPress={handleNavigationToSettings}>
-          <MaterialIcons name="settings" size={24} color="#24565C" />
-        </TouchableOpacity>
-  
+
         <FlatList
           data={[
             {
-              id: 'tripDetails',
+              id: "tripDetails",
               component: (
-                <View style={styles.section}>
-                  <Text style={styles.title}>{tripName}</Text>
-                  <Text>{tripStartDate} --- {tripEndDate}</Text>
-                  
-                    </View>
-                 
-                
+                <View style={styles.topSection}>
+                  <View style={styles.topRow}>
+                    <Text style={styles.title}>{tripName}</Text>
+                    <TouchableOpacity onPress={handleNavigationToSettings}>
+                      <MaterialIcons
+                        name="settings"
+                        size={26}
+                        color="#24565C"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <Text>
+                    {tripStartDate} --- {tripEndDate}
+                  </Text>
+                </View>
               ),
             },
             {
-              id: 'tabs',
+              id: "tabs",
               component: (
                 <View style={styles.tabs}>
                   <ItineraryButton
@@ -258,7 +264,7 @@ const TripScreen = ({ route }) => {
               ),
             },
             {
-              id: 'dynamicSection',
+              id: "dynamicSection",
               component: (
                 <View style={styles.cards}>
                   {isLoading ? (
@@ -268,7 +274,9 @@ const TripScreen = ({ route }) => {
                     </View>
                   ) : itinerary.length === 0 && possibility.length === 0 ? (
                     <View style={styles.center}>
-                      <Text style={styles.friendlymsg}>No activities found for this trip.</Text>
+                      <Text style={styles.friendlymsg}>
+                        No activities found for this trip.
+                      </Text>
                       <Text style={styles.friendlymsgBold}>Add one!</Text>
                     </View>
                   ) : (
@@ -277,7 +285,9 @@ const TripScreen = ({ route }) => {
                         <FlatList
                           data={itinerary}
                           renderItem={renderActivity}
-                          keyExtractor={(activity) => activity.activity_id.toString()}
+                          keyExtractor={(activity) =>
+                            activity.activity_id.toString()
+                          }
                           numColumns={1}
                         />
                       )}
@@ -285,7 +295,9 @@ const TripScreen = ({ route }) => {
                         <FlatList
                           data={possibility}
                           renderItem={renderActivity}
-                          keyExtractor={(activity) => activity.activity_id.toString()}
+                          keyExtractor={(activity) =>
+                            activity.activity_id.toString()
+                          }
                           numColumns={1}
                         />
                       )}
@@ -295,7 +307,7 @@ const TripScreen = ({ route }) => {
               ),
             },
             {
-              id: 'eventSection',
+              id: "eventSection",
               component: (
                 <View style={styles.section}>
                   {isEvent ? (
@@ -382,7 +394,6 @@ const TripScreen = ({ route }) => {
       </View>
     </KeyboardAvoidingView>
   );
- 
 };
 
 const styles = StyleSheet.create({
@@ -394,6 +405,17 @@ const styles = StyleSheet.create({
     padding: 0,
     flexGrow: 1,
   },
+  topSection: {
+    marginTop: 20,
+    marginBottom: 24,
+    marginHorizontal: 20,
+  },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 0,
+  },
   center: {
     flex: 1,
     justifyContent: "center",
@@ -404,7 +426,7 @@ const styles = StyleSheet.create({
   section: {
     marginTop: 40,
     marginBottom: 24,
-    marginLeft: 10,
+    marginHorizontal: 15,
   },
   eventBotton: {
     marginTop: 5,
@@ -444,6 +466,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginHorizontal: 20,
+    marginTop: 10,
   },
   input: {
     backgroundColor: "#fff",
@@ -456,9 +480,9 @@ const styles = StyleSheet.create({
   },
   cards: {
     flex: 1,
-    marginTop: 40,
+    marginTop: 30,
     marginBottom: 24,
-    marginLeft: 10,
+    marginHorizontal: 15,
   },
   datePicker: {
     height: 120,
