@@ -13,6 +13,7 @@ import TripCard from "../components/TripCard";
 import { fetchTripById, fetchTrips, fetchUserTrips } from "../api";
 import { useAuth } from "../../AuthContext";
 import { ScrollView } from "react-native-gesture-handler";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 export default function HomeScreen({ navigation }) {
   const [trips, setTrips] = useState([]);
@@ -57,15 +58,14 @@ export default function HomeScreen({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      if (
-        navigation.getState()?.routes?.some((route) => route.params?.newTrip)
-      ) {
-        const newTrip = navigation
-          .getState()
-          .routes.find((route) => route.params?.newTrip).params.newTrip;
-
+      const newTrip = navigation
+        .getState()
+        ?.routes?.find((route) => route.name === "HomeScreen")?.params?.newTrip;
+  
+      if (newTrip) {
         setTrips((prevTrips) => [newTrip, ...prevTrips]);
-
+  
+        // Clear the `newTrip` parameter after handling it
         navigation.setParams({ newTrip: null });
       }
     }, [navigation])
@@ -95,12 +95,9 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
-
+  
       {isLoading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color="#24565C" />
-          <Text>Loading trips...</Text>
-        </View>
+        <LoadingIndicator />
       ) : isError ? (
         <View style={styles.center}>
           <Text style={styles.friendlymsg}>You have no trips yet.</Text>
@@ -114,26 +111,27 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
       ) : (
-        <ScrollView>
-          <View style={styles.content}>
-            <Text style={styles.text}>My trips</Text>
-          </View>
-          <FlatList
-            data={trips}
-            renderItem={renderTrip}
-            keyExtractor={(item) => item.trip_id.toString()}
-            numColumns={2}
-            contentContainerStyle={styles.cardsContainer}
-            scrollEnabled={false}
-          />
-          <View>
-            <Button
-              title="Add trip"
-              style={styles.button}
-              onPress={handleCreateTrip}
-            />
-          </View>
-        </ScrollView>
+        <FlatList
+          data={trips}
+          renderItem={renderTrip}
+          keyExtractor={(item) => item.trip_id.toString()}
+          numColumns={2}
+          contentContainerStyle={styles.cardsContainer}
+          ListHeaderComponent={
+            <View style={styles.content}>
+              <Text style={styles.text}>My trips</Text>
+            </View>
+          }
+          ListFooterComponent={
+            <View>
+              <Button
+                title="Add trip"
+                style={styles.button}
+                onPress={handleCreateTrip}
+              />
+            </View>
+          }
+        />
       )}
     </View>
   );

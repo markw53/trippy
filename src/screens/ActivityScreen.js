@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Header from "../components/Header";
 import {
   activityVote,
   deleteActivity,
@@ -9,13 +8,16 @@ import {
   moveToItinerary,
   moveToPossibility,
 } from "../api";
+import { useNavigation } from "@react-navigation/native";
+import Header from "../components/Header";
 import Card from "../components/Card";
 import Button from "../components/Button";
-import { useNavigation } from "@react-navigation/native";
+import BackButton from "../components/BackButton";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const ActivityScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { activityId, tripId, setIsRefresh, isRefresh } = route.params;
+  const { activityId, tripId, isRefresh } = route.params;
   const [activityName, setActivityName] = useState("");
   const [time, setTime] = useState("");
   const [votes, setVotes] = useState("");
@@ -27,7 +29,20 @@ const ActivityScreen = ({ route }) => {
   const [hasVoted, setHasVoted] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
 
-  //CALLUM TESTING
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Button
+          title="Refresh"
+          onPress={() => {
+            // Trigger the refresh logic here, if needed
+            // Example: trigger a state update in the parent component
+          }}
+        />
+      ),
+    });
+  }, [navigation]);
+
   useEffect(() => {
     AsyncStorage.getItem("votedActivities")
       .then((votedActivities) => {
@@ -153,9 +168,7 @@ const ActivityScreen = ({ route }) => {
   };
 
   const isoDate = date;
-
   const dateObj = new Date(isoDate);
-
   const readableDate = dateObj.toLocaleDateString("en-GB", {
     weekday: "short",
     year: "numeric",
@@ -166,16 +179,13 @@ const ActivityScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
-      <Button
-        title="<"
+      <BackButton
+        title="Back"
         onPress={() => navigation.goBack()}
         style={[styles.button, styles.back]}
       />
       {isLoading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Loading trips...</Text>
-        </View>
+        <LoadingIndicator />
       ) : (
         <Card
           title={activityName}
@@ -248,7 +258,9 @@ const styles = StyleSheet.create({
   },
   back: {
     alignSelf: "flex-start",
-    marginLeft: 10,
+    marginLeft: 0,
+    marginBottom: 10,
+    marginTop: 15,
   },
 });
 

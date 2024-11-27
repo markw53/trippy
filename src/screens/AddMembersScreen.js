@@ -1,63 +1,106 @@
 import React, { useState, useEffect } from "react";
 import {
-    View,
-    Text,
-    StyleSheet,
-    TextInput,
-    Image,
-    ScrollView,
-    TouchableOpacity,
-    FlatList
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
 } from "react-native";
+
 import { fetchTripById, patchTripDetails, fetchTripMembers, getUserIdByEmail, postTripMembers, deleteMemberFromTrip } from "../api";
+
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import Header from "../components/Header";
 import Button from "../components/Button";
-
 import Card from "../components/Card";
+import BackButton from "../components/BackButton";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 export default function AddMembersScreen() {
-    const [tripName, setTripName] = useState("");
-    const [tripPic, setTripPic] = useState("");
-    const [tripDescription, setTripDescription] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { tripId } = route.params;
+  const [tripName, setTripName] = useState("");
+  const [tripPic, setTripPic] = useState("");
+  const [tripDescription, setTripDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
+  const [originalTripName, setOriginalTripName] = useState("");
+  const [originalTripPic, setOriginalTripPic] = useState("");
+  const [originalTripDescription, setOriginalTripDescription] = useState("");
+  const [members, setMembers] = useState([]);
+  const [userEmail, setUserEmail] = useState("");
+  const isFormValid = tripName.trim() !== "" && tripPic.trim() !== "";
 
-    const [originalTripName, setOriginalTripName] = useState("")
-    const [originalTripPic, setOriginalTripPic] = useState("")
-    const [originalTripDescription, setOriginalTripDescription] = useState("")
+  const [deleteState, setDeleteState] = useState({});
 
-    const [members, setMembers] = useState("");
-    const [userEmail, setUserEmail] = useState("");
+ 
 
-    const [deleteState, setDeleteState] = useState({});
+  const handleSubmit = () => {
+    const updateTrip = {
+      trip_id: tripId,
+      trip_name: tripName,
+      trip_img_url: tripPic,
+      description: tripDescription,
+    };
+    patchTripDetails(updateTrip)
+      .then((response) => {
+        const updatedTrip = response.data.trip;
 
-    const tripId = 4;
 
-    const isFormValid = tripName.trim() !== "" && tripPic.trim() !== "";
+        setOriginalTripName(updatedTrip.trip_name || tripName);
+        setOriginalTripPic(updatedTrip.trip_img_url || tripPic);
+        setOriginalTripDescription(updateTrip.description || tripDescription);
 
-    const handleSubmit = () => {
-        const updateTrip = {
-            trip_id: tripId,
-            trip_name: tripName,
-            trip_img_url: tripPic,
-            description: tripDescription,
-        }
-        patchTripDetails(updateTrip)
-            .then((response) => {
-                const updatedTrip = response.data.trip;
+        alert("Trip details updated successfully!");
+      })
+      .catch((error) => {
+        alert("Failed to update trip details. Please try again.");
+        console.error("Error in patching trip details:", error);
+      });
+  };
 
-                setOriginalTripName(updatedTrip.trip_name || tripName);
-                setOriginalTripPic(updatedTrip.trip_img_url || tripPic);
-                setOriginalTripDescription(updateTrip.description || tripDescription)
+  const handleCancel = () => {
+    // Revert to original values
+    setTripName(originalTripName);
+    setTripPic(originalTripPic);
+    setOriginalTripDescription(originalTripDescription);
+  };
 
-                alert("Trip details updated successfully!");
-            })
-            .catch((error) => {
-                alert("Failed to update trip details. Please try again.");
-                console.error("Error in patching trip details:", error);
-            })
-    }
+  useEffect(() => {
+    fetchTripById(tripId)
+      .then((response) => {
+        const data = response.data.trip;
+        setTripName(data.trip_name || "");
+        setTripPic(data.trip_img_url || "");
+        setTripDescription(data.description || "");
+        setOriginalTripName(data.trip_name || "");
+        setOriginalTripPic(data.trip_img_url || "");
+        setOriginalTripDescription(data.description || "");
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching trip details:", error);
+        setIsError(true);
+        setIsLoading(false);
+      });
+    fetchTripMembers(tripId)
+      .then((response) => {
+        const data = response.data.members;
+        setMembers(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching member details:", error);
+        setIsError(true);
+        setIsLoading(false);
+      });
+  }, []);
+
 
     const handleCancel = () => {
         // Revert to original values
@@ -68,37 +111,54 @@ export default function AddMembersScreen() {
         setDeleteState({});
     };
 
-    useEffect(() => {
-        fetchTripById(tripId)
-            .then((response) => {
-                const data = response.data.trip;
+  const renderMembers = ({ item }) => <Card title={item.name} />;
 
-                setTripName(data.trip_name || "");
-                setTripPic(data.trip_img_url || "");
-                setTripDescription(data.description || "");
+  const isValidEmail = (email) => {
+    const regex = /\S+@\S+\.\S+/;
+    return regex.test(email);
+  };
 
-                setOriginalTripName(data.trip_name || "");
-                setOriginalTripPic(data.trip_img_url || "");
-                setOriginalTripDescription(data.description || "");
 
-                setIsLoading(false)
-            })
-            .catch((error) => {
-                console.error("Error fetching trip details:", error);
-                setIsError(true)
-                setIsLoading(false)
-            })
-        fetchTripMembers(tripId)
-            .then((response) => {
-                const data = response.data.members;
-                setMembers(data)
-            })
-            .catch((error) => {
-                console.error("Error fetching member details:", error);
-                setIsError(true)
-                setIsLoading(false)
-            })
-    }, [members])
+  const addMember = () => {
+    if (!isValidEmail(userEmail)) {
+      alert("Please enter a valid email.");
+      return;
+    }
+
+    getUserIdByEmail(userEmail).then((response) => {
+      const userId = response.data.userId.user_id;
+      const newMember = {
+        user_id: userId,
+      };
+      postTripMembers(tripId, newMember)
+      .then(() => {
+        alert("Menber added successfully!");
+      })
+      .catch((err) => {
+        console.log("Error adding member:", err);
+        alert("Failed to add member.");
+      });
+    }).catch((err) => {
+      console.log("Error fetching user ID:", err);
+      alert("Invalid email address.");
+    });
+  };
+
+  const handlePrompt = () => {
+    setIsDelete(true);
+  };
+
+  const handleDelete = () => {
+    deleteTripById(tripId)
+      .then(() => {
+        alert("Trip deleted successfully!");
+        navigation.navigate("Home");
+      })
+      .catch((err) => {
+        console.log("Error deleting trip:", err);
+      });
+  };
+
 
 
 
@@ -134,13 +194,36 @@ export default function AddMembersScreen() {
         );
     }
 
-    const addMember = () => {
-        getUserIdByEmail(userEmail)
-            .then((response) => {
-                const userId = response.data.userId.user_id;
-                const newMember = {
-                    "user_id": userId,
+  if (isLoading) {
+    return (
+        <LoadingIndicator />
+    );
+  }
+
+
+  return (
+    <View style={styles.container}>
+      <Header title="Trippy" />
+      <View style={styles.content}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={{ color: "#24565C", fontSize: 16 }}>Back</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.text}>Trip Settings</Text>
+          <View style={styles.imageContainer}>
+            <Image
+              style={styles.image}
+              source={{
+                uri:
+                  originalTripPic ||
+                  "https://reactnative.dev/img/tiny_logo.png",
+              }}
+              onError={(e) => {
+                console.error("Image failed to load:", e.nativeEvent.error);
+                if (!originalTripPic) {
+                  setTripPic("https://reactnative.dev/img/tiny_logo.png");
                 }
+
                 postTripMembers(tripId, newMember)
                     .then(() => {
                         setUserEmail("")
@@ -165,14 +248,6 @@ export default function AddMembersScreen() {
                 console.error("Error removing member:", error)
                 alert("Failed to remove member. Please try again.")
             })
-    }
-
-    if (isLoading) {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.loadingText}>Loading trip details...</Text>
-            </View>
-        );
     }
 
     return (
@@ -284,8 +359,20 @@ export default function AddMembersScreen() {
                     </View>
                 </ScrollView>
             </View>
+            <View style={styles.deletebtn}>
+              {!isDelete && <Button title="Delete" onPress={handlePrompt} />}
+              {isDelete && (
+                <Button
+                  title="Are you sure?"
+                  onPress={handleDelete}
+                  style={styles.deletebtnColour}
+                />
+              )}
+            </View>
+          </View>
         </View>
-    )
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

@@ -7,9 +7,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
-  TextInput,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import ItineraryButton from "../components/ItineraryButtons";
 import Header from "../components/Header";
 import Card from "../components/Card";
@@ -19,11 +20,9 @@ import {
   fetchTripById,
   postPossibility,
 } from "../api";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
+import { FlatList } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
-import { WEATHER_API_KEY } from "@env";
 
 const TripScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -45,7 +44,6 @@ const TripScreen = ({ route }) => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [weatherData, setWeatherData] = useState(null);
   const { latitude, longitude } = location;
 
   useEffect(() => {
@@ -90,22 +88,9 @@ const TripScreen = ({ route }) => {
     }
   }, [tripId, isRefresh]);
 
-  useEffect(() => {
-    const fetchWeather = async (latitude, longitude) => {
-      try {
-        const weatherResponse = await axios.get(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
-        );
-        setWeatherData(weatherResponse.data);
-      } catch (error) {
-        console.error("Error fetching weather:", error);
-      }
-    };
-
-    if (tripName) {
-      fetchWeather();
-    }
-  }, [tripName, tripId]);
+  const handleNavigationToSettings = () => {
+    navigation.navigate("AddMembersScreen", { tripId, tripName });
+  };
 
   const showDatePicker = () => {
     setIsShowPicker(true);
@@ -186,9 +171,7 @@ const TripScreen = ({ route }) => {
 
   const renderActivity = (activity) => {
     const isoDate = activity.item.date;
-
     const dateObj = new Date(isoDate);
-
     const readableDate = dateObj.toLocaleDateString("en-GB", {
       weekday: "short",
       year: "numeric",
@@ -237,155 +220,176 @@ const TripScreen = ({ route }) => {
     >
       <View style={styles.container}>
         <Header title="Trippy" />
-        <ScrollView>
-          <View style={styles.section}>
-            <Text style={styles.title}>{tripName}</Text>
-            <Text>
-              {tripStartDate} --- {tripEndDate}
-            </Text>
-            {weatherData && (
-              <View style={styles.weather}>
-                <Text>{weatherData.main.temp}°C</Text>
-                <Image
-                  source={{
-                    uri: `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}.png`,
-                  }}
-                  style={{
-                    width: 50,
-                    height: 50,
-                    alignItems: "right",
-                  }}
-                />
-              </View>
-            )}
-          </View>
-          <View style={styles.tabs}>
-            <ItineraryButton
-              title="Itinerary"
-              onPress={handleItinerary}
-              style={styles.button}
-              isActive={isItinerary}
-            />
-            <ItineraryButton
-              title="Possibility"
-              onPress={handlePossibility}
-              style={styles.button}
-              isActive={isPossibility}
-            />
-          </View>
 
-          {/* Dynamic section: show loading, error, or data */}
-          {isLoading ? (
-            <View style={styles.center}>
-              <ActivityIndicator size="small" color="#24565C" />
-              <Text>Loading activities...</Text>
-            </View>
-          ) : itinerary.length === 0 && possibility.length === 0 ? (
-            <View style={styles.center}>
-              <Text style={styles.friendlymsg}>
-                No activities found for this trip.
-              </Text>
-              <Text style={styles.friendlymsgBold}>Add one!</Text>
-            </View>
-          ) : (
-            <View style={styles.cards}>
-              {isItinerary && (
-                <FlatList
-                  data={itinerary}
-                  renderItem={renderActivity}
-                  keyExtractor={(activity) => activity.activity_id.toString()}
-                  numColumns={1}
-                />
-              )}
-              {isPossibility && (
-                <FlatList
-                  data={possibility}
-                  renderItem={renderActivity}
-                  keyExtractor={(activity) => activity.activity_id.toString()}
-                  numColumns={1}
-                />
-              )}
-            </View>
-          )}
-
-          {isEvent && (
-            <ScrollView>
-              <View style={styles.section}>
-                <TextInput
-                  placeholder="Title"
-                  value={title}
-                  onChange={handleTitleChange}
-                  style={styles.input}
-                  placeholderTextColor="#888"
-                />
-                <TouchableOpacity
-                  style={styles.dateField}
-                  onPress={handleShowTimePicker}
-                >
-                  <Text style={styles.title}>
-                    {time.toLocaleTimeString() || "Select Time"}
+        <FlatList
+          data={[
+            {
+              id: "tripDetails",
+              component: (
+                <View style={styles.topSection}>
+                  <View style={styles.topRow}>
+                    <Text style={styles.title}>{tripName}</Text>
+                    <TouchableOpacity onPress={handleNavigationToSettings}>
+                      <MaterialIcons
+                        name="settings"
+                        size={26}
+                        color="#24565C"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <Text>
+                    {tripStartDate} --- {tripEndDate}
                   </Text>
-                </TouchableOpacity>
-                {showTimePicker && (
-                  <DateTimePicker
-                    mode="time"
-                    display="spinner"
-                    value={time}
-                    onChange={handleTimeChange}
-                    style={styles.datePicker}
+                </View>
+              ),
+            },
+            {
+              id: "tabs",
+              component: (
+                <View style={styles.tabs}>
+                  <ItineraryButton
+                    title="Itinerary"
+                    onPress={handleItinerary}
+                    style={styles.button}
+                    isActive={isItinerary}
                   />
-                )}
-                <TextInput
-                  multiline={true}
-                  numberOfLines={4}
-                  placeholder="Description"
-                  value={description}
-                  onChange={handleDescriptionChange}
-                  style={styles.input}
-                  placeholderTextColor="#888"
-                />
-                <TextInput
-                  placeholder="Image"
-                  value={activityImage}
-                  onChange={handleActivityImageChange}
-                  style={styles.input}
-                  placeholderTextColor="#888"
-                />
-                <TouchableOpacity
-                  style={styles.dateField}
-                  onPress={showDatePicker}
-                >
-                  <Text style={styles.title}>
-                    {date.toLocaleDateString() || "Select Date"}
-                  </Text>
-                </TouchableOpacity>
-                {isShowPicker && (
-                  <DateTimePicker
-                    mode="date"
-                    display="spinner"
-                    value={date}
-                    onChange={handleDate}
-                    style={styles.datePicker}
+                  <ItineraryButton
+                    title="Possibility"
+                    onPress={handlePossibility}
+                    style={styles.button}
+                    isActive={isPossibility}
                   />
-                )}
-                <ItineraryButton
-                  title="Post"
-                  onPress={handlePostEvent}
-                  style={styles.button}
-                />
-              </View>
-            </ScrollView>
-          )}
-          {!isEvent && (
-            <View style={styles.eventBotton}>
-              <ItineraryButton
-                title={"Add Event"}
-                onPress={handleEvent}
-                style={styles.button}
-              />
-            </View>
-          )}
-        </ScrollView>
+                </View>
+              ),
+            },
+            {
+              id: "dynamicSection",
+              component: (
+                <View style={styles.cards}>
+                  {isLoading ? (
+                    <View style={styles.center}>
+                      <ActivityIndicator size="small" color="#24565C" />
+                      <Text>Loading activities...</Text>
+                    </View>
+                  ) : itinerary.length === 0 && possibility.length === 0 ? (
+                    <View style={styles.center}>
+                      <Text style={styles.friendlymsg}>
+                        No activities found for this trip.
+                      </Text>
+                      <Text style={styles.friendlymsgBold}>Add one!</Text>
+                    </View>
+                  ) : (
+                    <>
+                      {isItinerary && (
+                        <FlatList
+                          data={itinerary}
+                          renderItem={renderActivity}
+                          keyExtractor={(activity) =>
+                            activity.activity_id.toString()
+                          }
+                          numColumns={1}
+                        />
+                      )}
+                      {isPossibility && (
+                        <FlatList
+                          data={possibility}
+                          renderItem={renderActivity}
+                          keyExtractor={(activity) =>
+                            activity.activity_id.toString()
+                          }
+                          numColumns={1}
+                        />
+                      )}
+                    </>
+                  )}
+                </View>
+              ),
+            },
+            {
+              id: "eventSection",
+              component: (
+                <View style={styles.section}>
+                  {isEvent ? (
+                    <>
+                      <TextInput
+                        placeholder="Title"
+                        value={title}
+                        onChange={handleTitleChange}
+                        style={styles.input}
+                        placeholderTextColor="#888"
+                      />
+                      <TouchableOpacity
+                        style={styles.dateField}
+                        onPress={handleShowTimePicker}
+                      >
+                        <Text style={styles.title}>
+                          {time.toLocaleTimeString() || "Select Time"}
+                        </Text>
+                      </TouchableOpacity>
+                      {showTimePicker && (
+                        <DateTimePicker
+                          mode="time"
+                          display="spinner"
+                          value={time}
+                          onChange={handleTimeChange}
+                          style={styles.datePicker}
+                        />
+                      )}
+                      <TextInput
+                        multiline={true}
+                        numberOfLines={4}
+                        placeholder="Description"
+                        value={description}
+                        onChange={handleDescriptionChange}
+                        style={styles.input}
+                        placeholderTextColor="#888"
+                      />
+                      <TextInput
+                        placeholder="Image"
+                        value={activityImage}
+                        onChange={handleActivityImageChange}
+                        style={styles.input}
+                        placeholderTextColor="#888"
+                      />
+                      <TouchableOpacity
+                        style={styles.dateField}
+                        onPress={showDatePicker}
+                      >
+                        <Text style={styles.title}>
+                          {date.toLocaleDateString() || "Select Date"}
+                        </Text>
+                      </TouchableOpacity>
+                      {isShowPicker && (
+                        <DateTimePicker
+                          mode="date"
+                          display="spinner"
+                          value={date}
+                          onChange={handleDate}
+                          style={styles.datePicker}
+                        />
+                      )}
+                      <ItineraryButton
+                        title="Post"
+                        onPress={handlePostEvent}
+                        style={styles.button}
+                      />
+                    </>
+                  ) : (
+                    <View style={styles.eventBotton}>
+                      <ItineraryButton
+                        title="Add Event"
+                        onPress={handleEvent}
+                        style={styles.button}
+                      />
+                    </View>
+                  )}
+                </View>
+              ),
+            },
+          ]}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => item.component}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -400,6 +404,17 @@ const styles = StyleSheet.create({
     padding: 0,
     flexGrow: 1,
   },
+  topSection: {
+    marginTop: 20,
+    marginBottom: 24,
+    marginHorizontal: 20,
+  },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 0,
+  },
   center: {
     flex: 1,
     justifyContent: "center",
@@ -410,7 +425,7 @@ const styles = StyleSheet.create({
   section: {
     marginTop: 40,
     marginBottom: 24,
-    marginLeft: 10,
+    marginHorizontal: 15,
   },
   eventBotton: {
     marginTop: 5,
@@ -450,6 +465,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginHorizontal: 20,
+    marginTop: 10,
   },
   input: {
     backgroundColor: "#fff",
@@ -462,9 +479,9 @@ const styles = StyleSheet.create({
   },
   cards: {
     flex: 1,
-    marginTop: 40,
+    marginTop: 30,
     marginBottom: 24,
-    marginLeft: 10,
+    marginHorizontal: 15,
   },
   datePicker: {
     height: 120,
