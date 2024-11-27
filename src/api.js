@@ -55,7 +55,7 @@ export const fetchTripMembers = (tripId) => {
 };
 
 export const postTripMembers = (tripId, userId) => {
-  return axios.post(`${apiBase}/trips/${tripId}/members`, userId)
+  return axios.post(`${apiBase}/trips/${tripId}/members`, userId);
 };
 
 export const fetchRoomMessages = (roomId) => {
@@ -81,7 +81,6 @@ export const patchUserDetails = (userData) => {
   return axios.patch(`${apiBase}/users/${userData.user_id}`, userData);
 };
 
-
 export const moveToPossibility = (tripId, activityId) => {
   return axios.patch(`${apiBase}/trips/${tripId}/activities/${activityId}`, {
     in_itinerary: false,
@@ -89,9 +88,13 @@ export const moveToPossibility = (tripId, activityId) => {
 };
 
 export const patchTripDetails = (tripData) => {
-  return axios.patch(`${apiBase}/trips/${tripData.trip_id}`, tripData)
+  return axios.patch(`${apiBase}/trips/${tripData.trip_id}`, tripData);
 };
 
 export const getUserIdByEmail = (userEmail) => {
-  return axios.get(`${apiBase}/users/email/${userEmail}`, userEmail)
+  return axios.get(`${apiBase}/users/email/${userEmail}`, userEmail);
+};
+
+export const deleteTripById = (tripId) => {
+  return axios.delete(`${apiBase}/trips/${tripId}`);
 };
