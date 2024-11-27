@@ -105,21 +105,20 @@ export default function AddMembersScreen() {
     const handlePrompt = (userId) => {
         setDeleteState((previousState) => ({
             ...previousState,
-            [userId]: true, // Show "Are you sure?"
+            [userId]: true,
         }));
-
-        // Automatically revert state after 5 seconds if no action is taken
+        n
         setTimeout(() => {
             setDeleteState((previousState) => {
                 if (previousState[userId]) {
                     return {
                         ...previousState,
-                        [userId]: false // Revert back to "Delete"
+                        [userId]: false
                     };
                 }
-                return previousState; // No change if already reverted
+                return previousState;
             });
-        }, 5000); // Adjust timeout duration as needed
+        }, 5000);
     };
 
     const renderMembers = ({ item }) => {
