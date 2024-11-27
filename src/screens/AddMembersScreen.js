@@ -45,37 +45,6 @@ export default function AddMembersScreen() {
     const [userEmail, setUserEmail] = useState("");
     const isFormValid = tripName.trim() !== "" && tripPic.trim() !== "";
 
-    // useEffect(() => {
-    //     fetchTripById(tripId)
-    //         .then((response) => {
-    //             const data = response.data.trip;
-
-    //             setTripName(data.trip_name || "");
-    //             setTripPic(data.trip_img_url || "");
-    //             setTripDescription(data.description || "");
-
-    //             setOriginalTripName(data.trip_name || "");
-    //             setOriginalTripPic(data.trip_img_url || "");
-    //             setOriginalTripDescription(data.description || "");
-
-    //             setIsLoading(false)
-    //         })
-    //         .catch((error) => {
-    //             console.error("Error fetching trip details:", error);
-    //             setIsError(true)
-    //             setIsLoading(false)
-    //         })
-    //     fetchTripMembers(tripId)
-    //         .then((response) => {
-    //             const data = response.data.members;
-    //             setMembers(data)
-    //         })
-    //         .catch((error) => {
-    //             console.error("Error fetching member details:", error);
-    //             setIsError(true)
-    //             setIsLoading(false)
-    //         })
-    // }, [])
     useEffect(() => {
         fetchTripById(tripId)
             .then((response) => {
@@ -96,7 +65,7 @@ export default function AddMembersScreen() {
                 setIsError(true);
                 setIsLoading(false);
             });
-    }, []); // Only fetch the trip details on component mount.
+    }, []);
 
     useEffect(() => {
         fetchTripMembers(tripId)
@@ -108,8 +77,7 @@ export default function AddMembersScreen() {
                 setIsError(true);
                 setIsLoading(false);
             });
-    }, [members]); // Fetch members when `tripId` changes.
-
+    }, [members]); 
 
     const handleSubmit = () => {
         const updateTrip = {
@@ -135,7 +103,6 @@ export default function AddMembersScreen() {
     }
 
     const handleCancel = () => {
-        // Revert to original values
         setTripName(originalTripName);
         setTripPic(originalTripPic);
         setOriginalTripDescription(originalTripDescription)
@@ -229,8 +196,6 @@ export default function AddMembersScreen() {
                 console.log("Error deleting trip:", err);
             });
     };
-
-
 
     if (isLoading) {
         return (
