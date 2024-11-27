@@ -12,6 +12,7 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import { fetchUserDetails, patchUserDetails } from "../api";
 import { useAuth } from "../../AuthContext";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 export default function UserScreen() {
   const { user, loading: authLoading } = useAuth();
@@ -76,9 +77,7 @@ export default function UserScreen() {
 
   if (loading || authLoading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>Loading user details...</Text>
-      </View>
+      <LoadingIndicator />
     );
   }
 

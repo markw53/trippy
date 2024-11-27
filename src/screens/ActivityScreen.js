@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Header from "../components/Header";
 import {
   activityVote,
   deleteActivity,
@@ -9,10 +8,12 @@ import {
   moveToItinerary,
   moveToPossibility,
 } from "../api";
+import { useNavigation } from "@react-navigation/native";
+import Header from "../components/Header";
 import Card from "../components/Card";
 import Button from "../components/Button";
-import BackButton from "../components/BackButton"
-import { useNavigation } from "@react-navigation/native";
+import BackButton from "../components/BackButton";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const ActivityScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -184,10 +185,7 @@ const ActivityScreen = ({ route }) => {
         style={[styles.button, styles.back]}
       />
       {isLoading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Loading trips...</Text>
-        </View>
+        <LoadingIndicator />
       ) : (
         <Card
           title={activityName}
@@ -262,7 +260,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 0,
     marginBottom: 10,
-    marginTop: 15
+    marginTop: 15,
   },
 });
 
