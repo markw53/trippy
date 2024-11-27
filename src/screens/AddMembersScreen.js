@@ -19,12 +19,12 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Header from "../components/Header";
 import Button from "../components/Button";
-
 import Card from "../components/Card";
 
 export default function AddMembersScreen() {
   const navigation = useNavigation();
   const route = useRoute();
+  const { tripId } = route.params;
 
   const [tripName, setTripName] = useState("");
   const [tripPic, setTripPic] = useState("");
@@ -38,8 +38,6 @@ export default function AddMembersScreen() {
 
   const [members, setMembers] = useState("");
   const [userEmail, setUserEmail] = useState("");
-
-  const tripId = 8;
 
   const isFormValid = tripName.trim() !== "" && tripPic.trim() !== "";
 
@@ -132,9 +130,9 @@ export default function AddMembersScreen() {
       <Header title="Trippy" />
       <View style={styles.content}>
         <ScrollView>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text style={{ color: "#24565C", fontSize: 16 }}>Back</Text>
-            </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={{ color: "#24565C", fontSize: 16 }}>Back</Text>
+          </TouchableOpacity>
           <Text style={styles.text}>Trip Settings</Text>
           <View style={styles.imageContainer}>
             <Image

@@ -17,6 +17,7 @@ import Header from "./src/components/Header";
 import TripScreen from "./src/screens/TripScreen";
 import TripCreationScreen from "./src/screens/TripCreationScreen";
 import ActivityScreen from "./src/screens/ActivityScreen";
+import AddMembersScreen from "./src/screens/AddMembersScreen";
 
 export default function MainApp() {
   const { user } = useAuth();
@@ -33,6 +34,7 @@ export default function MainApp() {
           header: () => <Header title="Trip Details" />,
         }}
       />
+      <Stack.Screen name="AddMembersScreen" component={AddMembersScreen}/>
       <Stack.Screen name="Activity" component={ActivityScreen} />
       <Stack.Screen name="TripCreationScreen" component={TripCreationScreen} />
     </Stack.Navigator>
