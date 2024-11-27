@@ -26,7 +26,7 @@ export default function MainApp() {
 
   const HomeStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Homescreen" component={HomeScreen} />
       <Stack.Screen
         name="Trip"
         component={TripScreen}

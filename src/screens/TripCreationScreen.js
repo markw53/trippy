@@ -105,7 +105,7 @@ export default function TripCreationScreen({ navigation }) {
       .then((response) => {
         console.log(tripData);
         alert("Trip created successfully!");
-        navigation.navigate("Home");
+        navigation.navigate("Homescreen");
       })
       .catch((error) => {
         console.error(
