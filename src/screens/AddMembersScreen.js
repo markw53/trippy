@@ -15,11 +15,13 @@ import {
   fetchTripMembers,
   getUserIdByEmail,
   postTripMembers,
+  deleteTripById,
 } from "../api";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import Card from "../components/Card";
+import BackButton from "../components/BackButton";
 
 export default function AddMembersScreen() {
   const navigation = useNavigation();
@@ -31,6 +33,7 @@ export default function AddMembersScreen() {
   const [tripDescription, setTripDescription] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
 
   const [originalTripName, setOriginalTripName] = useState("");
   const [originalTripPic, setOriginalTripPic] = useState("");
@@ -117,6 +120,21 @@ export default function AddMembersScreen() {
     });
   };
 
+  const handlePrompt = () => {
+    setIsDelete(true);
+  };
+
+  const handleDelete = () => {
+    deleteTripById(tripId)
+      .then(() => {
+        alert("Trip deleted successfully!");
+        navigation.navigate("Home");
+      })
+      .catch((err) => {
+        console.log("Error deleting trip:", err);
+      });
+  };
+
   if (isLoading) {
     return (
       <View style={styles.container}>
@@ -129,9 +147,11 @@ export default function AddMembersScreen() {
     <View style={styles.container}>
       <Header title="Trippy" />
       <View style={styles.content}>
+
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Text style={{ color: "#24565C", fontSize: 16 }}>Back</Text>
           </TouchableOpacity>
+
           <Text style={styles.text}>Trip Settings</Text>
           <View style={styles.imageContainer}>
             <Image
@@ -230,6 +250,16 @@ export default function AddMembersScreen() {
             <View style={styles.cancelbtn}>
               <Button title="Cancel" onPress={handleCancel} />
             </View>
+            <View style={styles.deletebtn}>
+              {!isDelete && <Button title="Delete" onPress={handlePrompt} />}
+              {isDelete && (
+                <Button
+                  title="Are you sure?"
+                  onPress={handleDelete}
+                  style={styles.deletebtnColour}
+                />
+              )}
+            </View>
           </View>
         </View>
     </View>
@@ -288,6 +318,12 @@ const styles = StyleSheet.create({
   },
   cancelbtn: {
     padding: 10,
+  },
+  deletebtn: {
+    padding: 10,
+  },
+  deletebtnColour: {
+    backgroundColor: "red",
   },
   loadingText: {
     fontSize: 18,

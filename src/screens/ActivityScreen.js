@@ -11,6 +11,7 @@ import {
 } from "../api";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import BackButton from "../components/BackButton"
 import { useNavigation } from "@react-navigation/native";
 
 const ActivityScreen = ({ route }) => {
@@ -177,8 +178,8 @@ const ActivityScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
-      <Button
-        title="<"
+      <BackButton
+        title="Back"
         onPress={() => navigation.goBack()}
         style={[styles.button, styles.back]}
       />
@@ -259,7 +260,9 @@ const styles = StyleSheet.create({
   },
   back: {
     alignSelf: "flex-start",
-    marginLeft: 10,
+    marginLeft: 0,
+    marginBottom: 10,
+    marginTop: 15
   },
 });
 
