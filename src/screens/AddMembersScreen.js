@@ -104,11 +104,10 @@ export default function AddMembersScreen() {
             </View>
             <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={handleDeleteMember}
+                onPress={() => { handleDeleteMember(item.user_id) }}
             >
                 <Text style={styles.deleteButtonText}>Delete</Text>
             </TouchableOpacity>
-            console.log(item.id);
         </View>
     );
 
@@ -126,8 +125,12 @@ export default function AddMembersScreen() {
             })
     }
 
-    const handleDeleteMember = () => {
-        deleteMemberFromTrip(tripId, memberId)
+    const handleDeleteMember = (memberId) => {
+        console.log("Line 129:", tripId)
+        console.log("Line 139:", memberId)
+        const removeUser = { user_id: memberId }
+        deleteMemberFromTrip(tripId, removeUser)
+
             .then((response) => {
                 alert(response.data.msg)
             })
