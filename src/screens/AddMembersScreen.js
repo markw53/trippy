@@ -144,7 +144,7 @@ export default function AddMembersScreen() {
             style={styles.deleteButton}
             onPress={() => handleUserDelete(item.user_id)}
           >
-            <Text style={styles.deleteButtonText}>Delete Trip</Text>
+            <Text style={styles.deleteButtonText}>Delete</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
@@ -309,7 +309,7 @@ export default function AddMembersScreen() {
                 {!isTripDelete ? (
                   // <Button title="Delete" onPress={handleTripDeleteConfirm} />
                   <TouchableOpacity style={{ alignItems: "center", marginTop: 20, marginBottom: 20 }}onPress={handleTripDeleteConfirm}>
-                    <Text style={styles.deleteText}>Delete</Text>
+                    <Text style={styles.deleteText}>Delete Trip</Text>
                   </TouchableOpacity>
                 ) : (
                   // <Button title="Are you sure?" onPress={handleDeleteTrip} />
