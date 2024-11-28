@@ -150,16 +150,16 @@ const styles = StyleSheet.create({
     textAlign: "right"
   },
   appName: {
-    fontSize: 50,
-    fontFamily: "DancingScript-Regular",
+    fontSize: 60,
+    fontFamily: "DancingScript-Bold",
     fontWeight: "bold",
     color: "#24565C",
     textAlign: "center",
     marginVertical: 20
   },
   tagline: {
-    fontSize: 16,
-    fontFamily: "DancingScript-Regular",
+    fontSize: 24,
+    fontFamily: "DancingScript-Bold",
     color: "#24565C",
     textAlign: "center",
     marginBottom: 30
