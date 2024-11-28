@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useAuth } from "./AuthContext";
 import { SafeAreaView } from "react-native";
+import { LogBox } from 'react-native';
 
 import LoginScreen from "./src/screens/LoginScreen";
 import HomeScreen from "./src/screens/HomeScreen";
@@ -17,6 +18,12 @@ import TripScreen from "./src/screens/TripScreen";
 import TripCreationScreen from "./src/screens/TripCreationScreen";
 import ActivityScreen from "./src/screens/ActivityScreen";
 import AddMembersScreen from "./src/screens/AddMembersScreen";
+
+//ERROR SUPRESSION
+LogBox.ignoreAllLogs(true);
+global.ErrorUtils.setGlobalHandler(() => {});
+console.error = () => {};
+//ERROR SUPRESSION
 
 export default function MainApp() {
   const { user } = useAuth();
