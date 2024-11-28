@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: 60,
-    fontFamily: "DancingScript-Regular",
+    fontFamily: "DancingScript-Bold",
     fontWeight: "bold",
     color: "#24565C",
     textAlign: "center",
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   tagline: {
     fontSize: 24,
-    fontFamily: "DancingScript-Regular",
+    fontFamily: "DancingScript-Bold",
     color: "#24565C",
     textAlign: "center",
     marginBottom: 30
