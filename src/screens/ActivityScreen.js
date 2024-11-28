@@ -229,7 +229,7 @@ const ActivityScreen = ({ route }) => {
       )}
       {inItinerary && (
         <Button
-          title="Return to Possibility"
+          title="Move to Possibility"
           onPress={handleMoveToPossib}
           style={styles.button}
         />
