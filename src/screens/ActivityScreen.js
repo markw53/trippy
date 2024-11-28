@@ -6,7 +6,7 @@ import {
   deleteActivity,
   getActivity,
   moveToItinerary,
-  moveToPossibility
+  moveToPossibility,
 } from "../api";
 import { useNavigation } from "@react-navigation/native";
 import Header from "../components/Header";
@@ -17,13 +17,7 @@ import LoadingIndicator from "../components/LoadingIndicator";
 
 const ActivityScreen = ({ route }) => {
   const navigation = useNavigation();
-  const {
-    activityId,
-    tripId,
-    tripName,
-    tripImage,
-    location
-  } = route.params;
+  const { activityId, tripId, tripName, tripImage, location } = route.params;
   const [activityName, setActivityName] = useState("");
   const [time, setTime] = useState("");
   const [votes, setVotes] = useState("");
@@ -37,36 +31,33 @@ const ActivityScreen = ({ route }) => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-      navigation.setOptions({
-        headerRight: () => (
-          <Button
-            title="Refresh"
-            onPress={() => {
-              setRefreshKey((prevKey) => prevKey + 1);
-            }}
-          />
+    navigation.setOptions({
+      headerRight: () => (
+        <Button
+          title="Refresh"
+          onPress={() => {
+            setRefreshKey((prevKey) => prevKey + 1);
+          }}
+        />
       ),
     });
-   }, [navigation]);
-
-  useEffect(
-    () => {
-      AsyncStorage.getItem("votedActivities")
-        .then(votedActivities => {
-          if (votedActivities) {
-            const votedSet = JSON.parse(votedActivities);
-            setHasVoted(votedSet.includes(activityId));
-          }
-        })
-        .catch(err => {
-          console.log("Error reading voting status:", err);
-        });
-    },
-    [activityId]
-  );
+  }, [navigation]);
 
   useEffect(() => {
-      getActivity(tripId, activityId)
+    AsyncStorage.getItem("votedActivities")
+      .then((votedActivities) => {
+        if (votedActivities) {
+          const votedSet = JSON.parse(votedActivities);
+          setHasVoted(votedSet.includes(activityId));
+        }
+      })
+      .catch((err) => {
+        console.log("Error reading voting status:", err);
+      });
+  }, [activityId]);
+
+  useEffect(() => {
+    getActivity(tripId, activityId)
       .then((response) => {
         const activityData = response.data.activity;
         setActivityName(activityData.activity_name);
@@ -81,37 +72,42 @@ const ActivityScreen = ({ route }) => {
       .catch((err) => {
         console.log("Error fetching activity:", err);
       });
-    },[tripId, activityId, refreshKey]);
+  }, [tripId, activityId, refreshKey]);
 
   const handleVote = () => {
     if (hasVoted) {
-      setVotes(currVotes => currVotes - 1);
+      setVotes((currVotes) => currVotes - 1);
       activityVote(tripId, activityId, votes - 1)
         .then(() => {
           AsyncStorage.getItem("votedActivities")
-            .then(votedActivities => {
-              const votedSet = votedActivities ? JSON.parse(votedActivities) : [];
-              const updatedSet = votedSet.filter(id => id !== activityId);
-              return AsyncStorage.setItem("votedActivities", JSON.stringify(updatedSet));
+            .then((votedActivities) => {
+              const votedSet = votedActivities
+                ? JSON.parse(votedActivities)
+                : [];
+              const updatedSet = votedSet.filter((id) => id !== activityId);
+              return AsyncStorage.setItem(
+                "votedActivities",
+                JSON.stringify(updatedSet)
+              );
             })
             .then(() => {
               setHasVoted(false);
               setRefreshKey((prevKey) => prevKey + 1);
             })
-            .catch(err => {
+            .catch((err) => {
               console.log("Error updating vote storage:", err);
             });
         })
-        .catch(err => {
+        .catch((err) => {
           console.log("Error with removing vote:", err);
-          setVotes(currVotes => currVotes + 1);
+          setVotes((currVotes) => currVotes + 1);
         });
     } else {
-      setVotes(currVotes => currVotes + 1);
+      setVotes((currVotes) => currVotes + 1);
       activityVote(tripId, activityId, votes + 1)
         .then(() => {
           AsyncStorage.getItem("votedActivities")
-            .then(votedActivities => {
+            .then((votedActivities) => {
               const votedSet = votedActivities
                 ? JSON.parse(votedActivities)
                 : [];
@@ -125,13 +121,13 @@ const ActivityScreen = ({ route }) => {
               setHasVoted(true);
               setRefreshKey((prevKey) => prevKey + 1);
             })
-            .catch(err => {
+            .catch((err) => {
               console.log("Error updating vote storage:", err);
             });
         })
-        .catch(err => {
+        .catch((err) => {
           console.log("Error with voting:", err);
-          setVotes(currVotes => currVotes - 1);
+          setVotes((currVotes) => currVotes - 1);
         });
     }
   };
@@ -143,7 +139,12 @@ const ActivityScreen = ({ route }) => {
   const handleDelete = () => {
     deleteActivity(tripId, activityId)
       .then(() => {
-        navigation.goBack();
+        navigation.navigate("Trip", {
+          tripId: tripId,
+          tripName: tripName,
+          tripImage: tripImage,
+          location: location,
+        });
       })
       .catch((err) => {
         console.log("Error deleting activity:", err);
@@ -153,10 +154,14 @@ const ActivityScreen = ({ route }) => {
   const handleMoveToItin = () => {
     moveToItinerary(tripId, activityId)
       .then(() => {
-        setIsRefresh(!isRefresh);
-        navigation.goBack();
+        navigation.navigate("Trip", {
+          tripId: tripId,
+          tripName: tripName,
+          tripImage: tripImage,
+          location: location,
+        });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("Error with moving to itinerary:", err);
       });
   };
@@ -164,9 +169,14 @@ const ActivityScreen = ({ route }) => {
   const handleMoveToPossib = () => {
     moveToPossibility(tripId, activityId)
       .then(() => {
-        navigation.goBack();
+        navigation.navigate("Trip", {
+          tripId: tripId,
+          tripName: tripName,
+          tripImage: tripImage,
+          location: location,
+        });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("Error with moving to possibility:", err);
       });
   };
@@ -177,7 +187,7 @@ const ActivityScreen = ({ route }) => {
     weekday: "short",
     year: "numeric",
     month: "short",
-    day: "numeric"
+    day: "numeric",
   });
 
   return (
@@ -190,36 +200,39 @@ const ActivityScreen = ({ route }) => {
             tripId: tripId,
             tripName: tripName,
             tripImage: tripImage,
-            location: location
-          })}
+            location: location,
+          })
+        }
         style={[styles.button, styles.back]}
       />
-      {isLoading ? ( 
+      {isLoading ? (
         <LoadingIndicator />
       ) : (
-         <Card
-            title={activityName}
-            time={time}
-            votes={votes}
-            content={description}
-            image={image}
-            date={readableDate}
-          />
-        )}
+        <Card
+          title={activityName}
+          time={time}
+          votes={votes}
+          content={description}
+          image={image}
+          date={readableDate}
+        />
+      )}
       <Button
         title={hasVoted ? "Remove Vote" : "Vote"}
         onPress={handleVote}
         style={styles.button}
         disabled={hasVoted}
       />
-      {!isDelete &&
-        <Button title="Delete" onPress={handlePrompt} style={styles.button} />}
-      {isDelete &&
+      {!isDelete && (
+        <Button title="Delete" onPress={handlePrompt} style={styles.button} />
+      )}
+      {isDelete && (
         <Button
           title="Are you sure?"
           onPress={handleDelete}
           style={styles.button}
-        />}
+        />
+      )}
       {!inItinerary && (
         <Button
           title="Add to Itinerary"
@@ -233,7 +246,7 @@ const ActivityScreen = ({ route }) => {
           onPress={handleMoveToPossib}
           style={styles.button}
         />
-        )}
+      )}
     </View>
   );
 };
@@ -241,35 +254,35 @@ const ActivityScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F7F7"
+    backgroundColor: "#F7F7F7",
   },
   cardsContainer: {
-    padding: 16
+    padding: 16,
   },
   scrollContainer: {
     padding: 0,
-    flexGrow: 1
+    flexGrow: 1,
   },
   section: {
     marginTop: 70,
-    marginBottom: 24
+    marginBottom: 24,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8
+    marginBottom: 8,
   },
   button: {
     marginTop: 10,
     paddingHorizontal: 40,
-    marginHorizontal: "auto"
+    marginHorizontal: "auto",
   },
   back: {
     alignSelf: "flex-start",
     marginLeft: 0,
     marginBottom: 10,
-    marginTop: 15
-  }
+    marginTop: 15,
+  },
 });
 
 export default ActivityScreen;
