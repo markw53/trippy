@@ -211,7 +211,6 @@ export default function AddMembersScreen() {
         <FlatList
           ListHeaderComponent={
             <>
-              <View></View>
               <View style={styles.topSection}>
                 <Text style={styles.text}>Trip Settings</Text>
                 <Image
