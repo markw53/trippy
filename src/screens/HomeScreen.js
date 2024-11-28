@@ -152,6 +152,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#24565C",
     fontWeight: "bold",
+    marginBottom: 30
   },
   cardsContainer: {
     padding: 30,
