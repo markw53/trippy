@@ -210,7 +210,7 @@ const ActivityScreen = ({ route }) => {
       ) : (
         <Card
           title={activityName}
-          time={time}
+          time={time.substring(0, 5)}
           votes={votes}
           content={description}
           image={image}
