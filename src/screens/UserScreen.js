@@ -86,7 +86,6 @@ export default function UserScreen() {
       <Header title="Trippy" />
       <View style={styles.content}>
         <ScrollView>
-          <Text style={styles.text}>Welcome to your Profile!</Text>
           <View style={styles.imageContainer}>
             <Image
               style={styles.image}
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    paddingHorizontal: 20,
   },
   text: {
     marginBottom: 30,
@@ -182,6 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   imageContainer: {
+    marginTop: 50,
     alignItems: "center",
   },
   image: {
