@@ -144,7 +144,7 @@ export default function AddMembersScreen() {
             style={styles.deleteButton}
             onPress={() => handleUserDelete(item.user_id)}
           >
-            <Text style={styles.deleteButtonText}>Delete</Text>
+            <Text style={styles.deleteButtonText}>Delete Trip</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
