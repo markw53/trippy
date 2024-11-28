@@ -1,17 +1,25 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+// import { useNavigation } from "@react-navigation/native";
 
-const TripCard = ({ tripName, tripImage, onPress }) => {
-  const navigation = useNavigation();
+const TripCard = ({ tripName, tripImage, onPress, spanFullWidth }) => {
+  // const navigation = useNavigation();
+  // const [cardWidth, setCardWidth] = useState(0);
+
+  // Calculate the height dynamically based on the card's width
+  // const imageHeight = cardWidth * 0.66; // Adjust the ratio as per your design
 
   return (
-    <TouchableOpacity onPress={onPress} style={styles.card}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.card, spanFullWidth && styles.fullWidthCard]}
+      onLayout={(event) => setCardWidth(event.nativeEvent.layout.width)}
+    >
       <Image
         source={
           tripImage ? { uri: tripImage } : require("../assets/placeholder.png")
         }
-        style={styles.image}
+        style={[styles.image, spanFullWidth && styles.fullWidthCard]}
       />
       <Text style={styles.name}>{tripName}</Text>
     </TouchableOpacity>
@@ -22,7 +30,8 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 16,
+    // padding: 16,
+    paddingBottom: 8,
     alignItems: "center",
     borderRadius: 20,
     shadowColor: "#000",
@@ -32,11 +41,20 @@ const styles = StyleSheet.create({
     elevation: 3,
     margin: 8,
   },
+  fullWidthCard: {
+    flex: 1,
+    width: "100%",
+  },
   image: {
-    width: 150,
+    width: "100%",
     height: 100,
-    borderRadius: 8,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     marginBottom: 8,
+    // paddingHorizontal: 20
+  },
+  fullWithImage: {
+    height: 150,
   },
   name: {
     fontSize: 16,

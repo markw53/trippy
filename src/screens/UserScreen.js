@@ -90,7 +90,7 @@ export default function UserScreen() {
             <Image
               style={styles.image}
               source={{
-                uri: originalProfilePic || "https://reactnative.dev/img/tiny_logo.png",
+                uri: originalProfilePic || "https://i.imgur.com/kiE5OWQ.png",
               }}
               onError={(e) => {
                 console.error("Image failed to load:", e.nativeEvent.error);
