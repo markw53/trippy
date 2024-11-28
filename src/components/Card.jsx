@@ -17,7 +17,7 @@ const Card = ({ title, content, style, onPress, time, image, date, votes }) => {
       {title && <Text style={styles.title}>{title}</Text>}
       {time && <Text style={styles.time}>{time}</Text>}
       {date && <Text style={styles.time}>{date}</Text>}
-      {votes && <Text style={styles.content}>votes:{votes}</Text>}
+      {votes && <Text style={styles.content}>Votes: {votes}</Text>}
       {content && <Text style={styles.content}>{content}</Text>}
     </TouchableOpacity>
   );

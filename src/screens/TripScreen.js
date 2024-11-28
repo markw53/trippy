@@ -183,7 +183,7 @@ const TripScreen = ({ route }) => {
     return (
       <Card
         title={activity.item.activity_name}
-        time={activity.item.time}
+        time={activity.item.time.substring(0,5)}
         votes={activity.item.votes}
         content={activity.item.description}
         image={activity.item.activity_img_url}
@@ -314,7 +314,7 @@ const TripScreen = ({ route }) => {
             {
               id: "eventSection",
               component: (
-                <View style={styles.section}>
+                <View style={styles.isEventSection}>
                   {isEvent ? (
                     <>
                       <TextInput
@@ -328,8 +328,8 @@ const TripScreen = ({ route }) => {
                         style={styles.dateField}
                         onPress={handleShowTimePicker}
                       >
-                        <Text style={styles.title}>
-                          {time.toLocaleTimeString() || "Select Time"}
+                        <Text style={styles.dateText}>
+                          {time.toLocaleTimeString().substring(0,5) || "Select Time"}
                         </Text>
                       </TouchableOpacity>
                       {showTimePicker && (
@@ -361,7 +361,7 @@ const TripScreen = ({ route }) => {
                         style={styles.dateField}
                         onPress={showDatePicker}
                       >
-                        <Text style={styles.title}>
+                        <Text style={styles.dateText}>
                           {date.toLocaleDateString() || "Select Date"}
                         </Text>
                       </TouchableOpacity>
@@ -377,7 +377,7 @@ const TripScreen = ({ route }) => {
                       <ItineraryButton
                         title="Post"
                         onPress={handlePostEvent}
-                        style={styles.button}
+                        style={styles.postButton}
                       />
                     </>
                   ) : (
@@ -433,16 +433,26 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     marginHorizontal: 15,
   },
+  isEventSection: {
+    marginTop: 10,
+    marginBottom: 24,
+    marginHorizontal: 15,
+  },
   eventBotton: {
     marginTop: 5,
     marginBottom: 30,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 8,
   },
   button: {
+    paddingHorizontal: 40,
+    marginHorizontal: "auto",
+  },
+  postButton: {
+    marginTop: 10,
     paddingHorizontal: 40,
     marginHorizontal: "auto",
   },
@@ -501,8 +511,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 12,
     fontSize: 16,
-    justifyContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignItems: "center",
+  },
+  dateText: {
+    fontSize: 16,
   },
 });
 
