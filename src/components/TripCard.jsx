@@ -1,17 +1,25 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+// import { useNavigation } from "@react-navigation/native";
 
 const TripCard = ({ tripName, tripImage, onPress }) => {
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
+  const [cardWidth, setCardWidth] = useState(0);
+
+  // Calculate the height dynamically based on the card's width
+  const imageHeight = cardWidth * 0.66; // Adjust the ratio as per your design
 
   return (
-    <TouchableOpacity onPress={onPress} style={styles.card}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={styles.card}
+      onLayout={(event) => setCardWidth(event.nativeEvent.layout.width)}
+    >
       <Image
         source={
           tripImage ? { uri: tripImage } : require("../assets/placeholder.png")
         }
-        style={styles.image}
+        style={[styles.image, { height: imageHeight, width: cardWidth }]}
       />
       <Text style={styles.name}>{tripName}</Text>
     </TouchableOpacity>
@@ -22,7 +30,8 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 16,
+    // padding: 16,
+    paddingBottom: 8,
     alignItems: "center",
     borderRadius: 20,
     shadowColor: "#000",
@@ -33,10 +42,12 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   image: {
-    width: 150,
-    height: 100,
-    borderRadius: 8,
+    // width: 150,
+    // height: 100,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
     marginBottom: 8,
+    // paddingHorizontal: 20
   },
   name: {
     fontSize: 16,
