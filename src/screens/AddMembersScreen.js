@@ -148,7 +148,7 @@ export default function AddMembersScreen() {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            style={styles.deleteButton}
+            style={styles.deleteConfirmButton}
             onPress={() => handleDeleteMember(item.user_id)}
           >
             <Text style={styles.deleteButtonText}>Are you sure?</Text>
@@ -207,113 +207,121 @@ export default function AddMembersScreen() {
   return (
     <View style={styles.container}>
       <Header title="Trippy" />
-      <FlatList
-        ListHeaderComponent={
-          <>
-            <Text style={styles.text}>Trip Settings</Text>
-            <View style={styles.imageContainer}>
-              <Image
-                style={styles.image}
-                source={{
-                  uri:
-                    originalTripPic ||
-                    "https://reactnative.dev/img/tiny_logo.png",
-                }}
-                onError={(e) => {
-                  console.error("Image failed to load:", e.nativeEvent.error);
-                  if (!originalTripPic) {
-                    setTripPic("https://reactnative.dev/img/tiny_logo.png");
-                  }
-                }}
-              />
-              <Text style={styles.tripNameheading}>{originalTripName}</Text>
-            </View>
-            <View>
-              <Text style={styles.label}>Trip Name:</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={setTripName}
-                value={tripName}
-                numberOfLines={1}
-                multiline={false}
-                textAlignVertical="center"
-                autoCapitalize="none"
-              />
-            </View>
-            <View>
-              <Text style={styles.label}>Trip Picture:</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={setTripPic}
-                value={tripPic}
-                numberOfLines={1}
-                multiline={false}
-                textAlignVertical="center"
-                autoCapitalize="none"
-              />
-            </View>
-            <View>
-              <Text style={styles.label}>Trip Description:</Text>
-              <TextInput
-                style={[styles.input, styles.tripDescription]}
-                onChangeText={setTripDescription}
-                value={tripDescription}
-                numberOfLines={5}
-                scrollEnabled={true}
-                multiline={true}
-                autoCapitalize="none"
-              />
-            </View>
-            <View>
-              <Text style={styles.textAddMembers}>Add Member</Text>
-              <Text style={styles.label}>Members Email:</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={setUserEmail}
-                numberOfLines={1}
-                multiline={false}
-                textAlignVertical="center"
-                autoCapitalize="none"
-                value={userEmail}
-              />
-              <View style={styles.addMemberbtn}>
-                <Button
-                  title="Add Member"
-                  style={styles.button}
-                  onPress={addMember}
+      <View style={styles.content}>
+        <FlatList
+          ListHeaderComponent={
+            <>
+              <View style={styles.topSection}>
+                <Text style={styles.text}>Trip Settings</Text>
+                <Image
+                  style={styles.image}
+                  source={{
+                    uri:
+                      originalTripPic ||
+                      "https://reactnative.dev/img/tiny_logo.png",
+                  }}
+                  onError={(e) => {
+                    console.error("Image failed to load:", e.nativeEvent.error);
+                    if (!originalTripPic) {
+                      setTripPic("https://reactnative.dev/img/tiny_logo.png");
+                    }
+                  }}
+                />
+                <Text style={styles.tripNameheading}>{originalTripName}</Text>
+              </View>
+              <View>
+                <Text style={styles.label}>Trip Name:</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={setTripName}
+                  value={tripName}
+                  numberOfLines={1}
+                  multiline={false}
+                  textAlignVertical="center"
+                  autoCapitalize="none"
                 />
               </View>
+              <View>
+                <Text style={styles.label}>Trip Picture:</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={setTripPic}
+                  value={tripPic}
+                  numberOfLines={1}
+                  multiline={false}
+                  textAlignVertical="center"
+                  autoCapitalize="none"
+                />
+              </View>
+              <View>
+                <Text style={styles.label}>Trip Description:</Text>
+                <TextInput
+                  style={[styles.input, styles.tripDescription]}
+                  onChangeText={setTripDescription}
+                  value={tripDescription}
+                  numberOfLines={5}
+                  scrollEnabled={true}
+                  multiline={true}
+                  autoCapitalize="none"
+                />
+              </View>
+              <View>
+                <Text style={styles.textAddMembers}>Add Member</Text>
+                <Text style={styles.label}>Members Email:</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={setUserEmail}
+                  numberOfLines={1}
+                  multiline={false}
+                  textAlignVertical="center"
+                  autoCapitalize="none"
+                  value={userEmail}
+                />
+                <View style={styles.addMemberbtn}>
+                  <Button
+                    title="Add Member"
+                    style={styles.button}
+                    onPress={addMember}
+                  />
+                </View>
+              </View>
+            </>
+          }
+          data={members}
+          renderItem={renderMembers}
+          keyExtractor={(item) => item.name.toString()}
+          contentContainerStyle={styles.memberardsContainer}
+          ListFooterComponent={
+            <View style={styles.confirmationbtnsContainer}>
+              <View style={styles.saveChangesbtn}>
+                <TouchableOpacity
+                  onPress={handleSubmit}
+                  disabled={!isFormValid}
+                  style={[styles.button, !isFormValid && styles.buttonDisabled]}
+                >
+                  <Text style={styles.buttonText}>Save Changes</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.cancelbtn}>
+                <Button title="Cancel" onPress={handleCancel} />
+              </View>
+              <View style={styles.deletebtn}>
+                {!isTripDelete ? (
+                  // <Button title="Delete" onPress={handleTripDeleteConfirm} />
+                  <TouchableOpacity style={{ alignItems: "center", marginTop: 20, marginBottom: 20 }}onPress={handleTripDeleteConfirm}>
+                    <Text style={styles.deleteText}>Delete Trip</Text>
+                  </TouchableOpacity>
+                ) : (
+                  // <Button title="Are you sure?" onPress={handleDeleteTrip} />
+                  <TouchableOpacity style={{ alignItems: "center", marginTop: 20, marginBottom: 20 }}onPress={handleDeleteTrip}>
+                    <Text style={styles.deleteConfirmText}>Are you sure?</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </>
-        }
-        data={members}
-        renderItem={renderMembers}
-        keyExtractor={(item) => item.name.toString()}
-        contentContainerStyle={styles.memberardsContainer}
-        ListFooterComponent={
-          <View style={styles.confirmationbtnsContainer}>
-            <View style={styles.saveChangesbtn}>
-              <TouchableOpacity
-                onPress={handleSubmit}
-                disabled={!isFormValid}
-                style={[styles.button, !isFormValid && styles.buttonDisabled]}
-              >
-                <Text style={styles.buttonText}>Save Changes</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.cancelbtn}>
-              <Button title="Cancel" onPress={handleCancel} />
-            </View>
-            <View style={styles.deletebtn}>
-              {!isTripDelete ? (
-                <Button title="Delete" onPress={handleTripDeleteConfirm} />
-              ) : (
-                <Button title="Are you sure?" onPress={handleDeleteTrip} />
-              )}
-            </View>
-          </View>
-        }
-      />
+          }
+        />
+      </View>
     </View>
   );
 }
@@ -327,7 +335,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    paddingHorizontal: 20,
   },
   text: {
     marginBottom: 30,
@@ -349,7 +357,8 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
   },
-  imageContainer: {
+  topSection: {
+    marginTop: 20,
     alignItems: "center",
   },
   image: {
@@ -463,6 +472,12 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   deleteButton: {
+    backgroundColor: "#DDBF68",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  deleteConfirmButton: {
     backgroundColor: "#ff4d4d",
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -472,5 +487,13 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 14,
+  },
+  deleteText: {
+    color: "#24565C",
+    fontSize: 16,
+  },
+  deleteConfirmText: {
+    color: "#ff4d4d",
+    fontSize: 16
   },
 });
