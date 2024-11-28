@@ -56,29 +56,29 @@ export default function UserScreen() {
   };
 
   useEffect(() => {
-    fetchUserDetails(user.userId)
-      .then((response) => {
-        const data = response.data.user;
+    if (user) {
+      fetchUserDetails(user.userId)
+        .then((response) => {
+          const data = response.data.user;
 
-        setUserName(data.name || "");
-        setProfilePic(data.avatar_url || "");
-        setEmail(data.email || "");
+          setUserName(data.name || "");
+          setProfilePic(data.avatar_url || "");
+          setEmail(data.email || "");
 
-        setOriginalUserName(data.name || "");
-        setOriginalProfilePic(data.avatar_url || "");
+          setOriginalUserName(data.name || "");
+          setOriginalProfilePic(data.avatar_url || "");
 
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching user details:", error);
-        setLoading(false);
-      });
-  }, [authLoading, user]);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching user details:", error);
+          setLoading(false);
+        });
+      }
+    }, [authLoading, user]);
 
-  if (loading || authLoading) {
-    return (
-      <LoadingIndicator />
-    );
+  if (loading || authLoading || !user) {
+    return <LoadingIndicator />;
   }
 
   return (
