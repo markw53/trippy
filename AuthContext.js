@@ -11,8 +11,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        
+      if (currentUser) {        
         axios
           .get(
             `https://backend-for-trippy.onrender.com/api/users/email/${currentUser.email}`
