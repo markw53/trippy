@@ -334,8 +334,8 @@ const TripScreen = ({ route }) => {
                       </TouchableOpacity>
                       {showTimePicker && (
                         <DateTimePicker
-                          mode="time"
-                          display="spinner"
+                          mode={"time"}
+                          display={"default"}
                           value={time}
                           onChange={handleTimeChange}
                           style={styles.datePicker}
@@ -367,8 +367,8 @@ const TripScreen = ({ route }) => {
                       </TouchableOpacity>
                       {isShowPicker && (
                         <DateTimePicker
-                          mode="date"
-                          display="spinner"
+                          mode={"date"}
+                          display={"default"}
                           value={date}
                           onChange={handleDate}
                           style={styles.datePicker}
