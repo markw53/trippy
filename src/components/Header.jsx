@@ -156,7 +156,8 @@ const styles = StyleSheet.create({
   title: {
     color: "#FFFFFF",
     fontSize: 35,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    fontFamily: "DancingScript-Bold",
   },
   weatherContainer: {
     flexDirection: "row",
