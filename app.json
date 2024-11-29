@@ -2,6 +2,7 @@
   "expo": {
     "name": "Trippy",
     "slug": "Trippy",
+    "newArchEnabled": true, 
     "ios": {
       "bundleIdentifier": "com.southcoders.trippy-app",
       "infoPlist": {
